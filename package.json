@@ -4,15 +4,18 @@
   "main": "main.js",
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
-    "start": "electron ."
+    "start:dev": "concurrently \"yarn run _autobuild\" \"ELECTRON_RELOAD=yes electron .\"",
+    "_autobuild": "rollup -c -w"
   },
   "devDependencies": {
+    "concurrently": "^5.0.0",
     "electron": "^7.1.2",
+    "electron-reload": "^1.5.0",
+    "rollup": "^1.27.4",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-svelte": "^5.1.1"
-  },
-  "dependencies": {
+    "rollup-plugin-svelte": "^5.1.1",
     "svelte": "^3.15.0"
-  }
+  },
+  "dependencies": {}
 }

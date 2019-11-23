@@ -1,5 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 
+require('electron-reload')(__dirname);
+
 function createWindow () {
   let win = new BrowserWindow({
     width: 800,
