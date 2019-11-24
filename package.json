@@ -5,17 +5,48 @@
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
     "start:dev": "concurrently \"yarn run _autobuild\" \"ELECTRON_RELOAD=yes electron .\"",
-    "_autobuild": "rollup -c -w"
+    "test": "jest src",
+    "_autobuild": "yarn rollup -c -w"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.svelte$": "jest-transform-svelte"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "svelte"
+    ],
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-dom/extend-expect"
+    ]
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "plugins": [
+          "@babel/plugin-transform-modules-commonjs"
+        ]
+      }
+    }
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/svelte": "^1.9.1",
+    "babel-jest": "^24.9.0",
     "concurrently": "^5.0.0",
     "electron": "^7.1.2",
     "electron-reload": "^1.5.0",
+    "jest": "^24.9.0",
+    "jest-transform-svelte": "^2.1.0",
     "rollup": "^1.27.4",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^5.1.1",
     "svelte": "^3.15.0"
-  },
-  "dependencies": {}
+  }
 }
