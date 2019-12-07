@@ -2,11 +2,14 @@
   "name": "labler",
   "version": "0.0.1",
   "main": "main.js",
+  "license": "Proprietary",
+  "private": true,
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
-    "start:dev": "concurrently \"yarn run _autobuild\" \"ELECTRON_RELOAD=yes electron .\"",
+    "start:dev": "yarn run _build_backend && concurrently \"yarn run _autobuild_frontend\" \"ELECTRON_RELOAD=yes electron .\"",
     "test": "jest src",
-    "_autobuild": "yarn rollup -c -w"
+    "_autobuild_frontend": "yarn rollup -c -w",
+    "_build_backend": "GO111MODULE=on cd backend && go build -o bin/main cmd/main.go && cd .."
   },
   "jest": {
     "transform": {
@@ -35,6 +38,8 @@
     "@babel/core": "^7.7.4",
     "@babel/plugin-transform-modules-commonjs": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
+    "@rollup/plugin-json": "^4.0.0",
+    "@rollup/plugin-node-resolve": "^6.0.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/svelte": "^1.9.1",
     "babel-jest": "^24.9.0",
@@ -45,8 +50,10 @@
     "jest-transform-svelte": "^2.1.0",
     "rollup": "^1.27.4",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^5.1.1",
     "svelte": "^3.15.0"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
   }
 }
