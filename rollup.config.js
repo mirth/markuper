@@ -1,7 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs'
+import commonjs from 'rollup-plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
-import json from '@rollup/plugin-json';
+import json from '@rollup/plugin-json'; // eslint-disable-line
 
 export default {
   input: 'src/App.js',
@@ -16,10 +16,10 @@ export default {
     }),
     commonjs(),
     svelte({
-      css: function (css) {
+      css(css) {
         css.write('public/bundle.css');
       },
     }),
     json(),
-  ]
-}
+  ],
+};

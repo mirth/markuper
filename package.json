@@ -8,6 +8,7 @@
   "scripts": {
     "start:dev": "yarn run _build_backend && concurrently \"yarn run _autobuild_frontend\" \"ELECTRON_RELOAD=yes electron .\"",
     "test": "jest src",
+    "lint": "yarn run eslint --fix --ignore-path .gitignore .",
     "_autobuild_frontend": "yarn rollup -c -w",
     "_build_backend": "GO111MODULE=on cd backend && go build -o bin/main cmd/main.go && cd .."
   },
@@ -46,6 +47,10 @@
     "concurrently": "^5.0.0",
     "electron": "^7.1.2",
     "electron-reload": "^1.5.0",
+    "eslint": "^6.7.2",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-svelte3": "^2.7.3",
     "jest": "^24.9.0",
     "jest-transform-svelte": "^2.1.0",
     "rollup": "^1.27.4",
