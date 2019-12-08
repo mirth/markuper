@@ -1,15 +1,16 @@
 <script>
-  import config from './config'
-  import axios from 'axios'
+import axios from 'axios';
+import config from './config';
 
-  let name = 'new world';
-  let image = get()
+async function get() {
+  const url = `${config.BACKEND_URL}/api/v1/images`;
+  const resp = await axios.get(url);
+  return resp.data;
+}
 
-  async function get() {
-    const url = config.BACKEND_URL + '/api/v1/images';
-    const resp = await axios.get(url)
-    return resp.data
-  }
+const name = 'new world';
+const image = get();
+
 </script>
 
 <h1>Hello {name}!</h1>
