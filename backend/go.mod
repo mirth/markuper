@@ -8,6 +8,7 @@ require (
 	github.com/google/pprof v0.0.0-20191205061153-f9b734f9ee64 // indirect
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.3
+	github.com/recoilme/pudge v1.0.3 // indirect
 	golang.org/x/arch v0.0.0-20191126211547-368ea8f32fff // indirect
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 // indirect
 	golang.org/x/sys v0.0.0-20191206220618-eeba5f6aabab // indirect
