@@ -8,15 +8,21 @@ async function get() {
   return resp.data;
 }
 
-let image = get();
-
-function fetchNext() {
-  image = get();
+async function fetchNext() {
+  const res = await get();
+  return res;
 }
+
+let image = fetchNext();
+
+function handleClick() {
+  image = fetchNext();
+}
+
 </script>
 
 
-<button on:click={fetchNext}>Next</button>
+<button on:click={handleClick}>Next</button>
 <br />
 {#await image}
 <p>...waiting</p>

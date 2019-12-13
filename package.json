@@ -10,7 +10,7 @@
     "test": "jest src",
     "lint": "yarn run eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",
-    "_build_backend": "GO111MODULE=on cd backend && go build -o bin/main cmd/main.go && cd .."
+    "_build_backend": "GO111MODULE=on cd backend/cmd && go build -o ../bin/main . && cd ../.."
   },
   "jest": {
     "transform": {
