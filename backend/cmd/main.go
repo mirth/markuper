@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"net/http"
 	"os"
 
 	"path/filepath"
+
+	"backend/internal"
 
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/handlers"
@@ -12,42 +16,38 @@ import (
 	"github.com/recoilme/pudge"
 )
 
-func openDB() (*pudge.Db, error) {
-	cfg := &pudge.Config{
-		SyncInterval: 1}
-	db, err := pudge.Open("../bin/db", cfg)
-
+func openDB() {
 	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
 	for i, path := range matches {
-		sk := SampleKey{
+		sk := internal.SampleKey{
 			ProjectID: "project0",
 			SampleID:  int64(i),
 		}
 
-		db.Set(sk, path)
+		pudge.Set(internal.SamplesDB, sk, path)
 	}
 
-	return db, err
+	// return db, err
+}
+
+func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
 }
 
 func main() {
 	r := mux.NewRouter()
 
-	db, err := openDB()
-	if err != nil {
-		panic(err)
-	}
-	s := &testServiceImpl{
-		db: db,
-	}
+	openDB()
+
+	s := &internal.TestServiceImpl{}
 	urlListHandler := httptransport.NewServer(
-		MakeTestEndpoint(s),
+		internal.MakeTestEndpoint(s),
 		httptransport.NopRequestDecoder,
 		encodeResponse,
 	)
 
 	nextHandler := httptransport.NewServer(
-		MakeNextSampleEndpoint(s),
+		internal.MakeNextSampleEndpoint(s),
 		httptransport.NopRequestDecoder,
 		encodeResponse,
 	)
@@ -56,5 +56,6 @@ func main() {
 	r.Handle("/api/v1/next", nextHandler)
 
 	port := "3889"
-	_ = http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, r))
+	err := http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, r))
+	panic(err)
 }

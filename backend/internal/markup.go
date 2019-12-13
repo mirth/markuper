@@ -1,15 +1,20 @@
-package main
+package internal
 
 import (
 	"bytes"
 	"context"
 	"encoding/gob"
-	"encoding/json"
-	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/recoilme/pudge"
 )
+
+var SamplesDB string = "../bin/samples"
+
+type SampleKey struct {
+	ProjectID string
+	SampleID  int64
+}
 
 type URLListResponse struct {
 	Urls []string `json:"urls"`
@@ -22,10 +27,10 @@ type SampleResponse struct {
 type TestService interface {
 	GetURLS() (URLListResponse, error)
 	GetNext() (SampleResponse, error)
+	// Assess(SampleKey) error
 }
 
-type testServiceImpl struct {
-	db *pudge.Db
+type TestServiceImpl struct {
 }
 
 func MakeNextSampleEndpoint(s TestService) endpoint.Endpoint {
@@ -53,8 +58,8 @@ func decodeKey(raw []byte) SampleKey {
 	return key
 }
 
-func (s *testServiceImpl) GetURLS() (URLListResponse, error) {
-	rawKeys, _ := s.db.Keys(SampleKey{}, 0, 0, true)
+func (s *TestServiceImpl) GetURLS() (URLListResponse, error) {
+	rawKeys, err := pudge.Keys(SamplesDB, SampleKey{}, 0, 0, true)
 
 	keys := make([]SampleKey, 0)
 	for _, rawKey := range rawKeys {
@@ -65,36 +70,27 @@ func (s *testServiceImpl) GetURLS() (URLListResponse, error) {
 	samples := make([]string, 0)
 	for _, key := range keys {
 		sample := ""
-		_ = s.db.Get(key, &sample)
+		_ = pudge.Get(SamplesDB, key, &sample)
 		samples = append(samples, sample)
 	}
 
 	return URLListResponse{
 		Urls: samples,
-	}, nil
+	}, err
 }
 
 var offset = 0
 
-func (s *testServiceImpl) GetNext() (SampleResponse, error) {
-	rawKeys, err := s.db.Keys(SampleKey{}, 1, offset, true)
+func (s *TestServiceImpl) GetNext() (SampleResponse, error) {
+	rawKeys, err := pudge.Keys(SamplesDB, SampleKey{}, 1, offset, true)
 	key := decodeKey(rawKeys[0])
 
 	sampleURI := ""
-	err = s.db.Get(key, &sampleURI)
+	err = pudge.Get(SamplesDB, key, &sampleURI)
 
 	offset += 1
 
 	return SampleResponse{
 		SampleURI: sampleURI,
 	}, err
-}
-
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SampleKey struct {
-	ProjectID string
-	SampleID  int64
 }
