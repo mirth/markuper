@@ -4,36 +4,45 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"encoding/json"
+	"time"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/recoilme/pudge"
 )
 
 var SamplesDB string = "../bin/samples"
+var MarkupDB string = "../bin/markup"
 
-type SampleKey struct {
-	ProjectID string
-	SampleID  int64
+type SampleID struct {
+	ProjectID string `json:"project_id"`
+	SampleID  int64  `json:"sample_id"`
 }
 
-type URLListResponse struct {
-	Urls []string `json:"urls"`
+type SampleMarkup struct {
+	CreatedAt time.Time `json:"created_at"`
+
+	Markup json.RawMessage `json:"markup"`
 }
 
 type SampleResponse struct {
 	SampleURI string `json:"sample_uri"`
 }
 
-type TestService interface {
-	GetURLS() (URLListResponse, error)
+type AssessRequest struct {
+	SampleID     SampleID     `json:"sample_id"`
+	SampleMarkup SampleMarkup `json:"sample_markup"`
+}
+
+type MarkupService interface {
 	GetNext() (SampleResponse, error)
-	// Assess(SampleKey) error
+	Assess(AssessRequest) error
 }
 
-type TestServiceImpl struct {
+type MarkupServiceImpl struct {
 }
 
-func MakeNextSampleEndpoint(s TestService) endpoint.Endpoint {
+func NextSampleEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		s, _ := s.GetNext()
 
@@ -41,48 +50,32 @@ func MakeNextSampleEndpoint(s TestService) endpoint.Endpoint {
 	}
 }
 
-func MakeTestEndpoint(s TestService) endpoint.Endpoint {
+func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		urlList, _ := s.GetURLS()
+		r := request.(*AssessRequest)
+		err := s.Assess(*r)
 
-		return urlList, nil
+		s := SampleMarkup{}
+		_ = pudge.Get(MarkupDB, r.SampleID, &s)
+		r.SampleMarkup = s
+
+		return r, err
 	}
 }
 
-func decodeKey(raw []byte) SampleKey {
+func decodeKey(raw []byte) SampleID {
 	buf := bytes.NewBuffer(raw)
 	dec := gob.NewDecoder(buf)
-	key := SampleKey{}
+	key := SampleID{}
 	_ = dec.Decode(&key)
 
 	return key
 }
 
-func (s *TestServiceImpl) GetURLS() (URLListResponse, error) {
-	rawKeys, err := pudge.Keys(SamplesDB, SampleKey{}, 0, 0, true)
-
-	keys := make([]SampleKey, 0)
-	for _, rawKey := range rawKeys {
-		key := decodeKey(rawKey)
-		keys = append(keys, key)
-	}
-
-	samples := make([]string, 0)
-	for _, key := range keys {
-		sample := ""
-		_ = pudge.Get(SamplesDB, key, &sample)
-		samples = append(samples, sample)
-	}
-
-	return URLListResponse{
-		Urls: samples,
-	}, err
-}
-
 var offset = 0
 
-func (s *TestServiceImpl) GetNext() (SampleResponse, error) {
-	rawKeys, err := pudge.Keys(SamplesDB, SampleKey{}, 1, offset, true)
+func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
+	rawKeys, err := pudge.Keys(SamplesDB, SampleID{}, 1, offset, true)
 	key := decodeKey(rawKeys[0])
 
 	sampleURI := ""
@@ -93,4 +86,10 @@ func (s *TestServiceImpl) GetNext() (SampleResponse, error) {
 	return SampleResponse{
 		SampleURI: sampleURI,
 	}, err
+}
+
+func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
+	err := pudge.Set(MarkupDB, r.SampleID, r.SampleMarkup)
+
+	return err
 }
