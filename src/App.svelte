@@ -22,7 +22,7 @@ function makeHandleAssess(label) {
           }
         }
     })
-    image = api.get('/next');
+    image = fetchNext();
   }
 }
 

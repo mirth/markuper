@@ -23,7 +23,8 @@ type SampleMarkup struct {
 }
 
 type SampleResponse struct {
-	SampleURI string `json:"sample_uri"`
+	SampleID  SampleID `json:"sample_id"`
+	SampleURI string   `json:"sample_uri"`
 }
 
 type AssessRequest struct {
@@ -75,14 +76,15 @@ var offset = 0
 
 func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 	rawKeys, err := pudge.Keys(s.SamplesDB, SampleID{}, 1, offset, true)
-	key := decodeKey(rawKeys[0])
+	sID := decodeKey(rawKeys[0])
 
 	sampleURI := ""
-	err = pudge.Get(s.SamplesDB, key, &sampleURI)
+	err = pudge.Get(s.SamplesDB, sID, &sampleURI)
 
 	offset += 1
 
 	return SampleResponse{
+		SampleID:  sID,
 		SampleURI: sampleURI,
 	}, err
 }
