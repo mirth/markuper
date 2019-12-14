@@ -1,28 +1,41 @@
 <script>
-import axios from 'axios';
-import config from './config';
 
-async function get() {
-  const url = `${config.BACKEND_URL}/api/v1/next`;
-  const resp = await axios.get(url);
-  return resp.data;
-}
+import api from './api';
 
 async function fetchNext() {
-  const res = await get();
+  const res = await api.get('/next');
   return res;
 }
 
 let image = fetchNext();
-
-function handleClick() {
-  image = fetchNext();
+// image = fetchNext();
+function makeHandleAssess(label) {
+  return function() {
+    api.post('/assess', {
+        "sample_id": {
+          "project_id": "project0",
+          "sample_id":0,
+        },
+        "sample_markup": {
+          "markup":{
+            "label": label
+          }
+        }
+    })
+  }
 }
 
+const labels = [
+  'cat',
+  'dog',
+  'kek',
+]
 </script>
 
+{#each labels as label}
+  <button on:click={makeHandleAssess(label)}>{label}</button>
+{/each}
 
-<button on:click={handleClick}>Next</button>
 <br />
 {#await image}
 <p>...waiting</p>

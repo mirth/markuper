@@ -25,6 +25,15 @@ function createWindow(backend) {
 
 function runApp() {
   const backend = execFile('backend/bin/main');
+  backend.stdout.on('data', (chunk) => {
+    // eslint-disable-next-line no-console
+    console.log(chunk);
+  });
+  backend.stderr.on('data', (chunk) => {
+    // eslint-disable-next-line no-console
+    console.log(chunk);
+  });
+
   createWindow(backend);
 }
 

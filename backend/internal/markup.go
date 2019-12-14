@@ -56,7 +56,7 @@ func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 		err := s.Assess(*r)
 
 		s := SampleMarkup{}
-		_ = pudge.Get(MarkupDB, r.SampleID, &s)
+		err = pudge.Get(MarkupDB, r.SampleID, &s)
 		r.SampleMarkup = s
 
 		return r, err
