@@ -8,7 +8,9 @@
   "scripts": {
     "start:dev": "yarn run _build_backend && concurrently \"yarn run _autobuild_frontend\" \"ELECTRON_RELOAD=yes electron .\"",
     "test": "jest src",
-    "lint": "yarn run eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
+    "lint": "concurrently \"yarn run _lint_frontend\" \"yarn run _lint_backend\" ",
+    "_lint_backend": "cd backend/cmd && go vet && cd ../../",
+    "_lint_frontend": "yarn run eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",
     "_build_backend": "GO111MODULE=on cd backend/cmd && go build -o ../bin/main . && cd ../.."
   },
