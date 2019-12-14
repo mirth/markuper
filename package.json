@@ -7,8 +7,10 @@
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
     "start:dev": "yarn run _build_backend && concurrently \"yarn run _autobuild_frontend\" \"ELECTRON_RELOAD=yes electron .\"",
-    "test": "jest src",
+    "test": "concurrently \"yarn run _test_frontend\" \"yarn run _test_backend\" ",
     "lint": "concurrently \"yarn run _lint_frontend\" \"yarn run _lint_backend\" ",
+    "_test_frontend": "jest src",
+    "_test_backend": "cd backend && go test ./... && cd ..",
     "_lint_backend": "cd backend/cmd && go vet && cd ../../",
     "_lint_frontend": "yarn run eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",

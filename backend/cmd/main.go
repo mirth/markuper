@@ -18,7 +18,7 @@ import (
 	"backend/pkg/httpjsondecoder"
 )
 
-func openDB() {
+func openDB(samplesDB, markupDB string) {
 	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
 	for i, path := range matches {
 		sk := internal.SampleID{
@@ -26,7 +26,7 @@ func openDB() {
 			SampleID:  int64(i),
 		}
 
-		pudge.Set(internal.SamplesDB, sk, path)
+		pudge.Set(samplesDB, sk, path)
 	}
 
 	// return db, err
@@ -48,11 +48,16 @@ func MakeHTTPRequestDecoder(payloadMaker func() interface{}) httptransport.Decod
 }
 
 func main() {
+	var samplesDB string = "../bin/samples"
+	var markupDB string = "../bin/markup"
+	openDB(samplesDB, markupDB)
+
 	r := mux.NewRouter()
 
-	openDB()
-
-	s := &internal.MarkupServiceImpl{}
+	s := &internal.MarkupServiceImpl{
+		SamplesDB: samplesDB,
+		MarkupDB:  markupDB,
+	}
 	nextHandler := httptransport.NewServer(
 		internal.NextSampleEndpoint(s),
 		httptransport.NopRequestDecoder,

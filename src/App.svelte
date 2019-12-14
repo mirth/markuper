@@ -8,7 +8,7 @@ async function fetchNext() {
 }
 
 let image = fetchNext();
-// image = fetchNext();
+
 function makeHandleAssess(label) {
   return function() {
     api.post('/assess', {
@@ -22,6 +22,7 @@ function makeHandleAssess(label) {
           }
         }
     })
+    image = api.get('/next');
   }
 }
 

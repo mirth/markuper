@@ -11,9 +11,6 @@ import (
 	"github.com/recoilme/pudge"
 )
 
-var SamplesDB string = "../bin/samples"
-var MarkupDB string = "../bin/markup"
-
 type SampleID struct {
 	ProjectID string `json:"project_id"`
 	SampleID  int64  `json:"sample_id"`
@@ -40,6 +37,8 @@ type MarkupService interface {
 }
 
 type MarkupServiceImpl struct {
+	SamplesDB string
+	MarkupDB  string
 }
 
 func NextSampleEndpoint(s MarkupService) endpoint.Endpoint {
@@ -52,14 +51,14 @@ func NextSampleEndpoint(s MarkupService) endpoint.Endpoint {
 
 func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		r := request.(*AssessRequest)
-		err := s.Assess(*r)
+		r := *request.(*AssessRequest)
+		err := s.Assess(r)
 
-		s := SampleMarkup{}
-		err = pudge.Get(MarkupDB, r.SampleID, &s)
-		r.SampleMarkup = s
+		// s := SampleMarkup{}
+		// err = pudge.Get(s.MarkupDB, r.SampleID, &s)
+		// r.SampleMarkup = s
 
-		return r, err
+		return nil, err
 	}
 }
 
@@ -75,11 +74,11 @@ func decodeKey(raw []byte) SampleID {
 var offset = 0
 
 func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
-	rawKeys, err := pudge.Keys(SamplesDB, SampleID{}, 1, offset, true)
+	rawKeys, err := pudge.Keys(s.SamplesDB, SampleID{}, 1, offset, true)
 	key := decodeKey(rawKeys[0])
 
 	sampleURI := ""
-	err = pudge.Get(SamplesDB, key, &sampleURI)
+	err = pudge.Get(s.SamplesDB, key, &sampleURI)
 
 	offset += 1
 
@@ -89,7 +88,7 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 }
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
-	err := pudge.Set(MarkupDB, r.SampleID, r.SampleMarkup)
+	err := pudge.Set(s.MarkupDB, r.SampleID, r.SampleMarkup)
 
 	return err
 }
