@@ -18,18 +18,39 @@ import (
 	"backend/pkg/httpjsondecoder"
 )
 
-func openDB(samplesDB, markupDB string) {
+type ProjectID = string
+
+type ProjectSettings struct {
+}
+
+type ProjectState struct {
+}
+
+type Project struct {
+	ProjectID ProjectID       `json:"project_id"`
+	Settings  ProjectSettings `json:"settings"`
+	State     ProjectState    `json:"state"`
+}
+
+func openDB(samplesDB, markupDB, projectDB string) {
 	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
+
+	projectID := "project0"
+	project := Project{
+		ProjectID: projectID,
+		Settings:  ProjectSettings{},
+		State:     ProjectState{},
+	}
+
+	pudge.Set(projectDB, projectID, project)
 	for i, path := range matches {
-		sk := internal.SampleID{
-			ProjectID: "project0",
+		sID := internal.SampleID{
+			ProjectID: projectID,
 			SampleID:  int64(i),
 		}
 
-		pudge.Set(samplesDB, sk, path)
+		pudge.Set(samplesDB, sID, path)
 	}
-
-	// return db, err
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
@@ -48,9 +69,10 @@ func MakeHTTPRequestDecoder(payloadMaker func() interface{}) httptransport.Decod
 }
 
 func main() {
-	var samplesDB string = "../bin/samples"
-	var markupDB string = "../bin/markup"
-	openDB(samplesDB, markupDB)
+	samplesDB := "../bin/samples"
+	markupDB := "../bin/markup"
+	projectDB := "../bin/project"
+	openDB(samplesDB, markupDB, projectDB)
 
 	r := mux.NewRouter()
 

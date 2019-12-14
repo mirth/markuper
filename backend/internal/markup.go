@@ -5,15 +5,25 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
+	"fmt"
+	"sort"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/golang-collections/collections/set"
+	"github.com/pkg/errors"
 	"github.com/recoilme/pudge"
+
+	"backend/pkg/utils"
 )
 
 type SampleID struct {
 	ProjectID string `json:"project_id"`
 	SampleID  int64  `json:"sample_id"`
+}
+
+func (s SampleID) toString() string {
+	return fmt.Sprintf("%s|%d", s.ProjectID, s.SampleID)
 }
 
 type SampleMarkup struct {
@@ -55,10 +65,6 @@ func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 		r := *request.(*AssessRequest)
 		err := s.Assess(r)
 
-		// s := SampleMarkup{}
-		// err = pudge.Get(s.MarkupDB, r.SampleID, &s)
-		// r.SampleMarkup = s
-
 		return nil, err
 	}
 }
@@ -74,14 +80,49 @@ func decodeKey(raw []byte) SampleID {
 
 var offset = 0
 
-func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
-	rawKeys, err := pudge.Keys(s.SamplesDB, SampleID{}, 1, offset, true)
-	sID := decodeKey(rawKeys[0])
+func getAllSampleIDs(db string) ([]SampleID, error) {
+	rawIDs, err := pudge.Keys(db, SampleID{}, 0, 0, true)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 
+	sIDs := make([]SampleID, 0)
+	for _, rawKey := range rawIDs {
+		key := decodeKey(rawKey)
+		sIDs = append(sIDs, key)
+	}
+
+	return sIDs, nil
+}
+
+func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
+	tmp, err := getAllSampleIDs(s.MarkupDB)
+	if err != nil {
+		return SampleResponse{}, err
+	}
+	doneIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
+
+	tmp, err = getAllSampleIDs(s.SamplesDB)
+	if err != nil {
+		return SampleResponse{}, err
+	}
+	allIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
+
+	toAssess := make([]SampleID, 0)
+	allIDs.Difference(doneIDs).Do(func(sID interface{}) {
+		toAssess = append(toAssess, sID.(SampleID))
+	})
+
+	sort.SliceStable(toAssess, func(i, j int) bool {
+		return toAssess[i].SampleID < toAssess[j].SampleID
+	})
+
+	sID := toAssess[0]
 	sampleURI := ""
 	err = pudge.Get(s.SamplesDB, sID, &sampleURI)
-
-	offset += 1
+	if err != nil {
+		return SampleResponse{}, errors.WithStack(err)
+	}
 
 	return SampleResponse{
 		SampleID:  sID,

@@ -84,42 +84,40 @@ func TestMarkupNext(t *testing.T) {
 		MarkupDB:  markupDB,
 	}
 
+	assertNext := func(i int64) SampleID {
+		a, err := svc.GetNext()
+		assert.Nil(t, err)
+		sID := SampleID{
+			ProjectID: "testproject0",
+			SampleID:  i,
+		}
+		e := SampleResponse{
+			SampleID:  sID,
+			SampleURI: fmt.Sprintf("sampleuri%d", i),
+		}
+		assert.Equal(t, e, a)
+
+		return sID
+	}
+
+	assessSample := func(sID SampleID) {
+		r := AssessRequest{SampleID: sID}
+		err := svc.Assess(r)
+		assert.Nil(t, err)
+	}
+
 	{
 		{
-			a, err := svc.GetNext()
-			assert.Nil(t, err)
-			e := SampleResponse{
-				SampleID: SampleID{
-					ProjectID: "testproject0",
-					SampleID:  0,
-				},
-				SampleURI: "sampleuri0",
-			}
-			assert.Equal(t, e, a)
+			sID := assertNext(0)
+			assessSample(sID)
 		}
 		{
-			a, err := svc.GetNext()
-			assert.Nil(t, err)
-			e := SampleResponse{
-				SampleID: SampleID{
-					ProjectID: "testproject0",
-					SampleID:  1,
-				},
-				SampleURI: "sampleuri1",
-			}
-			assert.Equal(t, e, a)
+			sID := assertNext(1)
+			assessSample(sID)
 		}
 		{
-			a, err := svc.GetNext()
-			assert.Nil(t, err)
-			e := SampleResponse{
-				SampleID: SampleID{
-					ProjectID: "testproject0",
-					SampleID:  2,
-				},
-				SampleURI: "sampleuri2",
-			}
-			assert.Equal(t, e, a)
+			sID := assertNext(2)
+			assessSample(sID)
 		}
 	}
 }

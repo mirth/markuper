@@ -7,22 +7,19 @@ async function fetchNext() {
   return res;
 }
 
-let image = fetchNext();
+let sample = fetchNext();
 
 function makeHandleAssess(label) {
   return function() {
     api.post('/assess', {
-        "sample_id": {
-          "project_id": "project0",
-          "sample_id":0,
-        },
+        "sample_id": sample.sample_id,
         "sample_markup": {
           "markup":{
             "label": label
           }
         }
     })
-    image = fetchNext();
+    sample = fetchNext();
   }
 }
 
@@ -38,10 +35,10 @@ const labels = [
 {/each}
 
 <br />
-{#await image}
+{#await sample}
 <p>...waiting</p>
-{:then data}
-<img src="file://{data.sample_uri}" alt="KEK"/>
+{:then sample}
+<img src="file://{sample.sample_uri}" alt="KEK"/>
 {:catch error}
 	<p style="color: red">{error}</p>
 {/await}
