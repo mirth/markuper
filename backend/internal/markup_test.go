@@ -3,7 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"testing"
 	"time"
 
@@ -11,20 +10,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func openTestDB() (string, string) {
-	sampleDB, err := ioutil.TempFile("/tmp", "test123123")
-	if err != nil {
-		panic(err)
-	}
-	markupDB, err := ioutil.TempFile("/tmp", "test123123")
-	if err != nil {
-		panic(err)
-	}
+func openTestDB() *DB {
+	cfg := &pudge.Config{StoreMode: 2}
 
-	return sampleDB.Name(), markupDB.Name()
+	projectDB, _ := pudge.Open("/tmp/1", cfg)
+	samplesDB, _ := pudge.Open("/tmp/2", cfg)
+	markupDB, _ := pudge.Open("/tmp/3", cfg)
+
+	return &DB{
+		Project: projectDB,
+		Sample:  samplesDB,
+		Markup:  markupDB,
+	}
 }
 
-func fillTestDB(sampleDB string) {
+func fillTestDB(db *DB) {
 	matches := make([]string, 0)
 	for i := 0; i < 10; i++ {
 		matches = append(matches, fmt.Sprintf("sampleuri%d", i))
@@ -37,17 +37,16 @@ func fillTestDB(sampleDB string) {
 			SampleID:  int64(i),
 		}
 
-		pudge.Set(sampleDB, sk, path)
+		db.Sample.Set(sk, path)
 	}
 }
 
 func TestMarkupAssess(t *testing.T) {
-	sampleDB, markupDB := openTestDB()
+	db := openTestDB()
 
 	{
 		svc := MarkupServiceImpl{
-			SamplesDB: sampleDB,
-			MarkupDB:  markupDB,
+			db: db,
 		}
 
 		sID := SampleID{
@@ -69,19 +68,18 @@ func TestMarkupAssess(t *testing.T) {
 			assert.Nil(t, err)
 
 			actual := SampleMarkup{}
-			pudge.Get(svc.MarkupDB, sID, &actual)
+			svc.db.Markup.Get(sID, &actual)
 			assert.Equal(t, mkp, actual)
 		}
 	}
 }
 
 func TestMarkupNext(t *testing.T) {
-	sampleDB, markupDB := openTestDB()
-	fillTestDB(sampleDB)
+	db := openTestDB()
+	fillTestDB(db)
 
 	svc := MarkupServiceImpl{
-		SamplesDB: sampleDB,
-		MarkupDB:  markupDB,
+		db: db,
 	}
 
 	assertNext := func(i int64) SampleID {

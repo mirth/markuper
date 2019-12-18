@@ -47,9 +47,20 @@ type MarkupService interface {
 	Assess(AssessRequest) error
 }
 
+type DB struct {
+	Project *pudge.Db
+	Sample  *pudge.Db
+	Markup  *pudge.Db
+}
+
 type MarkupServiceImpl struct {
-	SamplesDB string
-	MarkupDB  string
+	db *DB
+}
+
+func NewMarkupService(db *DB) MarkupService {
+	return &MarkupServiceImpl{
+		db: db,
+	}
 }
 
 func NextSampleEndpoint(s MarkupService) endpoint.Endpoint {
@@ -80,8 +91,8 @@ func decodeKey(raw []byte) SampleID {
 
 var offset = 0
 
-func getAllSampleIDs(db string) ([]SampleID, error) {
-	rawIDs, err := pudge.Keys(db, SampleID{}, 0, 0, true)
+func getAllSampleIDs(db *pudge.Db) ([]SampleID, error) {
+	rawIDs, err := db.Keys(SampleID{}, 0, 0, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -96,13 +107,12 @@ func getAllSampleIDs(db string) ([]SampleID, error) {
 }
 
 func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
-	tmp, err := getAllSampleIDs(s.MarkupDB)
+	tmp, err := getAllSampleIDs(s.db.Markup)
 	if err != nil {
 		return SampleResponse{}, err
 	}
 	doneIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
-
-	tmp, err = getAllSampleIDs(s.SamplesDB)
+	tmp, err = getAllSampleIDs(s.db.Sample)
 	if err != nil {
 		return SampleResponse{}, err
 	}
@@ -117,9 +127,10 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 		return toAssess[i].SampleID < toAssess[j].SampleID
 	})
 
+	// FIXME empty toAssess
 	sID := toAssess[0]
 	sampleURI := ""
-	err = pudge.Get(s.SamplesDB, sID, &sampleURI)
+	err = s.db.Sample.Get(sID, &sampleURI)
 	if err != nil {
 		return SampleResponse{}, errors.WithStack(err)
 	}
@@ -131,7 +142,7 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 }
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
-	err := pudge.Set(s.MarkupDB, r.SampleID, r.SampleMarkup)
+	err := s.db.Markup.Set(r.SampleID, r.SampleMarkup)
 
 	return err
 }

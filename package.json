@@ -6,28 +6,15 @@
   "private": true,
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
-    "start:dev": "yarn run _build_backend && concurrently \"yarn run _autobuild_frontend\" \"ELECTRON_RELOAD=yes electron .\"",
-    "test": "concurrently \"yarn run _test_frontend\" \"yarn run _test_backend\" ",
-    "lint": "concurrently \"yarn run _lint_frontend\" \"yarn run _lint_backend\" ",
-    "_test_frontend": "jest src",
+    "start:dev": "yarn _build_backend && concurrently \"yarn _autobuild_frontend\" \"ELECTRON_RELOAD=yes electron .\"",
+    "test": "ENV=test concurrently \"yarn _test_frontend\" \"yarn _test_backend\"",
+    "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\" ",
+    "_test_frontend": "yarn _build_backend && yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
     "_test_backend": "cd backend && go test ./... && cd ..",
     "_lint_backend": "cd backend/cmd && go vet && cd ../../",
-    "_lint_frontend": "yarn run eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
+    "_lint_frontend": "yarn eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",
     "_build_backend": "GO111MODULE=on cd backend/cmd && go build -o ../bin/main . && cd ../.."
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "^.+\\.svelte$": "jest-transform-svelte"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "svelte"
-    ],
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-dom/extend-expect"
-    ]
   },
   "babel": {
     "env": {
@@ -36,18 +23,23 @@
           "@babel/plugin-transform-modules-commonjs"
         ]
       }
-    }
+    },
+    "presets": [
+      "@babel/preset-env"
+    ]
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/plugin-transform-modules-commonjs": "^7.7.4",
-    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-env": "^7.7.6",
+    "@babel/register": "^7.7.4",
     "@rollup/plugin-json": "^4.0.0",
     "@rollup/plugin-node-resolve": "^6.0.0",
-    "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/svelte": "^1.9.1",
     "babel-jest": "^24.9.0",
+    "babel-polyfill": "^6.26.0",
+    "chai": "^4.2.0",
     "concurrently": "^5.0.0",
     "electron": "^7.1.2",
     "electron-reload": "^1.5.0",
@@ -55,11 +47,14 @@
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-svelte3": "^2.7.3",
-    "jest": "^24.9.0",
-    "jest-transform-svelte": "^2.1.0",
+    "mocha": "^6.2.2",
+    "puppeteer": "^2.0.0",
+    "puppeteer-core": "^2.0.0",
+    "puppeteer-in-electron": "^1.0.7",
     "rollup": "^1.27.4",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-svelte": "^5.1.1",
+    "spectron": "^9.0.0",
     "svelte": "^3.15.0"
   },
   "dependencies": {

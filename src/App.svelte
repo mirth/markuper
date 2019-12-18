@@ -10,24 +10,25 @@ async function fetchNext() {
 let sample = fetchNext();
 
 function makeHandleAssess(label) {
-  return function() {
-    api.post('/assess', {
-        "sample_id": sample.sample_id,
-        "sample_markup": {
-          "markup":{
-            "label": label
-          }
-        }
-    })
+  return async () => {
+    sample = await sample;
+    await api.post('/assess', {
+      sample_id: sample.sample_id,
+      sample_markup: {
+        markup: {
+          label,
+        },
+      },
+    });
     sample = fetchNext();
-  }
+  };
 }
 
 const labels = [
   'cat',
   'dog',
   'kek',
-]
+];
 </script>
 
 {#each labels as label}

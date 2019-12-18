@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require('electron');
-const { execFile } = require('child_process');
-
+const runBackend = require('./run_backend');
 require('electron-reload')(__dirname);
 
 function createWindow(backend) {
@@ -23,16 +22,9 @@ function createWindow(backend) {
   });
 }
 
+
 function runApp() {
-  const backend = execFile('backend/bin/main');
-  backend.stdout.on('data', (chunk) => {
-    // eslint-disable-next-line no-console
-    console.log(chunk);
-  });
-  backend.stderr.on('data', (chunk) => {
-    // eslint-disable-next-line no-console
-    console.log(chunk);
-  });
+  const backend = runBackend();
 
   createWindow(backend);
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-
 	"path/filepath"
 
 	"backend/internal"
@@ -13,6 +12,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/recoilme/pudge"
 
 	"backend/pkg/httpjsondecoder"
@@ -32,8 +32,29 @@ type Project struct {
 	State     ProjectState    `json:"state"`
 }
 
-func openDB(samplesDB, markupDB, projectDB string) {
-	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
+func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, error) {
+	storeMode := 0
+	if os.Getenv("ENV") == "test" {
+		storeMode = 2
+		samplesDBFile = "/tmp/1"
+		markupDBFile = "/tmp/2"
+		projectDBFile = "/tmp/3"
+	}
+
+	cfg := &pudge.Config{StoreMode: storeMode}
+
+	projectDB, err := pudge.Open(projectDBFile, cfg)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	samplesDB, err := pudge.Open(samplesDBFile, cfg)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	markupDB, err := pudge.Open(markupDBFile, cfg)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 
 	projectID := "project0"
 	project := Project{
@@ -42,15 +63,31 @@ func openDB(samplesDB, markupDB, projectDB string) {
 		State:     ProjectState{},
 	}
 
-	pudge.Set(projectDB, projectID, project)
+	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
+
+	if os.Getenv("ENV") == "test" {
+		matches = []string{
+			"img0",
+			"img1",
+			"img2",
+		}
+	}
+
+	projectDB.Set(projectID, project)
 	for i, path := range matches {
 		sID := internal.SampleID{
 			ProjectID: projectID,
 			SampleID:  int64(i),
 		}
 
-		pudge.Set(samplesDB, sID, path)
+		samplesDB.Set(sID, path)
 	}
+
+	return &internal.DB{
+		Project: projectDB,
+		Sample:  samplesDB,
+		Markup:  markupDB,
+	}, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
@@ -72,14 +109,13 @@ func main() {
 	samplesDB := "../bin/samples"
 	markupDB := "../bin/markup"
 	projectDB := "../bin/project"
-	openDB(samplesDB, markupDB, projectDB)
+	db, err := openDB(samplesDB, markupDB, projectDB)
 
-	r := mux.NewRouter()
-
-	s := &internal.MarkupServiceImpl{
-		SamplesDB: samplesDB,
-		MarkupDB:  markupDB,
+	if err != nil {
+		panic(err)
 	}
+
+	s := internal.NewMarkupService(db)
 	nextHandler := httptransport.NewServer(
 		internal.NextSampleEndpoint(s),
 		httptransport.NopRequestDecoder,
@@ -94,10 +130,13 @@ func main() {
 		encodeResponse,
 	)
 
+	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
 
 	port := "3889"
-	err := http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, r))
-	panic(err)
+	err = http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, r))
+	if err != nil {
+		panic(err)
+	}
 }
