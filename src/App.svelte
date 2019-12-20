@@ -1,6 +1,8 @@
 <script>
 
 import api from './api';
+import Button from './components/Button.svelte';
+import './global.svelte';
 
 async function fetchNext() {
   const res = await api.get('/next');
@@ -32,7 +34,7 @@ const labels = [
 </script>
 
 {#each labels as label}
-  <button on:click={makeHandleAssess(label)}>{label}</button>
+  <Button on:click={makeHandleAssess(label)}>{label}</Button>
 {/each}
 
 <br />

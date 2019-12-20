@@ -1,14 +1,15 @@
 /* eslint-disable consistent-return */
 /* eslint-disable func-names */
 import { Application } from 'spectron';
-// import assert from 'assert';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 
+const appPath = [path.join(__dirname, '../..')];
+
 const app = new Application({
   path: electronPath,
-  args: [path.join(__dirname, '../..')],
+  args: appPath,
 });
 
 describe('Application launch', function () {
