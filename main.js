@@ -1,6 +1,10 @@
 const { app, BrowserWindow } = require('electron');
 const runBackend = require('./run_backend');
-require('electron-reload')(__dirname);
+
+if (process.env.ENV === 'dev') {
+  // eslint-disable-next-line global-require
+  require('electron-reload')(__dirname);
+}
 
 function createWindow(backend) {
   let win = new BrowserWindow({

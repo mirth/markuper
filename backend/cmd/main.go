@@ -36,9 +36,9 @@ func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, er
 	storeMode := 0
 	if os.Getenv("ENV") == "test" {
 		storeMode = 2
-		samplesDBFile = "/tmp/1"
-		markupDBFile = "/tmp/2"
-		projectDBFile = "/tmp/3"
+		samplesDBFile = "/tmp/test_1"
+		markupDBFile = "/tmp/test_2"
+		projectDBFile = "/tmp/test_3"
 	}
 
 	cfg := &pudge.Config{StoreMode: storeMode}
@@ -106,9 +106,9 @@ func MakeHTTPRequestDecoder(payloadMaker func() interface{}) httptransport.Decod
 }
 
 func main() {
-	samplesDB := "../bin/samples"
-	markupDB := "../bin/markup"
-	projectDB := "../bin/project"
+	samplesDB := "/tmp/1"
+	markupDB := "/tmp/2"
+	projectDB := "/tmp/3"
 	db, err := openDB(samplesDB, markupDB, projectDB)
 
 	if err != nil {
@@ -133,6 +133,9 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
+	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte("VEGETALS"))
+	})
 
 	port := "3889"
 	err = http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, r))
