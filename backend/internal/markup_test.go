@@ -3,6 +3,8 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"path"
 	"testing"
 	"time"
 
@@ -13,9 +15,10 @@ import (
 func openTestDB() *DB {
 	cfg := &pudge.Config{StoreMode: 2}
 
-	projectDB, _ := pudge.Open("/tmp/1", cfg)
-	samplesDB, _ := pudge.Open("/tmp/2", cfg)
-	markupDB, _ := pudge.Open("/tmp/3", cfg)
+	tmpdir, _ := ioutil.TempDir("/tmp", "unittest")
+	projectDB, _ := pudge.Open(path.Join(tmpdir, "1"), cfg)
+	samplesDB, _ := pudge.Open(path.Join(tmpdir, "2"), cfg)
+	markupDB, _ := pudge.Open(path.Join(tmpdir, "3"), cfg)
 
 	return &DB{
 		Project: projectDB,
