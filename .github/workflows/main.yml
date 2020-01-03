@@ -18,5 +18,5 @@ jobs:
     - name: Install deps
       run: yarn install
 
-    - name: Dist
-      run: yarn dist
+    - name: Release
+      run: yarn release
