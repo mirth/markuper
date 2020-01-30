@@ -4,7 +4,8 @@ const path = require('path');
 
 function runBackend() {
   const backendPath = (process.env.ENV === 'dev' || process.env.ENV === 'test') ? 'backend/bin/main'
-    : path.join(appRootDir, '..', './bin', 'main');
+    : path.join(appRootDir, 'backend', 'bin', 'main');
+
   const backend = execFile(backendPath, {
     env: {
       ENV: process.env.ENV,

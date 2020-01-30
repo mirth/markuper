@@ -1,6 +1,6 @@
 {
   "name": "labler",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Some cool app",
   "main": "main.js",
   "license": "Proprietary",
@@ -8,10 +8,11 @@
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
     "start:dev": "yarn _build_backend && concurrently \"yarn _autobuild_frontend\" \"ENV=dev electron .\"",
-    "test": "concurrently \"yarn _test_frontend\" \"yarn _test_backend\"",
+    "test": "concurrently \"yarn _test_e2e\" \"yarn _test_backend\"",
     "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\"",
-    "dist": "yarn _build_backend && yarn _build_frontend  && electron-builder",
-    "_test_frontend": "yarn _build_backend && yarn _build_frontend && ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
+    "release": "yarn build && yarn electron-packager . dist",
+    "build": "yarn _build_backend && yarn _build_frontend",
+    "_test_e2e": "yarn build && ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
     "_test_backend": "yarn _build_backend && cd backend && go test ./... && cd ..",
     "_lint_backend": "cd backend/cmd && go vet && cd ../../",
     "_lint_frontend": "yarn eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
@@ -25,7 +26,9 @@
       {
         "from": "backend/bin",
         "to": "Resources/bin",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ]
   },
@@ -55,7 +58,7 @@
     "chai": "^4.2.0",
     "concurrently": "^5.0.0",
     "electron": "^7.1.2",
-    "electron-builder": "^21.2.0",
+    "electron-packager": "^14.1.1",
     "electron-reload": "^1.5.0",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",

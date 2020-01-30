@@ -34,6 +34,8 @@ type Project struct {
 
 func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, error) {
 	storeMode := 0
+
+	// TODO: it e2e!
 	if os.Getenv("ENV") == "test" {
 		storeMode = 2
 		samplesDBFile = "/tmp/test_1"
