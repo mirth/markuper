@@ -33,7 +33,7 @@ describe('Application launch', function () {
 
     await app.client.waitForExist('img');
     const after = await app.client.element('img').getAttribute('src');
-    expect(after).to.be.eq('file://img2/');
+    expect(after).to.be.eq('file://img1/');
     expect(before).to.be.not.eq(after);
   });
 });
