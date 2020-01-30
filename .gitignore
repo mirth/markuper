@@ -1,5 +1,5 @@
 node_modules
 bundle.*
 backend/bin
-dist
+dist*
 .DS_Store
