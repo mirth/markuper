@@ -18,8 +18,8 @@ import (
 )
 
 type SampleID struct {
-	ProjectID string `json:"project_id"`
-	SampleID  int64  `json:"sample_id"`
+	ProjectID ProjectID `json:"project_id"`
+	SampleID  int64     `json:"sample_id"`
 }
 
 func (s SampleID) toString() string {
@@ -45,12 +45,6 @@ type AssessRequest struct {
 type MarkupService interface {
 	GetNext() (SampleResponse, error)
 	Assess(AssessRequest) error
-}
-
-type DB struct {
-	Project *pudge.Db
-	Sample  *pudge.Db
-	Markup  *pudge.Db
 }
 
 type MarkupServiceImpl struct {

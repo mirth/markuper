@@ -18,20 +18,6 @@ import (
 	"backend/pkg/httpjsondecoder"
 )
 
-type ProjectID = string
-
-type ProjectSettings struct {
-}
-
-type ProjectState struct {
-}
-
-type Project struct {
-	ProjectID ProjectID       `json:"project_id"`
-	Settings  ProjectSettings `json:"settings"`
-	State     ProjectState    `json:"state"`
-}
-
 func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, error) {
 	storeMode := 0
 
@@ -58,31 +44,32 @@ func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, er
 		return nil, errors.WithStack(err)
 	}
 
-	projectID := "project0"
-	project := Project{
-		ProjectID: projectID,
-		Settings:  ProjectSettings{},
-		State:     ProjectState{},
-	}
-
-	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
-
+	// TODO: it e2e!
 	if os.Getenv("ENV") == "test" {
+		projectID := "project0"
+		project := internal.Project{
+			ProjectID: projectID,
+			Settings:  internal.ProjectSettings{},
+			State:     internal.ProjectState{},
+		}
+
+		matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
+
 		matches = []string{
 			"img0",
 			"img1",
 			"img2",
 		}
-	}
 
-	projectDB.Set(projectID, project)
-	for i, path := range matches {
-		sID := internal.SampleID{
-			ProjectID: projectID,
-			SampleID:  int64(i),
+		projectDB.Set(projectID, project)
+		for i, path := range matches {
+			sID := internal.SampleID{
+				ProjectID: projectID,
+				SampleID:  int64(i),
+			}
+
+			samplesDB.Set(sID, path)
 		}
-
-		samplesDB.Set(sID, path)
 	}
 
 	return &internal.DB{
