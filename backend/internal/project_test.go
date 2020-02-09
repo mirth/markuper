@@ -13,10 +13,8 @@ func TestCreateProject(t *testing.T) {
 		db: db,
 	}
 
-	req := Project{
-		Description: ProjectDescription{
-			Name: "testproject0",
-		},
+	req := ProjectDescription{
+		Name: "testproject0",
 	}
 
 	c, err := db.Project.Count()
@@ -31,8 +29,14 @@ func TestCreateProject(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, 1, c)
 
-		actual := req.Description
+		actual := Project{}
 		svc.db.Project.Get(p.ProjectID, &actual)
-		assert.Equal(t, req.Description, actual)
+		assert.Equal(t, req, actual.Description)
+	}
+	{
+		projects, err := svc.ListProjects()
+		assert.Nil(t, err)
+
+		assert.Len(t, projects, 1)
 	}
 }

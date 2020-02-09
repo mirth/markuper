@@ -1,9 +1,7 @@
 package internal
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -74,17 +72,6 @@ func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 	}
 }
 
-func decodeKey(raw []byte) SampleID {
-	buf := bytes.NewBuffer(raw)
-	dec := gob.NewDecoder(buf)
-	key := SampleID{}
-	_ = dec.Decode(&key)
-
-	return key
-}
-
-var offset = 0
-
 func getAllSampleIDs(db *pudge.Db) ([]SampleID, error) {
 	rawIDs, err := db.Keys(SampleID{}, 0, 0, true)
 	if err != nil {
@@ -93,7 +80,9 @@ func getAllSampleIDs(db *pudge.Db) ([]SampleID, error) {
 
 	sIDs := make([]SampleID, 0)
 	for _, rawKey := range rawIDs {
-		key := decodeKey(rawKey)
+		key := *decodeBinary(rawKey, func() interface{} {
+			return &SampleID{}
+		}).(*SampleID)
 		sIDs = append(sIDs, key)
 	}
 

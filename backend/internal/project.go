@@ -28,14 +28,15 @@ type Project struct {
 }
 
 type ProjectService interface {
-	CreateProject(Project) (Project, error)
+	CreateProject(ProjectDescription) (Project, error)
+	ListProjects() ([]Project, error)
 }
 
 type ProjectServiceImpl struct {
 	db *DB
 }
 
-func NewProject(db *DB) ProjectService {
+func NewProjectService(db *DB) ProjectService {
 	return &ProjectServiceImpl{
 		db: db,
 	}
@@ -43,20 +44,20 @@ func NewProject(db *DB) ProjectService {
 
 func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		p := *request.(*Project)
+		p := *request.(*ProjectDescription)
 		s, _ := s.CreateProject(p)
 
 		return s, nil
 	}
 }
 
-func (s *ProjectServiceImpl) CreateProject(req Project) (Project, error) {
+func (s *ProjectServiceImpl) CreateProject(req ProjectDescription) (Project, error) {
 	projectID := ProjectID(xid.New().String())
 	project := Project{
 		ProjectID:   projectID,
-		Settings:    req.Settings,
+		Settings:    ProjectSettings{},
 		State:       ProjectState{},
-		Description: req.Description,
+		Description: req,
 	}
 
 	err := s.db.Project.Set(projectID, project)
@@ -65,4 +66,21 @@ func (s *ProjectServiceImpl) CreateProject(req Project) (Project, error) {
 	}
 
 	return project, nil
+}
+
+func (s *ProjectServiceImpl) ListProjects() ([]Project, error) {
+	rawIDs, err := s.db.Project.Keys("", 0, 0, true)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	projects := make([]Project, 0)
+	for _, rawID := range rawIDs {
+		p := Project{}
+		s.db.Project.Get(rawID, &p)
+		projects = append(projects, p)
+	}
+
+	return projects, nil
+
 }

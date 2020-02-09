@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"backend/internal"
 
@@ -53,9 +52,7 @@ func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, er
 			State:     internal.ProjectState{},
 		}
 
-		matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
-
-		matches = []string{
+		matches := []string{
 			"img0",
 			"img1",
 			"img2",
@@ -104,17 +101,27 @@ func main() {
 		panic(err)
 	}
 
-	s := internal.NewMarkupService(db)
+	ms := internal.NewMarkupService(db)
+	ps := internal.NewProjectService(db)
+
 	nextHandler := httptransport.NewServer(
-		internal.NextSampleEndpoint(s),
+		internal.NextSampleEndpoint(ms),
 		httptransport.NopRequestDecoder,
 		encodeResponse,
 	)
 
 	assessHandler := httptransport.NewServer(
-		internal.AssessEndpoint(s),
+		internal.AssessEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.AssessRequest{}
+		}),
+		encodeResponse,
+	)
+
+	createProjectHandler := httptransport.NewServer(
+		internal.CreateProjectEndpoint(ps),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.ProjectDescription{}
 		}),
 		encodeResponse,
 	)
@@ -122,6 +129,8 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
+	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
+
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("VEGETALS"))
 	})
