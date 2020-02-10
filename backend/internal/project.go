@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"backend/pkg/utils"
 	"context"
+	"time"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/pkg/errors"
@@ -21,10 +23,24 @@ type ProjectDescription struct {
 }
 
 type Project struct {
+	CreatedAt   time.Time          `json:"created_at"`
 	ProjectID   ProjectID          `json:"project_id"`
 	Settings    ProjectSettings    `json:"settings"`
 	State       ProjectState       `json:"state"`
 	Description ProjectDescription `json:"description"`
+}
+
+func NewProject(desc ProjectDescription) Project {
+	projectID := ProjectID(xid.New().String())
+	now := utils.NowUTC()
+
+	return Project{
+		CreatedAt:   now,
+		ProjectID:   projectID,
+		Settings:    ProjectSettings{},
+		State:       ProjectState{},
+		Description: desc,
+	}
 }
 
 type ProjectService interface {
@@ -52,15 +68,9 @@ func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 }
 
 func (s *ProjectServiceImpl) CreateProject(req ProjectDescription) (Project, error) {
-	projectID := ProjectID(xid.New().String())
-	project := Project{
-		ProjectID:   projectID,
-		Settings:    ProjectSettings{},
-		State:       ProjectState{},
-		Description: req,
-	}
+	project := NewProject(req)
 
-	err := s.db.Project.Set(projectID, project)
+	err := s.db.Project.Set(project.ProjectID, project)
 	if err != nil {
 		return Project{}, errors.WithStack(err)
 	}
