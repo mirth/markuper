@@ -29,7 +29,7 @@ type Project struct {
 
 type ProjectService interface {
 	CreateProject(ProjectDescription) (Project, error)
-	ListProjects() ([]Project, error)
+	ListProjects() (PorjectList, error)
 }
 
 type ProjectServiceImpl struct {
@@ -68,10 +68,14 @@ func (s *ProjectServiceImpl) CreateProject(req ProjectDescription) (Project, err
 	return project, nil
 }
 
-func (s *ProjectServiceImpl) ListProjects() ([]Project, error) {
+type PorjectList struct {
+	Projects []Project `json:"projects"`
+}
+
+func (s *ProjectServiceImpl) ListProjects() (PorjectList, error) {
 	rawIDs, err := s.db.Project.Keys("", 0, 0, true)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return PorjectList{}, errors.WithStack(err)
 	}
 
 	projects := make([]Project, 0)
@@ -81,6 +85,13 @@ func (s *ProjectServiceImpl) ListProjects() ([]Project, error) {
 		projects = append(projects, p)
 	}
 
-	return projects, nil
+	return PorjectList{
+		Projects: projects,
+	}, nil
+}
 
+func ListProjectsEndpoint(s ProjectService) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		return s.ListProjects()
+	}
 }

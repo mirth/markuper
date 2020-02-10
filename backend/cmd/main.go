@@ -126,10 +126,19 @@ func main() {
 		encodeResponse,
 	)
 
+	listProjectsHandler := httptransport.NewServer(
+		internal.ListProjectsEndpoint(ps),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.PorjectList{}
+		}),
+		encodeResponse,
+	)
+
 	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
 	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
+	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("VEGETALS"))

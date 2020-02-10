@@ -1,11 +1,12 @@
 <script>
+import { newProject, projects, fetchProjectList } from "../store.js";
 import api from '../api';
-import { newProject } from "../store.js";
 
 let name = '';
 
 async function createNewProject() {
-  const res = await api.post('/project', $newProject);
+  await api.post('/project', $newProject);
+  await fetchProjectList();
 }
 
 </script>
