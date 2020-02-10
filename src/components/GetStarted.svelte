@@ -7,7 +7,6 @@ import Button from './Button.svelte'
 import CreateProjectPopup from './CreateProjectPopup.svelte'
 import { projects, fetchProjectList } from "../store.js";
 
-
 onMount(fetchProjectList);
 
 let isNewProjectPopupShown = false;
@@ -22,7 +21,6 @@ function closeNewProjectPopup() {
 
 </script>
 
-
 <ul>
   <li>
     <Button on:click={showNewProjectPopup}>Create new project</Button>
@@ -30,7 +28,9 @@ function closeNewProjectPopup() {
 
   {#each $projects as project}
     <li>
-      <ProjectPreview project={project} />
+      <a href={`/project/${project.project_id}`}>
+        <ProjectPreview project={project} />
+      </a>
     </li>
   {/each}
 </ul>

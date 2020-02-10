@@ -1,16 +1,18 @@
+
 <script>
-import './global.svelte';
-import GetStarted from './components/GetStarted.svelte';
 import Layout from './components/Layout.svelte';
 import SideBar from './components/SideBar.svelte'
 
+export let project;
+
 </script>
+
 
 <Layout>
   <div slot='sidebar'>
     <SideBar />
   </div>
   <div slot='content'>
-    <GetStarted />
+    <h1>{project.name}</h1>
   </div>
 </Layout>
