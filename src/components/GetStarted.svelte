@@ -34,7 +34,7 @@ function closeNewProjectPopup() {
 
 {#if isNewProjectPopupShown}
   <Modal on:click={closeNewProjectPopup}>
-    <p><CreateProjectPopup /></p>
+    <p><CreateProjectPopup close={closeNewProjectPopup}/></p>
   </Modal>
 {/if}
 </PageBlank>

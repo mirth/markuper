@@ -4,7 +4,11 @@ import { writable } from 'svelte/store';
 import api from './api';
 
 export const newProject = writable({
-  name: '',
+  description: {
+    name: '',
+  },
+  template: {
+  },
 });
 
 export const projects = writable([]);

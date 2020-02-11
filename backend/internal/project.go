@@ -25,18 +25,25 @@ type ProjectDescription struct {
 type Project struct {
 	CreatedAt   time.Time          `json:"created_at"`
 	ProjectID   ProjectID          `json:"project_id"`
+	Template    ProjectTemplate    `json:"template"`
 	Settings    ProjectSettings    `json:"settings"`
 	State       ProjectState       `json:"state"`
 	Description ProjectDescription `json:"description"`
 }
 
-func NewProject(desc ProjectDescription) Project {
+type CreateProjectRequest struct {
+	Template    ProjectTemplate    `json:"template"`
+	Description ProjectDescription `json:"description"`
+}
+
+func NewProject(template ProjectTemplate, desc ProjectDescription) Project {
 	projectID := ProjectID(xid.New().String())
 	now := utils.NowUTC()
 
 	return Project{
 		CreatedAt:   now,
 		ProjectID:   projectID,
+		Template:    template,
 		Settings:    ProjectSettings{},
 		State:       ProjectState{},
 		Description: desc,
@@ -44,7 +51,7 @@ func NewProject(desc ProjectDescription) Project {
 }
 
 type ProjectService interface {
-	CreateProject(ProjectDescription) (Project, error)
+	CreateProject(CreateProjectRequest) (Project, error)
 	ListProjects() (ProjectList, error)
 	GetProject(GetProjectRequest) (Project, error)
 }
@@ -61,15 +68,15 @@ func NewProjectService(db *DB) ProjectService {
 
 func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		p := *request.(*ProjectDescription)
+		p := *request.(*CreateProjectRequest)
 		s, _ := s.CreateProject(p)
 
 		return s, nil
 	}
 }
 
-func (s *ProjectServiceImpl) CreateProject(req ProjectDescription) (Project, error) {
-	project := NewProject(req)
+func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
+	project := NewProject(req.Template, req.Description)
 
 	err := s.db.Project.Set(project.ProjectID, project)
 	if err != nil {

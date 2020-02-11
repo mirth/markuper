@@ -103,6 +103,7 @@ func main() {
 
 	ms := internal.NewMarkupService(db)
 	ps := internal.NewProjectService(db)
+	pts := internal.NewProjectTemplateService()
 
 	nextHandler := httptransport.NewServer(
 		internal.NextSampleEndpoint(ms),
@@ -121,16 +122,14 @@ func main() {
 	createProjectHandler := httptransport.NewServer(
 		internal.CreateProjectEndpoint(ps),
 		MakeHTTPRequestDecoder(func() interface{} {
-			return &internal.ProjectDescription{}
+			return &internal.CreateProjectRequest{}
 		}),
 		encodeResponse,
 	)
 
 	listProjectsHandler := httptransport.NewServer(
 		internal.ListProjectsEndpoint(ps),
-		MakeHTTPRequestDecoder(func() interface{} {
-			return &internal.ProjectList{}
-		}),
+		httptransport.NopRequestDecoder,
 		encodeResponse,
 	)
 
@@ -142,12 +141,19 @@ func main() {
 		encodeResponse,
 	)
 
+	listProjectTemplatesEndpoint := httptransport.NewServer(
+		internal.ListProjectTemplatesEndpoint(pts),
+		httptransport.NopRequestDecoder,
+		encodeResponse,
+	)
+
 	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
 	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
 	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}", getProjectEndpoint).Methods("GET")
+	r.Handle("/api/v1/project_templates", listProjectTemplatesEndpoint).Methods("GET")
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("VEGETALS"))

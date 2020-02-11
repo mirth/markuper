@@ -8,13 +8,15 @@ import (
 
 func TestCreateProject(t *testing.T) {
 	db := openTestDB()
+	svc := NewProjectService(db)
 
-	svc := ProjectServiceImpl{
-		db: db,
-	}
-
-	req := ProjectDescription{
-		Name: "testproject0",
+	req := CreateProjectRequest{
+		Template: ProjectTemplate{
+			Type: "classification",
+		},
+		Description: ProjectDescription{
+			Name: "testproject0",
+		},
 	}
 
 	c, err := db.Project.Count()
@@ -30,23 +32,57 @@ func TestCreateProject(t *testing.T) {
 		assert.Equal(t, 1, c)
 
 		actual := Project{}
-		svc.db.Project.Get(p.ProjectID, &actual)
-		assert.Equal(t, req, actual.Description)
+		db.Project.Get(p.ProjectID, &actual)
+		assert.Equal(t, req.Template, actual.Template)
+		assert.Equal(t, req.Description, actual.Description)
+	}
+}
+
+func TestGetProject(t *testing.T) {
+	db := openTestDB()
+	svc := NewProjectService(db)
+
+	req := CreateProjectRequest{
+		Template: ProjectTemplate{
+			Type: "classification",
+		},
+		Description: ProjectDescription{
+			Name: "testproject0",
+		},
 	}
 
+	c, err := db.Project.Count()
+	assert.Nil(t, err)
+	assert.Zero(t, c)
+
+	p, err := svc.CreateProject(req)
+
+	{
+		actual, err := svc.GetProject(GetProjectRequest{
+			ProjectID: p.ProjectID,
+		})
+		assert.Nil(t, err)
+
+		assert.Equal(t, p.ProjectID, actual.ProjectID)
+		assert.Equal(t, p.Template, actual.Template)
+		assert.Equal(t, req.Template, actual.Template)
+		assert.Equal(t, p.Description, actual.Description)
+		assert.Equal(t, req.Description, actual.Description)
+	}
 }
 
 func TestListProjects(t *testing.T) {
 	db := openTestDB()
+	svc := NewProjectService(db)
 
-	svc := ProjectServiceImpl{
-		db: db,
+	req1 := CreateProjectRequest{
+		Template: ProjectTemplate{
+			Type: "classification",
+		},
+		Description: ProjectDescription{
+			Name: "testproject0",
+		},
 	}
-
-	req1 := ProjectDescription{
-		Name: "testproject0",
-	}
-
 	c, err := db.Project.Count()
 	assert.Nil(t, err)
 	assert.Zero(t, c)
@@ -61,14 +97,18 @@ func TestListProjects(t *testing.T) {
 			descs = append(descs, p.Description)
 		}
 		assert.ElementsMatch(t, []ProjectDescription{
-			{Name: req1.Name},
+			{Name: req1.Description.Name},
 		}, descs)
 	}
 
-	req2 := ProjectDescription{
-		Name: "testproject1",
+	req2 := CreateProjectRequest{
+		Template: ProjectTemplate{
+			Type: "classification",
+		},
+		Description: ProjectDescription{
+			Name: "testproject1",
+		},
 	}
-
 	_, err = svc.CreateProject(req2)
 
 	{
@@ -80,8 +120,8 @@ func TestListProjects(t *testing.T) {
 			descs = append(descs, p.Description)
 		}
 		assert.ElementsMatch(t, []ProjectDescription{
-			{Name: req1.Name},
-			{Name: req2.Name},
+			{Name: req1.Description.Name},
+			{Name: req2.Description.Name},
 		}, descs)
 	}
 }

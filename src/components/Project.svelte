@@ -14,5 +14,6 @@ $: project = api.get(`/project/${params.project_id}`)
 {#await project then p}
 <PageBlank>
 <h3>{p.description.name}</h3>
+<h3>{p.template.type}</h3>
 </PageBlank>
 {/await}
