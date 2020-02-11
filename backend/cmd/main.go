@@ -129,7 +129,15 @@ func main() {
 	listProjectsHandler := httptransport.NewServer(
 		internal.ListProjectsEndpoint(ps),
 		MakeHTTPRequestDecoder(func() interface{} {
-			return &internal.PorjectList{}
+			return &internal.ProjectList{}
+		}),
+		encodeResponse,
+	)
+
+	getProjectEndpoint := httptransport.NewServer(
+		internal.GetProjectEndpoint(ps),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.GetProjectRequest{}
 		}),
 		encodeResponse,
 	)
@@ -139,6 +147,7 @@ func main() {
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
 	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
 	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
+	r.Handle("/api/v1/project/{project_id}", getProjectEndpoint).Methods("GET")
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("VEGETALS"))

@@ -1,18 +1,18 @@
 
 <script>
-import Layout from './components/Layout.svelte';
-import SideBar from './components/SideBar.svelte'
+import { onMount } from 'svelte';
+import api from '../api.js';
+import PageBlank from './PageBlank.svelte';
 
-export let project;
+export let params = {};
+
+$: project = api.get(`/project/${params.project_id}`)
 
 </script>
 
 
-<Layout>
-  <div slot='sidebar'>
-    <SideBar />
-  </div>
-  <div slot='content'>
-    <h1>{project.name}</h1>
-  </div>
-</Layout>
+{#await project then p}
+<PageBlank>
+<h3>{p.description.name}</h3>
+</PageBlank>
+{/await}

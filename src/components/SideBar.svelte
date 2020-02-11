@@ -1,5 +1,6 @@
 <script>
 import { projects } from '../store.js'
+import { link } from 'svelte-spa-router'
 
 </script>
 
@@ -10,10 +11,12 @@ ul {
 </style>
 
 <ul>
-  {#each $projects as project}
-
   <li>
-    <a href={`/project/${project.project_id}`}>
+    <a href={`/`} use:link>Home</a>
+  </li>
+  {#each $projects as project}
+  <li>
+    <a href={`/project/${project.project_id}`} use:link>
       {project.description.name}
     </a>
   </li>

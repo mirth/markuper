@@ -3,7 +3,6 @@ package internal
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 
 	"github.com/recoilme/pudge"
 )
@@ -19,6 +18,6 @@ func decodeBinary(raw []byte, makeValuePtr func() interface{}) interface{} {
 	dec := gob.NewDecoder(buf)
 	key := makeValuePtr()
 	_ = dec.Decode(key)
-	fmt.Println("key: ", key)
+
 	return key
 }

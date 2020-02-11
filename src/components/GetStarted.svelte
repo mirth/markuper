@@ -1,13 +1,11 @@
 <script>
-import { onMount } from 'svelte';
 import api from '../api';
 import ProjectPreview from './ProjectPreview.svelte'
 import Modal from './Modal.svelte'
 import Button from './Button.svelte'
 import CreateProjectPopup from './CreateProjectPopup.svelte'
-import { projects, fetchProjectList } from "../store.js";
-
-onMount(fetchProjectList);
+import { projects } from "../store.js";
+import PageBlank from './PageBlank.svelte';
 
 let isNewProjectPopupShown = false;
 
@@ -21,6 +19,7 @@ function closeNewProjectPopup() {
 
 </script>
 
+<PageBlank>
 <ul>
   <li>
     <Button on:click={showNewProjectPopup}>Create new project</Button>
@@ -28,9 +27,7 @@ function closeNewProjectPopup() {
 
   {#each $projects as project}
     <li>
-      <a href={`/project/${project.project_id}`}>
-        <ProjectPreview project={project} />
-      </a>
+      <ProjectPreview project={project} />
     </li>
   {/each}
 </ul>
@@ -40,3 +37,4 @@ function closeNewProjectPopup() {
     <p><CreateProjectPopup /></p>
   </Modal>
 {/if}
+</PageBlank>
