@@ -3,6 +3,7 @@ package internal
 import (
 	"backend/pkg/utils"
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"

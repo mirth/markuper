@@ -3,14 +3,6 @@ import _ from 'lodash';
 import { writable } from 'svelte/store';
 import api from './api';
 
-export const newProject = writable({
-  description: {
-    name: '',
-  },
-  template: {
-  },
-});
-
 export const projects = writable([]);
 
 export async function fetchProjectList() {

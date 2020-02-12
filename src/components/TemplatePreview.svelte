@@ -8,4 +8,4 @@ import Button from './Button.svelte'
 
 </script>
 
-<h1>{template.type}</h1>
+<h1>{template.task}</h1>

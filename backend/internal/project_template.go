@@ -7,7 +7,7 @@ import (
 )
 
 type ProjectTemplate struct {
-	Task string `json:"type"`
+	Task string `json:"task"`
 }
 
 type ProjectTemplateList struct {
