@@ -48,8 +48,6 @@ func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, er
 		projectID := "project0"
 		project := internal.Project{
 			ProjectID: projectID,
-			Settings:  internal.ProjectSettings{},
-			State:     internal.ProjectState{},
 		}
 
 		matches := []string{

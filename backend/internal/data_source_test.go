@@ -26,15 +26,15 @@ func TestImageGlobDataSource(t *testing.T) {
 	}
 
 	src := ImageGlobDataSource{
-		globPattern: joinTmp(fmt.Sprintf("*.jpg")),
+		DataSource{SourceURI: joinTmp(fmt.Sprintf("*.jpg"))},
 	}
 
-	samples, err := src.FetchSamples()
+	list, err := src.FetchSampleList()
 	assert.Nil(t, err)
 
 	{
 		actual := []ImageSample{}
-		for _, iterS := range samples {
+		for _, iterS := range list {
 			actual = append(actual, iterS.(ImageSample))
 		}
 

@@ -12,31 +12,30 @@ import (
 
 type ProjectID = string
 
-type ProjectSettings struct {
-}
-
-type ProjectState struct {
-}
-
 type ProjectDescription struct {
 	Name string `json:"name"`
 }
 
 type Project struct {
-	CreatedAt   time.Time          `json:"created_at"`
-	ProjectID   ProjectID          `json:"project_id"`
-	Template    ProjectTemplate    `json:"template"`
-	Settings    ProjectSettings    `json:"settings"`
-	State       ProjectState       `json:"state"`
+	CreatedAt  time.Time       `json:"created_at"`
+	ProjectID  ProjectID       `json:"project_id"`
+	Template   ProjectTemplate `json:"template"`
+	DataSource DataSource      `json:"data_source"`
+
 	Description ProjectDescription `json:"description"`
 }
 
 type CreateProjectRequest struct {
 	Template    ProjectTemplate    `json:"template"`
+	DataSource  DataSource         `json:"data_source"`
 	Description ProjectDescription `json:"description"`
 }
 
-func NewProject(template ProjectTemplate, desc ProjectDescription) Project {
+func NewProject(
+	template ProjectTemplate,
+	dataSrc DataSource,
+	desc ProjectDescription,
+) Project {
 	projectID := ProjectID(xid.New().String())
 	now := utils.NowUTC()
 
@@ -44,8 +43,7 @@ func NewProject(template ProjectTemplate, desc ProjectDescription) Project {
 		CreatedAt:   now,
 		ProjectID:   projectID,
 		Template:    template,
-		Settings:    ProjectSettings{},
-		State:       ProjectState{},
+		DataSource:  dataSrc,
 		Description: desc,
 	}
 }
@@ -76,7 +74,7 @@ func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 }
 
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
-	project := NewProject(req.Template, req.Description)
+	project := NewProject(req.Template, req.DataSource, req.Description)
 
 	err := s.db.Project.Set(project.ProjectID, project)
 	if err != nil {

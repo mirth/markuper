@@ -19,7 +19,6 @@ func (s SampleID) toString() string {
 	return fmt.Sprintf("%s|%d", s.ProjectID, s.SampleID)
 }
 
-// type SampleData = json.RawMessage
 type SampleData interface {
 	JSON() ([]byte, error)
 }
@@ -32,16 +31,21 @@ func (s ImageSample) JSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
-type DataSource interface {
-	FetchSamples() ([]SampleData, error)
+type SampleListFetcher interface {
+	FetchSampleList() ([]SampleData, error)
+}
+
+type DataSource struct {
+	Type      string `json:"type"`
+	SourceURI string `json:"source_uri"`
 }
 
 type ImageGlobDataSource struct {
-	globPattern string
+	DataSource
 }
 
-func (s *ImageGlobDataSource) FetchSamples() ([]SampleData, error) {
-	matches, err := filepath.Glob(s.globPattern)
+func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
+	matches, err := filepath.Glob(s.SourceURI)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
