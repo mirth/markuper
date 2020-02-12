@@ -7,7 +7,7 @@ import (
 )
 
 type ProjectTemplate struct {
-	Type string `json:"type"`
+	Task string `json:"type"`
 }
 
 type ProjectTemplateList struct {
@@ -24,7 +24,7 @@ type ProjectTemplateServiceImpl struct {
 func (_ *ProjectTemplateServiceImpl) ListProjectTemplates() (ProjectTemplateList, error) {
 	return ProjectTemplateList{
 		Templates: []ProjectTemplate{
-			{Type: "classification"},
+			{Task: "classification"},
 		},
 	}, nil
 }

@@ -12,7 +12,7 @@ func TestCreateProject(t *testing.T) {
 
 	req := CreateProjectRequest{
 		Template: ProjectTemplate{
-			Type: "classification",
+			Task: "classification",
 		},
 		Description: ProjectDescription{
 			Name: "testproject0",
@@ -44,7 +44,7 @@ func TestGetProject(t *testing.T) {
 
 	req := CreateProjectRequest{
 		Template: ProjectTemplate{
-			Type: "classification",
+			Task: "classification",
 		},
 		Description: ProjectDescription{
 			Name: "testproject0",
@@ -77,7 +77,7 @@ func TestListProjects(t *testing.T) {
 
 	req1 := CreateProjectRequest{
 		Template: ProjectTemplate{
-			Type: "classification",
+			Task: "classification",
 		},
 		Description: ProjectDescription{
 			Name: "testproject0",
@@ -103,7 +103,7 @@ func TestListProjects(t *testing.T) {
 
 	req2 := CreateProjectRequest{
 		Template: ProjectTemplate{
-			Type: "classification",
+			Task: "classification",
 		},
 		Description: ProjectDescription{
 			Name: "testproject1",

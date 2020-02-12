@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"sort"
 	"time"
 
@@ -15,29 +14,20 @@ import (
 	"backend/pkg/utils"
 )
 
-type SampleID struct {
-	ProjectID ProjectID `json:"project_id"`
-	SampleID  int64     `json:"sample_id"`
-}
-
-func (s SampleID) toString() string {
-	return fmt.Sprintf("%s|%d", s.ProjectID, s.SampleID)
-}
-
 type SampleMarkup struct {
 	CreatedAt time.Time `json:"created_at"`
 
 	Markup json.RawMessage `json:"markup"`
 }
 
-type SampleResponse struct {
-	SampleID  SampleID `json:"sample_id"`
-	SampleURI string   `json:"sample_uri"`
-}
-
 type AssessRequest struct {
 	SampleID     SampleID     `json:"sample_id"`
 	SampleMarkup SampleMarkup `json:"sample_markup"`
+}
+
+type SampleResponse struct {
+	SampleID SampleID        `json:"sample_id"`
+	Sample   json.RawMessage `json:"sample"`
 }
 
 type MarkupService interface {
@@ -57,9 +47,7 @@ func NewMarkupService(db *DB) MarkupService {
 
 func NextSampleEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		s, _ := s.GetNext()
-
-		return s, nil
+		return s.GetNext()
 	}
 }
 
@@ -112,15 +100,15 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 
 	// FIXME empty toAssess
 	sID := toAssess[0]
-	sampleURI := ""
-	err = s.db.Sample.Get(sID, &sampleURI)
+	sampleData := []byte{}
+	err = s.db.Sample.Get(sID, &sampleData)
 	if err != nil {
 		return SampleResponse{}, errors.WithStack(err)
 	}
 
 	return SampleResponse{
-		SampleID:  sID,
-		SampleURI: sampleURI,
+		SampleID: sID,
+		Sample:   sampleData,
 	}, err
 }
 

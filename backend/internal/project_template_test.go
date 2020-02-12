@@ -13,8 +13,8 @@ func TestListProjectTemplates(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		assert.Equal(t, []ProjectTemplate{
-			{Type: "classification"},
+		assert.ElementsMatch(t, []ProjectTemplate{
+			{Task: "classification"},
 		}, l.Templates)
 	}
 }
