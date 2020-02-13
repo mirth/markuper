@@ -43,30 +43,6 @@ func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, er
 		return nil, errors.WithStack(err)
 	}
 
-	// TODO: it e2e!
-	if os.Getenv("ENV") == "test" {
-		projectID := "project0"
-		project := internal.Project{
-			ProjectID: projectID,
-		}
-
-		matches := []string{
-			"img0",
-			"img1",
-			"img2",
-		}
-
-		projectDB.Set(projectID, project)
-		for i, path := range matches {
-			sID := internal.SampleID{
-				ProjectID: projectID,
-				SampleID:  int64(i),
-			}
-
-			samplesDB.Set(sID, path)
-		}
-	}
-
 	return &internal.DB{
 		Project: projectDB,
 		Sample:  samplesDB,
