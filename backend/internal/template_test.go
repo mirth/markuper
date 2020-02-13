@@ -14,7 +14,7 @@ func TestListTemplates(t *testing.T) {
 
 	{
 		assert.ElementsMatch(t, []Template{
-			{Task: "classification"},
+			DEFAULT_CLASSIFICATION_TEMPLATE,
 		}, l.Templates)
 	}
 }

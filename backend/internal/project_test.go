@@ -12,9 +12,7 @@ import (
 
 func newTestCreateProjectRequest(name string) CreateProjectRequest {
 	return CreateProjectRequest{
-		Template: Template{
-			Task: "classification",
-		},
+		Template: DEFAULT_CLASSIFICATION_TEMPLATE,
 		DataSource: DataSource{
 			Type:      "local_directory",
 			SourceURI: "/tmp/*.jpg",
@@ -45,6 +43,7 @@ func TestCreateProject(t *testing.T) {
 
 		actual := Project{}
 		db.Project.Get(p.ProjectID, &actual)
+
 		assert.Equal(t, req.Template, actual.Template)
 		assert.Equal(t, req.Description, actual.Description)
 	}

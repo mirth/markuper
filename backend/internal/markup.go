@@ -100,15 +100,15 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 
 	// FIXME empty toAssess
 	sID := toAssess[0]
-	sampleData := []byte{}
-	err = s.db.Sample.Get(sID, &sampleData)
+	SampleData := []byte{}
+	err = s.db.Sample.Get(sID, &SampleData)
 	if err != nil {
 		return SampleResponse{}, errors.WithStack(err)
 	}
 
 	return SampleResponse{
 		SampleID: sID,
-		Sample:   sampleData,
+		Sample:   SampleData,
 	}, err
 }
 

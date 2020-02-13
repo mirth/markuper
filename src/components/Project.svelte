@@ -7,7 +7,6 @@ import PageBlank from './PageBlank.svelte';
 export let params = {};
 
 $: project = api.get(`/project/${params.project_id}`);
-
 </script>
 
 
@@ -17,7 +16,7 @@ $: project = api.get(`/project/${params.project_id}`);
 <h3>{p.template.task}</h3>
 <h3>{p.data_source.source_uri}</h3>
 <h3>
-  <a href={`/project/${project.project_id}/assess_sample`} use:link>Begin assess</a>
+  <a href={`/project/${p.project_id}/assess_sample`} use:link>Begin assess</a>
 </h3>
 </PageBlank>
 {/await}

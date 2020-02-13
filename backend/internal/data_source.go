@@ -19,9 +19,10 @@ func (s SampleID) toString() string {
 	return fmt.Sprintf("%s|%d", s.ProjectID, s.SampleID)
 }
 
-type SampleData interface {
+type Jsonable interface {
 	JSON() ([]byte, error)
 }
+type SampleData = Jsonable
 
 type ImageSample struct {
 	ImageURI SampleURI `json:"image_uri"`
