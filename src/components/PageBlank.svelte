@@ -1,6 +1,6 @@
 <script>
 import { onMount } from 'svelte';
-import { fetchProjectList } from "../store.js";
+import { fetchProjectList } from '../store';
 import SideBar from './SideBar.svelte';
 
 onMount(fetchProjectList);

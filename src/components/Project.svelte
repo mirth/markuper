@@ -1,13 +1,12 @@
 
 <script>
-import { onMount } from 'svelte';
-import api from '../api.js';
-import PageBlank from './PageBlank.svelte';
 import { link } from 'svelte-spa-router';
+import api from '../api';
+import PageBlank from './PageBlank.svelte';
 
 export let params = {};
 
-$: project = api.get(`/project/${params.project_id}`)
+$: project = api.get(`/project/${params.project_id}`);
 
 </script>
 

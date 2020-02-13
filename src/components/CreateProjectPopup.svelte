@@ -1,14 +1,14 @@
 <script>
-import { projects, fetchProjectList } from "../store.js";
+import { fetchProjectList } from '../store';
 import api from '../api';
-import ProjectTemplatePicker from './ProjectTemplatePicker.svelte'
-import DataSource from './DataSource.svelte'
+import ProjectTemplatePicker from './ProjectTemplatePicker.svelte';
+import DataSource from './DataSource.svelte';
 
 export let close;
 
 let projectName = '';
-let selectedTemplate = {};
-let dataSource = {
+const selectedTemplate = {};
+const dataSource = {
   type: 'local_directory',
   source_uri: '',
 };

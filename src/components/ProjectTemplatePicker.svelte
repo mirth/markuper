@@ -4,7 +4,7 @@ import TemplatePreview from './TemplatePreview.svelte';
 
 export let selectedTemplate;
 
-const templateList = api.get('/project_templates')
+const templateList = api.get('/project_templates');
 
 </script>
 
