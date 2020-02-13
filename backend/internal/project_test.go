@@ -10,22 +10,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateProject(t *testing.T) {
-	db := openTestDB()
-	svc := NewProjectService(db)
-
-	req := CreateProjectRequest{
+func newTestCreateProjectRequest(name string) CreateProjectRequest {
+	return CreateProjectRequest{
 		Template: ProjectTemplate{
 			Task: "classification",
-		},
-		Description: ProjectDescription{
-			Name: "testproject0",
 		},
 		DataSource: DataSource{
 			Type:      "local_directory",
 			SourceURI: "/tmp/*.jpg",
 		},
+		Description: ProjectDescription{
+			Name: name,
+		},
 	}
+}
+
+func TestCreateProject(t *testing.T) {
+	db := openTestDB()
+	svc := NewProjectService(db)
+
+	req := newTestCreateProjectRequest("testproject0")
 
 	c, err := db.Project.Count()
 	assert.Nil(t, err)
@@ -50,18 +54,7 @@ func TestGetProject(t *testing.T) {
 	db := openTestDB()
 	svc := NewProjectService(db)
 
-	req := CreateProjectRequest{
-		Template: ProjectTemplate{
-			Task: "classification",
-		},
-		Description: ProjectDescription{
-			Name: "testproject0",
-		},
-		DataSource: DataSource{
-			Type:      "local_directory",
-			SourceURI: "/tmp/*.jpg",
-		},
-	}
+	req := newTestCreateProjectRequest("testproject0")
 
 	c, err := db.Project.Count()
 	assert.Nil(t, err)
@@ -87,18 +80,8 @@ func TestListProjects(t *testing.T) {
 	db := openTestDB()
 	svc := NewProjectService(db)
 
-	req1 := CreateProjectRequest{
-		Template: ProjectTemplate{
-			Task: "classification",
-		},
-		Description: ProjectDescription{
-			Name: "testproject0",
-		},
-		DataSource: DataSource{
-			Type:      "local_directory",
-			SourceURI: "/tmp/*.jpg",
-		},
-	}
+	req1 := newTestCreateProjectRequest("testproject0")
+
 	c, err := db.Project.Count()
 	assert.Nil(t, err)
 	assert.Zero(t, c)
@@ -117,18 +100,7 @@ func TestListProjects(t *testing.T) {
 		}, descs)
 	}
 
-	req2 := CreateProjectRequest{
-		Template: ProjectTemplate{
-			Task: "classification",
-		},
-		Description: ProjectDescription{
-			Name: "testproject1",
-		},
-		DataSource: DataSource{
-			Type:      "local_directory",
-			SourceURI: "/tmp/*.jpg",
-		},
-	}
+	req2 := newTestCreateProjectRequest("testproject1")
 	_, err = svc.CreateProject(req2)
 
 	{
