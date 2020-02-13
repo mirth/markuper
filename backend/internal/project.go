@@ -17,22 +17,22 @@ type ProjectDescription struct {
 }
 
 type Project struct {
-	CreatedAt  time.Time       `json:"created_at"`
-	ProjectID  ProjectID       `json:"project_id"`
-	Template   ProjectTemplate `json:"template"`
-	DataSource DataSource      `json:"data_source"`
+	CreatedAt  time.Time  `json:"created_at"`
+	ProjectID  ProjectID  `json:"project_id"`
+	Template   Template   `json:"template"`
+	DataSource DataSource `json:"data_source"`
 
 	Description ProjectDescription `json:"description"`
 }
 
 type CreateProjectRequest struct {
-	Template    ProjectTemplate    `json:"template"`
+	Template    Template           `json:"template"`
 	DataSource  DataSource         `json:"data_source"`
 	Description ProjectDescription `json:"description"`
 }
 
 func NewProject(
-	template ProjectTemplate,
+	template Template,
 	dataSrc DataSource,
 	desc ProjectDescription,
 ) Project {

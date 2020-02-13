@@ -12,7 +12,7 @@ import (
 
 func newTestCreateProjectRequest(name string) CreateProjectRequest {
 	return CreateProjectRequest{
-		Template: ProjectTemplate{
+		Template: Template{
 			Task: "classification",
 		},
 		DataSource: DataSource{
@@ -137,7 +137,7 @@ func TestFetchSampleList(t *testing.T) {
 		Type:      "local_directory",
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
 	}
-	proj := NewProject(ProjectTemplate{}, src, ProjectDescription{})
+	proj := NewProject(Template{}, src, ProjectDescription{})
 	err := fetchSampleList(db, proj)
 	assert.Nil(t, err)
 

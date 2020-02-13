@@ -1,7 +1,7 @@
 <script>
 import { fetchProjectList } from '../store';
 import api from '../api';
-import ProjectTemplatePicker from './ProjectTemplatePicker.svelte';
+import TemplatePicker from './TemplatePicker.svelte';
 import DataSource from './DataSource.svelte';
 
 export let close;
@@ -29,7 +29,7 @@ async function createNewProject() {
 
 <form on:submit|preventDefault={createNewProject}>
   <input bind:value={projectName} placeholder="New project" minlength="1">
-  <ProjectTemplatePicker {selectedTemplate} />
+  <TemplatePicker {selectedTemplate} />
   <DataSource {dataSource} />
   <button>Create</button>
 </form>
