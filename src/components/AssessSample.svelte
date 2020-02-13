@@ -1,8 +1,7 @@
 <script>
 
-import api from './api';
-import Button from './components/Button.svelte';
-import './global.svelte';
+import api from '../api';
+import Button from './Button.svelte';
 
 async function fetchNext() {
   const res = await api.get('/next');
@@ -41,7 +40,7 @@ const labels = [
 {#await sample}
 <p>...waiting</p>
 {:then sample}
-<img src="file://{sample.sample_uri}" alt="KEK"/>
+<img src="file://{sample.sample.image_uri}" alt="KEK"/>
 {:catch error}
 	<p style="color: red">{error}</p>
 {/await}
