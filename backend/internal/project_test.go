@@ -1,6 +1,10 @@
 package internal
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +20,10 @@ func TestCreateProject(t *testing.T) {
 		},
 		Description: ProjectDescription{
 			Name: "testproject0",
+		},
+		DataSource: DataSource{
+			Type:      "local_directory",
+			SourceURI: "/tmp/*.jpg",
 		},
 	}
 
@@ -48,6 +56,10 @@ func TestGetProject(t *testing.T) {
 		},
 		Description: ProjectDescription{
 			Name: "testproject0",
+		},
+		DataSource: DataSource{
+			Type:      "local_directory",
+			SourceURI: "/tmp/*.jpg",
 		},
 	}
 
@@ -82,6 +94,10 @@ func TestListProjects(t *testing.T) {
 		Description: ProjectDescription{
 			Name: "testproject0",
 		},
+		DataSource: DataSource{
+			Type:      "local_directory",
+			SourceURI: "/tmp/*.jpg",
+		},
 	}
 	c, err := db.Project.Count()
 	assert.Nil(t, err)
@@ -108,6 +124,10 @@ func TestListProjects(t *testing.T) {
 		Description: ProjectDescription{
 			Name: "testproject1",
 		},
+		DataSource: DataSource{
+			Type:      "local_directory",
+			SourceURI: "/tmp/*.jpg",
+		},
 	}
 	_, err = svc.CreateProject(req2)
 
@@ -123,5 +143,48 @@ func TestListProjects(t *testing.T) {
 			{Name: req1.Description.Name},
 			{Name: req2.Description.Name},
 		}, descs)
+	}
+}
+
+func TestFetchSampleList(t *testing.T) {
+	db := openTestDB()
+
+	tmpDir, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir)
+	joinTmp := func(fn string) string {
+		return filepath.Join(tmpDir, fn)
+	}
+	imgPaths := []string{}
+	for i := 0; i < 5; i++ {
+		path := joinTmp(fmt.Sprintf("img%d.jpg", i))
+		os.Create(path)
+		imgPaths = append(imgPaths, path)
+	}
+
+	src := DataSource{
+		Type:      "local_directory",
+		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
+	}
+	proj := NewProject(ProjectTemplate{}, src, ProjectDescription{})
+	err := fetchSampleList(db, proj)
+	assert.Nil(t, err)
+
+	{
+		sIDs, _ := getAllSampleIDs(db.Sample)
+
+		samples := [][]byte{}
+		for _, id := range sIDs {
+			s := []byte{}
+			db.Sample.Get(id, &s)
+			samples = append(samples, s)
+		}
+
+		assert.ElementsMatch(t, [][]byte{
+			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[0])),
+			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[1])),
+			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[2])),
+			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[3])),
+			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[4])),
+		}, samples)
 	}
 }

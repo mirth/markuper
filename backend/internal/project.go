@@ -3,7 +3,6 @@ package internal
 import (
 	"backend/pkg/utils"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -74,10 +73,43 @@ func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	}
 }
 
+func fetchSampleList(db *DB, proj Project) error {
+	fetcher := GetSampleListFetcher(proj.DataSource)
+
+	list, err := fetcher.FetchSampleList()
+	if err != nil {
+		return err
+	}
+
+	for i, sample := range list {
+		sID := SampleID{
+			ProjectID: proj.ProjectID,
+			SampleID:  int64(i), //fixme -> uuid
+		}
+
+		j, err := sample.JSON()
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
+		err = db.Sample.Set(sID, j)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	return nil
+}
+
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
 	project := NewProject(req.Template, req.DataSource, req.Description)
 
-	err := s.db.Project.Set(project.ProjectID, project)
+	err := fetchSampleList(s.db, project)
+	if err != nil {
+		return Project{}, err
+	}
+
+	err = s.db.Project.Set(project.ProjectID, project)
 	if err != nil {
 		return Project{}, errors.WithStack(err)
 	}

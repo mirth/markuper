@@ -59,3 +59,14 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 
 	return samples, nil
 }
+
+func GetSampleListFetcher(src DataSource) SampleListFetcher {
+	switch src.Type {
+	case "local_directory":
+		return ImageGlobDataSource{
+			DataSource: src,
+		}
+	}
+
+	return nil
+}
