@@ -1,0 +1,49 @@
+package internal
+
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestImageGlobDataSource(t *testing.T) {
+	tmpDir, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir)
+
+	joinTmp := func(fn string) string {
+		return filepath.Join(tmpDir, fn)
+	}
+
+	for i := 0; i < 5; i++ {
+		os.Create(joinTmp(fmt.Sprintf("img%d.jpg", i)))
+	}
+	for i := 0; i < 5; i++ {
+		os.Create(joinTmp(fmt.Sprintf("img%d.jpeg", i)))
+	}
+
+	src := ImageGlobDataSource{
+		DataSource{SourceURI: joinTmp(fmt.Sprintf("*.jpg"))},
+	}
+
+	list, err := src.FetchSampleList()
+	assert.Nil(t, err)
+
+	{
+		actual := []ImageSample{}
+		for _, iterS := range list {
+			actual = append(actual, iterS.(ImageSample))
+		}
+
+		assert.ElementsMatch(t, []ImageSample{
+			{ImageURI: joinTmp("img0.jpg")},
+			{ImageURI: joinTmp("img1.jpg")},
+			{ImageURI: joinTmp("img2.jpg")},
+			{ImageURI: joinTmp("img3.jpg")},
+			{ImageURI: joinTmp("img4.jpg")},
+		}, actual)
+	}
+}

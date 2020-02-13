@@ -15,7 +15,7 @@ function createWindow(backend) {
     },
   });
 
-  win.loadFile('public/index.html');
+  win.loadFile('public/index.html', { hash: '#' });
   win.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time

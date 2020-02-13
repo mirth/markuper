@@ -3,44 +3,29 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"path"
 	"testing"
 	"time"
 
-	"github.com/recoilme/pudge"
 	"github.com/stretchr/testify/assert"
 )
 
-func openTestDB() *DB {
-	cfg := &pudge.Config{StoreMode: 2}
-
-	tmpdir, _ := ioutil.TempDir("/tmp", "unittest")
-	projectDB, _ := pudge.Open(path.Join(tmpdir, "1"), cfg)
-	samplesDB, _ := pudge.Open(path.Join(tmpdir, "2"), cfg)
-	markupDB, _ := pudge.Open(path.Join(tmpdir, "3"), cfg)
-
-	return &DB{
-		Project: projectDB,
-		Sample:  samplesDB,
-		Markup:  markupDB,
-	}
-}
-
 func fillTestDB(db *DB) {
-	matches := make([]string, 0)
+	samples := make([]ImageSample, 0)
 	for i := 0; i < 10; i++ {
-		matches = append(matches, fmt.Sprintf("sampleuri%d", i))
+		samples = append(samples, ImageSample{
+			ImageURI: fmt.Sprintf("sampleuri%d", i),
+		})
 	}
 
 	projectID := "testproject0"
-	for i, path := range matches {
+	for i, sample := range samples {
 		sk := SampleID{
 			ProjectID: projectID,
 			SampleID:  int64(i),
 		}
 
-		db.Sample.Set(sk, path)
+		j, _ := json.Marshal(sample)
+		db.Sample.Set(sk, j)
 	}
 }
 
@@ -93,8 +78,8 @@ func TestMarkupNext(t *testing.T) {
 			SampleID:  i,
 		}
 		e := SampleResponse{
-			SampleID:  sID,
-			SampleURI: fmt.Sprintf("sampleuri%d", i),
+			SampleID: sID,
+			Sample:   json.RawMessage(fmt.Sprintf(`{"image_uri":"sampleuri%d"}`, i)),
 		}
 		assert.Equal(t, e, a)
 

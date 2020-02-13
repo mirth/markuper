@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"backend/internal"
 
@@ -17,20 +16,6 @@ import (
 
 	"backend/pkg/httpjsondecoder"
 )
-
-type ProjectID = string
-
-type ProjectSettings struct {
-}
-
-type ProjectState struct {
-}
-
-type Project struct {
-	ProjectID ProjectID       `json:"project_id"`
-	Settings  ProjectSettings `json:"settings"`
-	State     ProjectState    `json:"state"`
-}
 
 func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, error) {
 	storeMode := 0
@@ -56,33 +41,6 @@ func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, er
 	markupDB, err := pudge.Open(markupDBFile, cfg)
 	if err != nil {
 		return nil, errors.WithStack(err)
-	}
-
-	projectID := "project0"
-	project := Project{
-		ProjectID: projectID,
-		Settings:  ProjectSettings{},
-		State:     ProjectState{},
-	}
-
-	matches, _ := filepath.Glob("/Users/tolik/Desktop/*.png")
-
-	if os.Getenv("ENV") == "test" {
-		matches = []string{
-			"img0",
-			"img1",
-			"img2",
-		}
-	}
-
-	projectDB.Set(projectID, project)
-	for i, path := range matches {
-		sID := internal.SampleID{
-			ProjectID: projectID,
-			SampleID:  int64(i),
-		}
-
-		samplesDB.Set(sID, path)
 	}
 
 	return &internal.DB{
@@ -117,24 +75,60 @@ func main() {
 		panic(err)
 	}
 
-	s := internal.NewMarkupService(db)
+	ms := internal.NewMarkupService(db)
+	ps := internal.NewProjectService(db)
+	pts := internal.NewProjectTemplateService()
+
 	nextHandler := httptransport.NewServer(
-		internal.NextSampleEndpoint(s),
+		internal.NextSampleEndpoint(ms),
 		httptransport.NopRequestDecoder,
 		encodeResponse,
 	)
 
 	assessHandler := httptransport.NewServer(
-		internal.AssessEndpoint(s),
+		internal.AssessEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.AssessRequest{}
 		}),
 		encodeResponse,
 	)
 
+	createProjectHandler := httptransport.NewServer(
+		internal.CreateProjectEndpoint(ps),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.CreateProjectRequest{}
+		}),
+		encodeResponse,
+	)
+
+	listProjectsHandler := httptransport.NewServer(
+		internal.ListProjectsEndpoint(ps),
+		httptransport.NopRequestDecoder,
+		encodeResponse,
+	)
+
+	getProjectEndpoint := httptransport.NewServer(
+		internal.GetProjectEndpoint(ps),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.GetProjectRequest{}
+		}),
+		encodeResponse,
+	)
+
+	listProjectTemplatesEndpoint := httptransport.NewServer(
+		internal.ListProjectTemplatesEndpoint(pts),
+		httptransport.NopRequestDecoder,
+		encodeResponse,
+	)
+
 	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
+	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
+	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
+	r.Handle("/api/v1/project/{project_id}", getProjectEndpoint).Methods("GET")
+	r.Handle("/api/v1/project_templates", listProjectTemplatesEndpoint).Methods("GET")
+
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("VEGETALS"))
 	})

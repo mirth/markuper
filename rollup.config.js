@@ -9,7 +9,7 @@ export default {
   output: {
     file: 'public/bundle.js',
     format: 'iife',
-    sourcemap: false,
+    sourcemap: true,
   },
   plugins: [
     resolve({
