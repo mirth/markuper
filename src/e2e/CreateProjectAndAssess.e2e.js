@@ -52,6 +52,7 @@ describe('Application launch', function () {
     await app.client.waitUntilTextExists('h3', 'testproj0');
     await app.client.waitUntilTextExists('h3', 'classification');
     await app.client.waitUntilTextExists('h3', path.join(imgDir, '*.jpg'));
+    await app.client.waitUntilTextExists('h3', 'cat, dog, chuk, gek');
 
     await app.client.waitUntilTextExists('a', 'Begin assess');
     await app.client.element('=Begin assess').click();

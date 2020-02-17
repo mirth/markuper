@@ -1,5 +1,6 @@
 
 <script>
+import _ from 'lodash';
 import { link } from 'svelte-spa-router';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
@@ -8,6 +9,10 @@ export let params = {};
 
 $: project = api.get(`/project/${params.project_id}`);
 $: assessedList = api.get(`/project/${params.project_id}/assessed`);
+
+function labelsStr(radio) {
+  return _.map(radio.labels, 'value').join(', ');
+}
 
 </script>
 
@@ -21,6 +26,10 @@ $: assessedList = api.get(`/project/${params.project_id}/assessed`);
 <h3>
   <a href={`/project/${p.project_id}/assess_sample`} use:link>Begin assess</a>
 </h3>
+
+{#each p.template.radios as radio}
+<h3>{labelsStr(radio)}</h3>
+{/each}
 {/await}
 
 {#await assessedList then list}
