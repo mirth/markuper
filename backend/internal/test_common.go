@@ -13,9 +13,9 @@ func openTestDB() *DB {
 
 func testCloseAndReset(db *DB) {
 	db.DB.Update(func(tx *bolt.Tx) error {
-		tx.DeleteBucket([]byte("projects"))
-		tx.DeleteBucket([]byte("samples"))
-		tx.DeleteBucket([]byte("markups"))
+		tx.DeleteBucket(Projects)
+		tx.DeleteBucket(Samples)
+		tx.DeleteBucket(Markups)
 
 		return nil
 	})

@@ -19,10 +19,16 @@ type DB struct {
 	Markup  *bolt.Bucket
 }
 
+var (
+	Projects []byte = []byte("projects")
+	Markups  []byte = []byte("markups")
+	Samples  []byte = []byte("samples")
+)
+
 func (db *DB) GetProject(pID ProjectID) (Project, error) {
 	proj := Project{}
 	err := db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("projects"))
+		b := tx.Bucket(Projects)
 		pIDBin, err := encodeBin(pID)
 		if err != nil {
 			return err
@@ -52,7 +58,7 @@ func (db *DB) GetSample(sID SampleID) ([]byte, error) {
 	var sample []byte
 
 	err = db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("samples"))
+		b := tx.Bucket(Samples)
 		sampleBin := b.Get(sIDBin)
 		if sampleBin == nil {
 			return errors.New(fmt.Sprintf(
@@ -80,7 +86,7 @@ func (db *DB) GetMarkup(sID SampleID) (SampleMarkup, error) {
 
 	var smBin []byte
 	err = db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("markups"))
+		b := tx.Bucket(Markups)
 		smBin = b.Get(sIDbin)
 		if smBin == nil {
 			return errors.New(fmt.Sprintf(
@@ -172,19 +178,19 @@ func OpenDB(test bool) (*DB, error) {
 
 	db := &DB{}
 	err = blt.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte("projects"))
+		b, err := tx.CreateBucketIfNotExists(Projects)
 		if err != nil {
 			return err
 		}
 		db.Project = b
 
-		b, err = tx.CreateBucketIfNotExists([]byte("samples"))
+		b, err = tx.CreateBucketIfNotExists(Samples)
 		if err != nil {
 			return err
 		}
 		db.Sample = b
 
-		b, err = tx.CreateBucketIfNotExists([]byte("markups"))
+		b, err = tx.CreateBucketIfNotExists(Markups)
 		if err != nil {
 			return err
 		}

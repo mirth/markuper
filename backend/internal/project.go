@@ -128,7 +128,7 @@ func (s *ProjectServiceImpl) ListProjects() (ProjectList, error) {
 	projects := make([]Project, 0)
 
 	err := s.db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("projects"))
+		b := tx.Bucket(Projects)
 		err := b.ForEach(func(_k, v []byte) error {
 			project := Project{}
 

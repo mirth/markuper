@@ -158,7 +158,7 @@ func (svc *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
 
 	samples := []MarkupListElement{}
 	err = svc.db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("markups"))
+		b := tx.Bucket(Markups)
 		for _, id := range ids {
 			binID, err := encodeBin(id)
 			if err != nil {
