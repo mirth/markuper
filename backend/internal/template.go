@@ -12,22 +12,27 @@ type AnswerField = Jsonable
 type TaskAnswer struct {
 }
 
-type StringWithName struct {
+type ValueWithName struct {
 	Value string `json:"value"`
 	Name  string `json:"name"`
 }
 
 type RadioField struct {
-	ID     string           `json:"id"`
-	Type   string           `json:"type"`
-	Labels []StringWithName `json:"labels"`
+	ID     string          `json:"id"`
+	Type   string          `json:"type"`
+	Name   ValueWithName   `json:"name"`
+	Labels []ValueWithName `json:"labels"`
 }
 
-func NewRadioField(id string) RadioField {
+func NewRadioField(id string, name ValueWithName) RadioField {
 	return RadioField{
-		ID:     id,
-		Type:   "radio",
-		Labels: make([]StringWithName, 1), // fixme wtf 1 expected: internal.Template{Task:"classification", Radios:[]internal.RadioField{internal.RadioField{ID:"1", Type:"radio", Labels:[]internal.StringWithName{}}}} actual  : internal.Template{Task:"classification", Radios:[]internal.RadioField{internal.RadioField{ID:"1", Type:"radio", Labels:[]internal.StringWithName(nil)}}
+		ID:   id,
+		Name: name,
+		Type: "radio",
+		Labels: []ValueWithName{
+			{Value: "cat", Name: "cat"},
+			{Value: "dog", Name: "dog"},
+		},
 	}
 }
 
@@ -60,7 +65,10 @@ type TemplateServiceImpl struct {
 var DEFAULT_CLASSIFICATION_TEMPLATE = Template{
 	Task: "classification",
 	Radios: []RadioField{
-		NewRadioField("1"),
+		NewRadioField("1", ValueWithName{
+			Name:  "class",
+			Value: "class",
+		}),
 	},
 }
 

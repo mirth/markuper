@@ -15,7 +15,7 @@ function addLabel() {
 
 <ul>
   <li>
-    <input bind:value={newLabel} />
+    <input bind:value={newLabel} placeholder='Label goes here...' />
     <Button on:click={addLabel}>+</Button>
   </li>
   {#each field.labels as label}

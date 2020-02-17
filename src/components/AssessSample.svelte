@@ -2,6 +2,7 @@
 
 import api from '../api';
 import Button from './Button.svelte';
+import PageBlank from './PageBlank.svelte';
 
 async function fetchNext() {
   const res = await api.get('/next');
@@ -27,7 +28,7 @@ function makeHandleAssess(label) {
 
 </script>
 
-
+<PageBlank>
 <br />
 {#await sample}
 <p>...waiting</p>
@@ -38,9 +39,7 @@ function makeHandleAssess(label) {
   {/each}
 {/each}
 <img src="file://{sample.sample.image_uri}" alt="KEK"/>
-
-
-
 {:catch error}
 	<p style="color: red">{error}</p>
 {/await}
+</PageBlank>

@@ -158,3 +158,9 @@ func (svc *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
 		List: samples,
 	}, nil
 }
+
+func ListMarkupEndpoint(s MarkupService) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		return s.ListMarkup()
+	}
+}

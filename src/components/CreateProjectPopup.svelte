@@ -29,9 +29,8 @@ async function createNewProject() {
 
 </script>
 
-<form>
-  <input bind:value={projectName} placeholder="New project" minlength="1">
-  <TemplatePicker {selectedTemplate} />
-  <DataSource {dataSource} />
-  <button on:click={createNewProject}>Create</button>
-</form>
+
+<input bind:value={projectName} placeholder="New project" minlength="1">
+<TemplatePicker {selectedTemplate} />
+<DataSource {dataSource} />
+<button on:click={createNewProject}>Create</button>
