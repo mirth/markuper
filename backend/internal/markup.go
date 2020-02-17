@@ -9,7 +9,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/golang-collections/collections/set"
 	"github.com/pkg/errors"
-	"github.com/recoilme/pudge"
+	bolt "go.etcd.io/bbolt"
 
 	"backend/pkg/utils"
 )
@@ -68,30 +68,47 @@ func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 	}
 }
 
-func getAllSampleIDs(db *pudge.Db) ([]SampleID, error) {
-	rawIDs, err := db.Keys(SampleID{}, 0, 0, true)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
+func getAllSampleIDs(db *DB, bucket string) ([]SampleID, error) {
 	sIDs := make([]SampleID, 0)
-	for _, rawKey := range rawIDs {
-		key := *decodeBinary(rawKey, func() interface{} {
-			return &SampleID{}
-		}).(*SampleID)
-		sIDs = append(sIDs, key)
+
+	err := db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		err := b.ForEach(func(k, _v []byte) error {
+			sID := SampleID{}
+
+			{
+				err := decodeBin(k).Decode(&sID)
+				if err != nil {
+					return errors.WithStack(err)
+				}
+
+				sIDs = append(sIDs, sID)
+			}
+
+			return nil
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
 	return sIDs, nil
 }
 
 func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
-	tmp, err := getAllSampleIDs(s.db.Markup)
+	// fixme lock sample
+
+	tmp, err := getAllSampleIDs(s.db, "markups")
 	if err != nil {
 		return SampleResponse{}, err
 	}
+
 	doneIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
-	tmp, err = getAllSampleIDs(s.db.Sample)
+	tmp, err = getAllSampleIDs(s.db, "samples")
+
 	if err != nil {
 		return SampleResponse{}, err
 	}
@@ -108,14 +125,13 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 
 	// FIXME empty toAssess
 	sID := toAssess[0]
-	sample := []byte{}
-	err = s.db.Sample.Get(sID, &sample)
+	sample, err := s.db.GetSample(sID)
+
 	if err != nil {
-		return SampleResponse{}, errors.WithStack(err)
+		return SampleResponse{}, err
 	}
 
-	proj := Project{}
-	err = s.db.Project.Get(sID.ProjectID, &proj)
+	proj, err := s.db.GetProject(sID.ProjectID)
 	if err != nil {
 		return SampleResponse{}, errors.WithStack(err)
 	}
@@ -129,29 +145,43 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
 	r.SampleMarkup.CreatedAt = utils.NowUTC()
-	err := s.db.Markup.Set(r.SampleID, r.SampleMarkup)
+	err := s.db.Put("markups", r.SampleID, r.SampleMarkup)
 
 	return err
 }
 
 func (svc *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
-	ids, err := getAllSampleIDs(svc.db.Markup)
+	ids, err := getAllSampleIDs(svc.db, "markups")
 	if err != nil {
 		return MarkupList{}, err
 	}
 
 	samples := []MarkupListElement{}
-	for _, id := range ids {
-		s := SampleMarkup{}
-		err := svc.db.Markup.Get(id, &s)
-		if err != nil {
-			return MarkupList{}, errors.WithStack(err)
+	err = svc.db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(Markups)
+		for _, id := range ids {
+			binID, err := encodeBin(id)
+			if err != nil {
+				return err
+			}
+			smBin := b.Get(binID)
+			sm := SampleMarkup{}
+			err = decodeBin(smBin).Decode(&sm)
+			if err != nil {
+				return err
+			}
+
+			samples = append(samples, MarkupListElement{
+				SampleID:     id,
+				SampleMarkup: sm,
+			})
 		}
 
-		samples = append(samples, MarkupListElement{
-			SampleID:     id,
-			SampleMarkup: s,
-		})
+		return nil
+	})
+
+	if err != nil {
+		return MarkupList{}, err
 	}
 
 	return MarkupList{

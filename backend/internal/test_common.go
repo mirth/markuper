@@ -1,23 +1,35 @@
 package internal
 
 import (
-	"io/ioutil"
-	"path"
-
-	"github.com/recoilme/pudge"
+	"go.etcd.io/bbolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 func openTestDB() *DB {
-	cfg := &pudge.Config{StoreMode: 2}
+	db, _ := OpenDB(true)
 
-	tmpdir, _ := ioutil.TempDir("/tmp", "unittest")
-	projectDB, _ := pudge.Open(path.Join(tmpdir, "1"), cfg)
-	samplesDB, _ := pudge.Open(path.Join(tmpdir, "2"), cfg)
-	markupDB, _ := pudge.Open(path.Join(tmpdir, "3"), cfg)
+	return db
+}
 
-	return &DB{
-		Project: projectDB,
-		Sample:  samplesDB,
-		Markup:  markupDB,
-	}
+func testCloseAndReset(db *DB) {
+	db.DB.Update(func(tx *bolt.Tx) error {
+		tx.DeleteBucket(Projects)
+		tx.DeleteBucket(Samples)
+		tx.DeleteBucket(Markups)
+
+		return nil
+	})
+	db.DB.Close()
+}
+
+func testGetBucketSize(db *DB, bucket string) int {
+	size := 0
+	db.DB.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		size = b.Stats().KeyN
+
+		return nil
+	})
+
+	return size
 }

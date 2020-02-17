@@ -25,24 +25,22 @@ func newTestCreateProjectRequest(name string) CreateProjectRequest {
 
 func TestCreateProject(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
 	req := newTestCreateProjectRequest("testproject0")
 
-	c, err := db.Project.Count()
-	assert.Nil(t, err)
+	c := testGetBucketSize(db, "projects")
 	assert.Zero(t, c)
 
 	p, err := svc.CreateProject(req)
+	assert.Nil(t, err)
 	{
-		assert.Nil(t, err)
-
-		c, err = db.Project.Count()
-		assert.Nil(t, err)
+		c = testGetBucketSize(db, "projects")
 		assert.Equal(t, 1, c)
 
-		actual := Project{}
-		db.Project.Get(p.ProjectID, &actual)
+		actual, err := db.GetProject(p.ProjectID)
+		assert.Nil(t, err)
 
 		assert.Equal(t, req.Template, actual.Template)
 		assert.Equal(t, req.Description, actual.Description)
@@ -51,15 +49,15 @@ func TestCreateProject(t *testing.T) {
 
 func TestGetProject(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
 	req := newTestCreateProjectRequest("testproject0")
 
-	c, err := db.Project.Count()
-	assert.Nil(t, err)
+	c := testGetBucketSize(db, "projects")
 	assert.Zero(t, c)
 
-	p, err := svc.CreateProject(req)
+	p, _ := svc.CreateProject(req)
 
 	{
 		actual, err := svc.GetProject(GetProjectRequest{
@@ -77,15 +75,15 @@ func TestGetProject(t *testing.T) {
 
 func TestListProjects(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
 	req1 := newTestCreateProjectRequest("testproject0")
 
-	c, err := db.Project.Count()
-	assert.Nil(t, err)
+	c := testGetBucketSize(db, "projects")
 	assert.Zero(t, c)
 
-	_, err = svc.CreateProject(req1)
+	_, _ = svc.CreateProject(req1)
 	{
 		list, err := svc.ListProjects()
 		assert.Nil(t, err)
@@ -100,7 +98,7 @@ func TestListProjects(t *testing.T) {
 	}
 
 	req2 := newTestCreateProjectRequest("testproject1")
-	_, err = svc.CreateProject(req2)
+	_, _ = svc.CreateProject(req2)
 
 	{
 		list, err := svc.ListProjects()
@@ -119,6 +117,7 @@ func TestListProjects(t *testing.T) {
 
 func TestFetchSampleList(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 
 	tmpDir, _ := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
@@ -141,12 +140,11 @@ func TestFetchSampleList(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		sIDs, _ := getAllSampleIDs(db.Sample)
+		sIDs, _ := getAllSampleIDs(db, "samples")
 
 		samples := [][]byte{}
 		for _, id := range sIDs {
-			s := []byte{}
-			db.Sample.Get(id, &s)
+			s, _ := db.GetSample(id)
 			samples = append(samples, s)
 		}
 
