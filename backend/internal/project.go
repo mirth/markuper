@@ -52,8 +52,6 @@ type ProjectService interface {
 	CreateProject(CreateProjectRequest) (Project, error)
 	ListProjects() (ProjectList, error)
 	GetProject(GetProjectRequest) (Project, error)
-
-	// MarkupStatistics(ProjectID) (
 }
 
 type ProjectServiceImpl struct {
