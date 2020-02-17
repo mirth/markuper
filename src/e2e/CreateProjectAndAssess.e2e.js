@@ -47,8 +47,12 @@ describe('Application launch', function () {
     await app.client.waitUntilTextExists('a', 'testproj0');
     app.client.refresh(); // fixme remove when router will be fixed
     await app.client.waitUntilTextExists('a', 'testproj0');
-
     await app.client.element('=testproj0').click();
+
+    await app.client.waitUntilTextExists('h3', 'testproj0');
+    await app.client.waitUntilTextExists('h3', 'classification');
+    await app.client.waitUntilTextExists('h3', path.join(imgDir, '*.jpg'));
+
     await app.client.waitUntilTextExists('a', 'Begin assess');
     await app.client.element('=Begin assess').click();
 
