@@ -5,7 +5,10 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"os/user"
 	"path"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 	bolt "go.etcd.io/bbolt"
@@ -165,13 +168,28 @@ func OpenDB(test bool) (*DB, error) {
 		Timeout: 1,
 	}
 
-	dbFilename := "markuper.db"
+	usr, err := user.Current()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	appDataDir := filepath.Join(usr.HomeDir, "Library/Application Support", "com.levchik.markuper")
+	if _, err := os.Stat(appDataDir); os.IsNotExist(err) {
+		err = os.Mkdir(appDataDir, 0755)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	dbFilename := filepath.Join(appDataDir, "db.db")
+
 	if test {
 		tmpdir, _ := ioutil.TempDir("/tmp", "unittest")
 		dbFilename = path.Join(tmpdir, "testmarkuper.db")
 	}
 
 	blt, err := bolt.Open(dbFilename, 0600, opts)
+
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

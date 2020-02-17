@@ -32,11 +32,10 @@ func MakeHTTPRequestDecoder(payloadMaker func() interface{}) httptransport.Decod
 
 func main() {
 	db, err := internal.OpenDB(os.Getenv("ENV") == "test")
-	defer db.DB.Close()
-
 	if err != nil {
 		panic(err)
 	}
+	defer db.DB.Close()
 
 	ms := internal.NewMarkupService(db)
 	ps := internal.NewProjectService(db)
