@@ -1,5 +1,5 @@
 <script>
-import FieldRadio from './FieldRadio.svelte'
+import FieldRadio from './FieldRadio.svelte';
 
 export let template;
 </script>

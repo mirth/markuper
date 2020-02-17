@@ -93,6 +93,12 @@ func main() {
 		encodeResponse,
 	)
 
+	listMarkupHandler := httptransport.NewServer(
+		internal.ListMarkupEndpoint(ms),
+		httptransport.NopRequestDecoder,
+		encodeResponse,
+	)
+
 	createProjectHandler := httptransport.NewServer(
 		internal.CreateProjectEndpoint(ps),
 		MakeHTTPRequestDecoder(func() interface{} {
@@ -127,6 +133,7 @@ func main() {
 	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
 	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}", getProjectEndpoint).Methods("GET")
+	r.Handle("/api/v1/project/{project_id}/assessed", listMarkupHandler).Methods("GET")
 	r.Handle("/api/v1/project_templates", listTemplatesEndpoint).Methods("GET")
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {

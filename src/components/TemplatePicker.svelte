@@ -1,7 +1,7 @@
 <script>
 import { onMount } from 'svelte';
-import api from '../api';
 import _ from 'lodash';
+import api from '../api';
 import TemplatePreview from './TemplatePreview.svelte';
 
 export let selectedTemplate;
@@ -12,14 +12,15 @@ let templateList = [];
 onMount(async () => {
   const res = await api.get('/project_templates');
   templateList = res.templates;
-})
+});
 
 
-
-$: selectedTemplate.template = Object.assign({}, _.find(
-  templateList,
-  {'task': selectedTemplateTask}),
-)
+$: selectedTemplate.template = {
+  ..._.find(
+    templateList,
+    { task: selectedTemplateTask },
+  ),
+};
 </script>
 
 <style>
@@ -34,7 +35,7 @@ $: selectedTemplate.template = Object.assign({}, _.find(
 <div class="grid">
   {#each templateList as template}
     <label>
-      <input type=radio bind:group={selectedTemplateTask} value={template.task} >
+      <input type=radio bind:group={selectedTemplateTask} value={template.task} />
     </label>
   {/each}
 </div>
