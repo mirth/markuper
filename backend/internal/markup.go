@@ -28,11 +28,19 @@ type AssessRequest struct {
 type SampleResponse struct {
 	SampleID SampleID        `json:"sample_id"`
 	Sample   json.RawMessage `json:"sample"`
+	Template Template        `json:"template"`
+}
+
+type MarkupListElement = AssessRequest
+type MarkupList struct {
+	List []MarkupListElement `json:"list"`
 }
 
 type MarkupService interface {
 	GetNext() (SampleResponse, error)
 	Assess(AssessRequest) error
+
+	ListMarkup() (MarkupList, error)
 }
 
 type MarkupServiceImpl struct {
@@ -100,20 +108,53 @@ func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
 
 	// FIXME empty toAssess
 	sID := toAssess[0]
-	SampleData := []byte{}
-	err = s.db.Sample.Get(sID, &SampleData)
+	sample := []byte{}
+	err = s.db.Sample.Get(sID, &sample)
+	if err != nil {
+		return SampleResponse{}, errors.WithStack(err)
+	}
+
+	proj := Project{}
+	err = s.db.Project.Get(sID.ProjectID, &proj)
 	if err != nil {
 		return SampleResponse{}, errors.WithStack(err)
 	}
 
 	return SampleResponse{
 		SampleID: sID,
-		Sample:   SampleData,
+		Sample:   sample,
+		Template: proj.Template,
 	}, err
 }
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
+	r.SampleMarkup.CreatedAt = utils.NowUTC()
 	err := s.db.Markup.Set(r.SampleID, r.SampleMarkup)
 
 	return err
+}
+
+func (svc *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
+	ids, err := getAllSampleIDs(svc.db.Markup)
+	if err != nil {
+		return MarkupList{}, err
+	}
+
+	samples := []MarkupListElement{}
+	for _, id := range ids {
+		s := SampleMarkup{}
+		err := svc.db.Markup.Get(id, &s)
+		if err != nil {
+			return MarkupList{}, errors.WithStack(err)
+		}
+
+		samples = append(samples, MarkupListElement{
+			SampleID:     id,
+			SampleMarkup: s,
+		})
+	}
+
+	return MarkupList{
+		List: samples,
+	}, nil
 }

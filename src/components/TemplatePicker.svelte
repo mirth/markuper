@@ -34,7 +34,7 @@ $: selectedTemplate.template = Object.assign({}, _.find(
 <div class="grid">
   {#each templateList as template}
     <label>
-      <input type=radio bind:group={selectedTemplateTask} value={template.task} >
+      <input type=radio bind:group={selectedTemplateTask} value={template.task} />
     </label>
   {/each}
 </div>

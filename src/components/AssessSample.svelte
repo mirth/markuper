@@ -25,22 +25,22 @@ function makeHandleAssess(label) {
   };
 }
 
-const labels = [
-  'cat',
-  'dog',
-  'kek',
-];
 </script>
 
-{#each labels as label}
-  <Button on:click={makeHandleAssess(label)}>{label}</Button>
-{/each}
 
 <br />
 {#await sample}
 <p>...waiting</p>
 {:then sample}
+{#each sample.template.radios as field}
+  {#each field.labels as label}
+    <Button on:click={makeHandleAssess(label)}>{label.name}</Button>
+  {/each}
+{/each}
 <img src="file://{sample.sample.image_uri}" alt="KEK"/>
+
+
+
 {:catch error}
 	<p style="color: red">{error}</p>
 {/await}
