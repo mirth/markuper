@@ -11,44 +11,9 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
-	"github.com/recoilme/pudge"
 
 	"backend/pkg/httpjsondecoder"
 )
-
-func openDB(samplesDBFile, markupDBFile, projectDBFile string) (*internal.DB, error) {
-	storeMode := 0
-
-	// TODO: it e2e!
-	if os.Getenv("ENV") == "test" {
-		storeMode = 2
-		samplesDBFile = "/tmp/test_1"
-		markupDBFile = "/tmp/test_2"
-		projectDBFile = "/tmp/test_3"
-	}
-
-	cfg := &pudge.Config{StoreMode: storeMode}
-
-	projectDB, err := pudge.Open(projectDBFile, cfg)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	samplesDB, err := pudge.Open(samplesDBFile, cfg)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	markupDB, err := pudge.Open(markupDBFile, cfg)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &internal.DB{
-		Project: projectDB,
-		Sample:  samplesDB,
-		Markup:  markupDB,
-	}, nil
-}
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
@@ -66,10 +31,8 @@ func MakeHTTPRequestDecoder(payloadMaker func() interface{}) httptransport.Decod
 }
 
 func main() {
-	samplesDB := "/tmp/1"
-	markupDB := "/tmp/2"
-	projectDB := "/tmp/3"
-	db, err := openDB(samplesDB, markupDB, projectDB)
+	db, err := internal.OpenDB(os.Getenv("ENV") == "test")
+	defer db.DB.Close()
 
 	if err != nil {
 		panic(err)

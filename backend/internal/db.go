@@ -3,21 +3,201 @@ package internal
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
+	"io/ioutil"
+	"path"
 
-	"github.com/recoilme/pudge"
+	"github.com/pkg/errors"
+	bolt "go.etcd.io/bbolt"
 )
 
 type DB struct {
-	Project *pudge.Db
-	Sample  *pudge.Db
-	Markup  *pudge.Db
+	DB *bolt.DB
+
+	Project *bolt.Bucket
+	Sample  *bolt.Bucket
+	Markup  *bolt.Bucket
 }
 
-func decodeBinary(raw []byte, makeValuePtr func() interface{}) interface{} {
-	buf := bytes.NewBuffer(raw)
-	dec := gob.NewDecoder(buf)
-	key := makeValuePtr()
-	_ = dec.Decode(key)
+func (db *DB) GetProject(pID ProjectID) (Project, error) {
+	proj := Project{}
+	err := db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("projects"))
+		pIDBin, err := encodeBin(pID)
+		if err != nil {
+			return err
+		}
+		projBin := b.Get(pIDBin)
 
-	return key
+		if projBin == nil {
+			return errors.New("No project exists for [" + pID + "]")
+		}
+
+		return decodeBin(projBin).Decode(&proj)
+	})
+
+	if err != nil {
+		return Project{}, err
+	}
+
+	return proj, nil
+}
+
+func (db *DB) GetSample(sID SampleID) ([]byte, error) {
+	sIDBin, err := encodeBin(sID)
+	if err != nil {
+		return nil, err
+	}
+
+	var sample []byte
+
+	err = db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("samples"))
+		sampleBin := b.Get(sIDBin)
+		if sampleBin == nil {
+			return errors.New(fmt.Sprintf(
+				"No sample exists for [%s, %d]",
+				sID.ProjectID,
+				sID.SampleID,
+			))
+		}
+
+		return decodeBin(sampleBin).Decode(&sample)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return sample, nil
+}
+
+func (db *DB) GetMarkup(sID SampleID) (SampleMarkup, error) {
+	sIDbin, err := encodeBin(sID)
+	if err != nil {
+		return SampleMarkup{}, err
+	}
+
+	var smBin []byte
+	err = db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("markups"))
+		smBin = b.Get(sIDbin)
+		if smBin == nil {
+			return errors.New(fmt.Sprintf(
+				"No markup exists for [%s, %d]",
+				sID.ProjectID,
+				sID.SampleID,
+			))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return SampleMarkup{}, err
+	}
+
+	sm := SampleMarkup{}
+	err = decodeBin(smBin).Decode(&sm)
+	if err != nil {
+		return SampleMarkup{}, err
+	}
+
+	return sm, nil
+}
+
+func (db *DB) Put(bucket string, key, value interface{}) error {
+	keyBin, err := encodeBin(key)
+	if err != nil {
+		return err
+	}
+
+	valueBin, err := encodeBin(value)
+	if err != nil {
+		return err
+	}
+
+	err = db.DB.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		if b == nil {
+			return errors.New(fmt.Sprintf("No such bucket [%s]", bucket))
+		}
+
+		err := b.Put(keyBin, valueBin)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func encodeBin(x interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(x)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return buf.Bytes(), nil
+}
+
+func decodeBin(bin []byte) *gob.Decoder {
+	buf := bytes.NewBuffer(bin)
+	return gob.NewDecoder(buf)
+}
+
+func OpenDB(test bool) (*DB, error) {
+	opts := &bolt.Options{
+		NoSync:  test,
+		Timeout: 1,
+	}
+
+	dbFilename := "markuper.db"
+	if test {
+		tmpdir, _ := ioutil.TempDir("/tmp", "unittest")
+		dbFilename = path.Join(tmpdir, "testmarkuper.db")
+	}
+
+	blt, err := bolt.Open(dbFilename, 0600, opts)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	db := &DB{}
+	err = blt.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("projects"))
+		if err != nil {
+			return err
+		}
+		db.Project = b
+
+		b, err = tx.CreateBucketIfNotExists([]byte("samples"))
+		if err != nil {
+			return err
+		}
+		db.Sample = b
+
+		b, err = tx.CreateBucketIfNotExists([]byte("markups"))
+		if err != nil {
+			return err
+		}
+		db.Markup = b
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	db.DB = blt
+
+	return db, nil
 }

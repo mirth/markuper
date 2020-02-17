@@ -2,12 +2,15 @@ package internal
 
 import (
 	"backend/pkg/utils"
+	"bytes"
 	"context"
+	"encoding/gob"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
+	bolt "go.etcd.io/bbolt"
 )
 
 type ProjectID = string
@@ -92,7 +95,7 @@ func fetchSampleList(db *DB, proj Project) error {
 			return errors.WithStack(err)
 		}
 
-		err = db.Sample.Set(sID, j)
+		err = db.Put("samples", sID, j)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -109,7 +112,7 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 		return Project{}, err
 	}
 
-	err = s.db.Project.Set(project.ProjectID, project)
+	err = s.db.Put("projects", project.ProjectID, project)
 	if err != nil {
 		return Project{}, errors.WithStack(err)
 	}
@@ -122,19 +125,36 @@ type ProjectList struct {
 }
 
 func (s *ProjectServiceImpl) ListProjects() (ProjectList, error) {
-	rawIDs, err := s.db.Project.Keys("", 0, 0, true)
-	if err != nil {
-		return ProjectList{}, errors.WithStack(err)
-	}
-
 	projects := make([]Project, 0)
-	for _, rawID := range rawIDs {
-		p := Project{}
-		err = s.db.Project.Get(rawID, &p)
+
+	err := s.db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("projects"))
+		err := b.ForEach(func(_k, v []byte) error {
+			project := Project{}
+
+			{
+				buf := bytes.NewBuffer(v)
+				dec := gob.NewDecoder(buf)
+				err := dec.Decode(&project)
+				if err != nil {
+					return errors.WithStack(err)
+				}
+			}
+
+			projects = append(projects, project)
+
+			return nil
+		})
+
 		if err != nil {
-			return ProjectList{}, errors.WithStack(err)
+			return err
 		}
-		projects = append(projects, p)
+
+		return nil
+	})
+
+	if err != nil {
+		return ProjectList{}, err
 	}
 
 	return ProjectList{
@@ -153,13 +173,7 @@ type GetProjectRequest struct {
 }
 
 func (s *ProjectServiceImpl) GetProject(req GetProjectRequest) (Project, error) {
-	p := Project{}
-	err := s.db.Project.Get(req.ProjectID, &p)
-	if err != nil {
-		return Project{}, errors.WithStack(err)
-	}
-
-	return p, err
+	return s.db.GetProject(req.ProjectID)
 }
 
 func GetProjectEndpoint(s ProjectService) endpoint.Endpoint {

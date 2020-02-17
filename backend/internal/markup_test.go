@@ -28,7 +28,7 @@ func fillTestDB(db *DB) Project {
 		}
 
 		j, _ := json.Marshal(sample)
-		db.Sample.Set(sk, j)
+		db.Put("samples", sk, j)
 	}
 
 	return p
@@ -36,6 +36,7 @@ func fillTestDB(db *DB) Project {
 
 func TestMarkupAssess(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 
 	{
 		svc := MarkupServiceImpl{
@@ -60,8 +61,7 @@ func TestMarkupAssess(t *testing.T) {
 		{
 			assert.Nil(t, err)
 
-			actual := SampleMarkup{}
-			svc.db.Markup.Get(sID, &actual)
+			actual, _ := svc.db.GetMarkup(sID)
 			assert.Equal(t, mkp, actual)
 		}
 	}
@@ -69,6 +69,7 @@ func TestMarkupAssess(t *testing.T) {
 
 func TestMarkupNext(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 	proj := fillTestDB(db)
 
 	svc := MarkupServiceImpl{
@@ -116,13 +117,14 @@ func TestMarkupNext(t *testing.T) {
 
 func TestListMarkup(t *testing.T) {
 	db := openTestDB()
+	defer testCloseAndReset(db)
 	proj := fillTestDB(db)
 
 	svc := MarkupServiceImpl{
 		db: db,
 	}
 
-	c, _ := db.Markup.Count()
+	c := testGetBucketSize(db, "markups")
 	assert.Zero(t, c)
 
 	assessSample := func(sID SampleID) {
@@ -140,7 +142,7 @@ func TestListMarkup(t *testing.T) {
 	assessSample(SampleID{ProjectID: proj.ProjectID, SampleID: 1})
 	assessSample(SampleID{ProjectID: proj.ProjectID, SampleID: 2})
 
-	c, _ = db.Markup.Count()
+	c = testGetBucketSize(db, "markups")
 	assert.Equal(t, 3, c)
 
 	list, err := svc.ListMarkup()
