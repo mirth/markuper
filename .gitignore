@@ -3,3 +3,4 @@ bundle.*
 backend/bin
 dist*
 .DS_Store
+markuper-darwin-x64*
