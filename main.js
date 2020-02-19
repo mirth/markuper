@@ -1,5 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, autoUpdater } = require('electron');
 const runBackend = require('./run_backend');
+
+const server = 'https://zeit.ink/5F';
+const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
+
+autoUpdater.setFeedURL(feed);
 
 if (process.env.ENV === 'dev') {
   // eslint-disable-next-line global-require
