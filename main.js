@@ -1,7 +1,7 @@
 const { app, BrowserWindow, autoUpdater } = require('electron');
 const runBackend = require('./run_backend');
 
-const server = 'https://zeit.ink/5F';
+const server = 'https://hazel.mirth.now.sh';
 const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
 
 autoUpdater.setFeedURL(feed);
