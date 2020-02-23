@@ -150,14 +150,14 @@ func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
 	return err
 }
 
-func (svc *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
-	ids, err := getAllSampleIDs(svc.db, "markups")
+func ListMarkup(db *DB) (MarkupList, error) {
+	ids, err := getAllSampleIDs(db, "markups")
 	if err != nil {
 		return MarkupList{}, err
 	}
 
 	samples := []MarkupListElement{}
-	err = svc.db.DB.View(func(tx *bolt.Tx) error {
+	err = db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Markups)
 		for _, id := range ids {
 			binID, err := encodeBin(id)
@@ -187,6 +187,10 @@ func (svc *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
 	return MarkupList{
 		List: samples,
 	}, nil
+}
+
+func (s *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
+	return ListMarkup(s.db)
 }
 
 func ListMarkupEndpoint(s MarkupService) endpoint.Endpoint {

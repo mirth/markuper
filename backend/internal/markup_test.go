@@ -34,6 +34,38 @@ func fillTestDB(db *DB) Project {
 	return p
 }
 
+func AssessWithMarkup(
+	t *testing.T,
+	s MarkupServiceImpl,
+	sampleID int64,
+	markup string,
+) {
+	sID := SampleID{
+		ProjectID: "project0",
+		SampleID:  sampleID,
+	}
+	mkp := SampleMarkup{
+		CreatedAt: utils.TestNowUTC(),
+		Markup:    []byte(markup),
+	}
+	r := AssessRequest{
+		SampleID: sID,
+		SampleMarkup: SampleMarkup{
+			CreatedAt: utils.TestNowUTC(),
+			Markup:    json.RawMessage(markup),
+		},
+	}
+
+	err := s.Assess(r)
+
+	{
+		assert.Nil(t, err)
+
+		actual, _ := s.db.GetMarkup(sID)
+		assert.Equal(t, mkp, actual)
+	}
+}
+
 func TestMarkupAssess(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
@@ -43,27 +75,7 @@ func TestMarkupAssess(t *testing.T) {
 			db: db,
 		}
 
-		sID := SampleID{
-			ProjectID: "project0",
-			SampleID:  0,
-		}
-		mkp := SampleMarkup{
-			CreatedAt: utils.TestNowUTC(),
-			Markup:    json.RawMessage(`{"kek": "kek"}`),
-		}
-		r := AssessRequest{
-			SampleID:     sID,
-			SampleMarkup: mkp,
-		}
-
-		err := svc.Assess(r)
-
-		{
-			assert.Nil(t, err)
-
-			actual, _ := svc.db.GetMarkup(sID)
-			assert.Equal(t, mkp, actual)
-		}
+		AssessWithMarkup(t, svc, 0, `{"kek": "kek"}`)
 	}
 }
 
