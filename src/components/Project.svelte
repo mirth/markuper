@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { link } from 'svelte-spa-router';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
+import Button from './Button.svelte';
 
 export let params = {};
 
@@ -14,6 +15,13 @@ function labelsStr(radio) {
   return _.map(radio.labels, 'value').join(', ');
 }
 
+function exportProject(p) {
+  return async () => {
+    const res = api.get(`/project/${p.project_id}/export`)
+    const x = await res;
+    console.log('X: ', x);
+  }
+}
 </script>
 
 
@@ -26,7 +34,7 @@ function labelsStr(radio) {
 <h3>
   <a href={`/project/${p.project_id}/assess_sample`} use:link>Begin assess</a>
 </h3>
-
+<Button on:click={exportProject(p)}>Export</Button>
 {#each p.template.radios as radio}
 <h3>{labelsStr(radio)}</h3>
 {/each}

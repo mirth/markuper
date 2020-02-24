@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"backend/pkg/httpjsondecoder"
+	"backend/pkg/utils"
 )
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
@@ -30,6 +32,24 @@ func MakeHTTPRequestDecoder(payloadMaker func() interface{}) httptransport.Decod
 	}
 }
 
+func streamFile(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	now := utils.NowUTC()
+	resp := response.(internal.ExportResponse)
+	content := resp.CSV
+	reader := bytes.NewReader(content)
+	http.ServeContent(w, resp.R, "file.csv", now, reader)
+
+	return nil
+}
+
+func withRequest() httptransport.DecodeRequestFunc {
+	return func(_ context.Context, req *http.Request) (request interface{}, err error) {
+		return internal.WithHttpRequest{
+			R: req,
+		}, nil
+	}
+}
+
 func main() {
 	db, err := internal.OpenDB(os.Getenv("ENV") == "test")
 	if err != nil {
@@ -40,6 +60,7 @@ func main() {
 	ms := internal.NewMarkupService(db)
 	ps := internal.NewProjectService(db)
 	pts := internal.NewTemplateService()
+	e := internal.NewExporterService(db)
 
 	nextHandler := httptransport.NewServer(
 		internal.NextSampleEndpoint(ms),
@@ -89,6 +110,12 @@ func main() {
 		encodeResponse,
 	)
 
+	exportToCsvEnpoint := httptransport.NewServer(
+		internal.ExportEndpoint(e),
+		withRequest(),
+		streamFile,
+	)
+
 	r := mux.NewRouter()
 	r.Handle("/api/v1/next", nextHandler)
 	r.Handle("/api/v1/assess", assessHandler).Methods("POST")
@@ -96,6 +123,7 @@ func main() {
 	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}", getProjectEndpoint).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}/assessed", listMarkupHandler).Methods("GET")
+	r.Handle("/api/v1/project/{project_id}/export", exportToCsvEnpoint)
 	r.Handle("/api/v1/project_templates", listTemplatesEndpoint).Methods("GET")
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
