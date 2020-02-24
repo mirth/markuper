@@ -54,7 +54,7 @@ func NewProject(
 type ProjectService interface {
 	CreateProject(CreateProjectRequest) (Project, error)
 	ListProjects() (ProjectList, error)
-	GetProject(GetProjectRequest) (Project, error)
+	GetProject(WithProjectIDRequest) (Project, error)
 }
 
 type ProjectServiceImpl struct {
@@ -168,17 +168,13 @@ func ListProjectsEndpoint(s ProjectService) endpoint.Endpoint {
 	}
 }
 
-type GetProjectRequest struct {
-	ProjectID ProjectID `json:"project_id"`
-}
-
-func (s *ProjectServiceImpl) GetProject(req GetProjectRequest) (Project, error) {
+func (s *ProjectServiceImpl) GetProject(req WithProjectIDRequest) (Project, error) {
 	return s.db.GetProject(req.ProjectID)
 }
 
 func GetProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := *request.(*GetProjectRequest)
+		req := *request.(*WithProjectIDRequest)
 		return s.GetProject(req)
 	}
 }

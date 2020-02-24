@@ -28,4 +28,14 @@ export default {
       .then((response) => response.data)
       .catch((error) => error.response);
   },
+
+  downloadFile(url, params = {}) {
+    return axios.get(`${API}${url}${queryString(params)}`)
+      .then((response) => {
+        const disposition = response.headers['content-disposition'];
+        const filename = decodeURI(disposition.match(/filename=(.*)/)[1]);
+
+        return [response.data, filename];
+      });
+  },
 };

@@ -60,7 +60,7 @@ func TestGetProject(t *testing.T) {
 	p, _ := svc.CreateProject(req)
 
 	{
-		actual, err := svc.GetProject(GetProjectRequest{
+		actual, err := svc.GetProject(WithProjectIDRequest{
 			ProjectID: p.ProjectID,
 		})
 		assert.Nil(t, err)
@@ -140,7 +140,7 @@ func TestFetchSampleList(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		sIDs, _ := getAllSampleIDs(db, "samples")
+		sIDs, _ := getAllSampleIDsForProject(db, "samples", proj.ProjectID)
 
 		samples := [][]byte{}
 		for _, id := range sIDs {

@@ -1,9 +1,11 @@
 package internal
 
 import (
+	"backend/pkg/utils"
 	"bytes"
 	"context"
 	"encoding/csv"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -16,8 +18,9 @@ type ExporterService interface {
 }
 
 type ExportResponse struct {
-	R   *http.Request
-	CSV []byte
+	R        *http.Request
+	CSV      []byte
+	Filename string
 }
 
 type ExporterServiceImpl struct {
@@ -25,11 +28,12 @@ type ExporterServiceImpl struct {
 }
 
 type WithHttpRequest struct {
-	R *http.Request
+	R       *http.Request
+	Payload WithProjectIDRequest
 }
 
 func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error) {
-	list, err := ListMarkup(s.db)
+	list, err := ListMarkup(s.db, req.Payload.ProjectID)
 	if err != nil {
 		return ExportResponse{}, nil
 	}
@@ -56,9 +60,13 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		return ExportResponse{}, errors.WithStack(err)
 	}
 
+	now := utils.NowUTC()
+	filename := fmt.Sprintf("%s_%s.csv", req.Payload.ProjectID, now.Format("2006-01-02T15:04:05"))
+
 	return ExportResponse{
-		CSV: buf.Bytes(),
-		R:   req.R,
+		CSV:      buf.Bytes(),
+		R:        req.R,
+		Filename: filename,
 	}, nil
 }
 

@@ -37,10 +37,14 @@ type MarkupList struct {
 }
 
 type MarkupService interface {
-	GetNext() (SampleResponse, error)
+	GetNext(WithProjectIDRequest) (SampleResponse, error)
 	Assess(AssessRequest) error
 
-	ListMarkup() (MarkupList, error)
+	ListMarkup(WithProjectIDRequest) (MarkupList, error)
+}
+
+type WithProjectIDRequest struct {
+	ProjectID ProjectID `json:"project_id"`
 }
 
 type MarkupServiceImpl struct {
@@ -55,7 +59,9 @@ func NewMarkupService(db *DB) MarkupService {
 
 func NextSampleEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		return s.GetNext()
+		req := *request.(*WithProjectIDRequest)
+
+		return s.GetNext(req)
 	}
 }
 
@@ -68,7 +74,7 @@ func AssessEndpoint(s MarkupService) endpoint.Endpoint {
 	}
 }
 
-func getAllSampleIDs(db *DB, bucket string) ([]SampleID, error) {
+func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]SampleID, error) {
 	sIDs := make([]SampleID, 0)
 
 	err := db.DB.View(func(tx *bolt.Tx) error {
@@ -82,7 +88,9 @@ func getAllSampleIDs(db *DB, bucket string) ([]SampleID, error) {
 					return errors.WithStack(err)
 				}
 
-				sIDs = append(sIDs, sID)
+				if sID.ProjectID == projectID {
+					sIDs = append(sIDs, sID)
+				}
 			}
 
 			return nil
@@ -98,16 +106,16 @@ func getAllSampleIDs(db *DB, bucket string) ([]SampleID, error) {
 	return sIDs, nil
 }
 
-func (s *MarkupServiceImpl) GetNext() (SampleResponse, error) {
+func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, error) {
 	// fixme lock sample
 
-	tmp, err := getAllSampleIDs(s.db, "markups")
+	tmp, err := getAllSampleIDsForProject(s.db, "markups", req.ProjectID)
 	if err != nil {
 		return SampleResponse{}, err
 	}
 
 	doneIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
-	tmp, err = getAllSampleIDs(s.db, "samples")
+	tmp, err = getAllSampleIDsForProject(s.db, "samples", req.ProjectID)
 
 	if err != nil {
 		return SampleResponse{}, err
@@ -150,8 +158,8 @@ func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
 	return err
 }
 
-func ListMarkup(db *DB) (MarkupList, error) {
-	ids, err := getAllSampleIDs(db, "markups")
+func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
+	ids, err := getAllSampleIDsForProject(db, "markups", projectID)
 	if err != nil {
 		return MarkupList{}, err
 	}
@@ -189,12 +197,14 @@ func ListMarkup(db *DB) (MarkupList, error) {
 	}, nil
 }
 
-func (s *MarkupServiceImpl) ListMarkup() (MarkupList, error) {
-	return ListMarkup(s.db)
+func (s *MarkupServiceImpl) ListMarkup(req WithProjectIDRequest) (MarkupList, error) {
+	return ListMarkup(s.db, req.ProjectID)
 }
 
 func ListMarkupEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		return s.ListMarkup()
+		req := *request.(*WithProjectIDRequest)
+
+		return s.ListMarkup(req)
 	}
 }

@@ -5,6 +5,10 @@ import { link } from 'svelte-spa-router';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import Button from './Button.svelte';
+import jsFileDownload from 'js-file-download';
+
+import axios from 'axios';
+import config from '../config';
 
 export let params = {};
 
@@ -17,9 +21,9 @@ function labelsStr(radio) {
 
 function exportProject(p) {
   return async () => {
-    const res = api.get(`/project/${p.project_id}/export`)
-    const x = await res;
-    console.log('X: ', x);
+    const res = api.downloadFile(`/project/${p.project_id}/export`)
+    const [data, filename] = await res;
+    jsFileDownload(data, filename)
   }
 }
 </script>

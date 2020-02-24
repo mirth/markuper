@@ -11,8 +11,12 @@ import (
 )
 
 func fillTestDB(db *DB) Project {
+	return fillTestDBWithProj(db, "testp0")
+}
+
+func fillTestDBWithProj(db *DB, projName string) Project {
 	svc := NewProjectService(db)
-	p, _ := svc.CreateProject(newTestCreateProjectRequest("testp0"))
+	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName))
 
 	samples := make([]ImageSample, 0)
 	for i := 0; i < 10; i++ {
@@ -37,13 +41,9 @@ func fillTestDB(db *DB) Project {
 func AssessWithMarkup(
 	t *testing.T,
 	s MarkupServiceImpl,
-	sampleID int64,
+	sID SampleID,
 	markup string,
 ) {
-	sID := SampleID{
-		ProjectID: "project0",
-		SampleID:  sampleID,
-	}
 	mkp := SampleMarkup{
 		CreatedAt: utils.TestNowUTC(),
 		Markup:    []byte(markup),
@@ -75,7 +75,7 @@ func TestMarkupAssess(t *testing.T) {
 			db: db,
 		}
 
-		AssessWithMarkup(t, svc, 0, `{"kek": "kek"}`)
+		AssessWithMarkup(t, svc, SampleID{ProjectID: "kek", SampleID: 0}, `{"kek": "kek"}`)
 	}
 }
 
@@ -89,7 +89,9 @@ func TestMarkupNext(t *testing.T) {
 	}
 
 	assertNext := func(i int64) SampleID {
-		a, err := svc.GetNext()
+		a, err := svc.GetNext(WithProjectIDRequest{
+			ProjectID: proj.ProjectID,
+		})
 		assert.Nil(t, err)
 		sID := SampleID{
 			ProjectID: proj.ProjectID,
@@ -130,7 +132,8 @@ func TestMarkupNext(t *testing.T) {
 func TestListMarkup(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
-	proj := fillTestDB(db)
+	proj0 := fillTestDBWithProj(db, "proj0")
+	proj1 := fillTestDBWithProj(db, "proj1")
 
 	svc := MarkupServiceImpl{
 		db: db,
@@ -150,34 +153,39 @@ func TestListMarkup(t *testing.T) {
 		assert.Nil(t, err)
 	}
 
-	assessSample(SampleID{ProjectID: proj.ProjectID, SampleID: 0})
-	assessSample(SampleID{ProjectID: proj.ProjectID, SampleID: 1})
-	assessSample(SampleID{ProjectID: proj.ProjectID, SampleID: 2})
+	assessSample(SampleID{ProjectID: proj0.ProjectID, SampleID: 0})
+	assessSample(SampleID{ProjectID: proj0.ProjectID, SampleID: 1})
+	assessSample(SampleID{ProjectID: proj0.ProjectID, SampleID: 2})
+
+	assessSample(SampleID{ProjectID: proj1.ProjectID, SampleID: 0})
+	assessSample(SampleID{ProjectID: proj1.ProjectID, SampleID: 2})
 
 	c = testGetBucketSize(db, "markups")
-	assert.Equal(t, 3, c)
+	assert.Equal(t, 5, c)
 
-	list, err := svc.ListMarkup()
+	list, err := svc.ListMarkup(WithProjectIDRequest{
+		ProjectID: proj0.ProjectID,
+	})
 	assert.Nil(t, err)
 
 	{
 		assert.ElementsMatch(t, []MarkupListElement{
 			{
-				SampleID: SampleID{ProjectID: proj.ProjectID, SampleID: 0},
+				SampleID: SampleID{ProjectID: proj0.ProjectID, SampleID: 0},
 				SampleMarkup: SampleMarkup{
 					CreatedAt: utils.TestNowUTC(),
 					Markup:    json.RawMessage(`{"kek":mark0}`),
 				},
 			},
 			{
-				SampleID: SampleID{ProjectID: proj.ProjectID, SampleID: 1},
+				SampleID: SampleID{ProjectID: proj0.ProjectID, SampleID: 1},
 				SampleMarkup: SampleMarkup{
 					CreatedAt: utils.TestNowUTC(),
 					Markup:    json.RawMessage(`{"kek":mark1}`),
 				},
 			},
 			{
-				SampleID: SampleID{ProjectID: proj.ProjectID, SampleID: 2},
+				SampleID: SampleID{ProjectID: proj0.ProjectID, SampleID: 2},
 				SampleMarkup: SampleMarkup{
 					CreatedAt: utils.TestNowUTC(),
 					Markup:    json.RawMessage(`{"kek":mark2}`),
