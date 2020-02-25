@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { link } from 'svelte-spa-router';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
-import Button from './Button.svelte';
+import Button from 'svelte-atoms/Button.svelte';
 import jsFileDownload from 'js-file-download';
 
 import axios from 'axios';

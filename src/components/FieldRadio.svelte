@@ -1,5 +1,5 @@
 <script>
-import Button from './Button.svelte';
+import Button from 'svelte-atoms/Button.svelte';
 
 export let field;
 let newLabel = '';

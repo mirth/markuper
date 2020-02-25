@@ -1,6 +1,6 @@
 <script>
 import Modal from './Modal.svelte';
-import Button from './Button.svelte';
+import Button from 'svelte-atoms/Button.svelte';
 import CreateProjectPopup from './CreateProjectPopup.svelte';
 import ProjectPreview from './ProjectPreview.svelte';
 import { projects } from '../store';

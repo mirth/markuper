@@ -1,7 +1,7 @@
 <script>
 
 import api from '../api';
-import Button from './Button.svelte';
+import Button from 'svelte-atoms/Button.svelte';
 import PageBlank from './PageBlank.svelte';
 
 export let params = {};
