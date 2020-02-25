@@ -18,6 +18,7 @@ function makeHandleAssess(label) {
   return async () => {
     sample = await sample;
     const { sample_id: sampleId } = sample;
+
     await api.post(`/project/${sampleId.project_id}/assess`, {
       sample_id: sampleId,
       sample_markup: {
