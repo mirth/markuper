@@ -4,25 +4,28 @@ import api from '../api';
 import Button from './Button.svelte';
 import PageBlank from './PageBlank.svelte';
 
-async function fetchNext() {
-  const res = await api.get('/next');
+export let params = {};
+
+async function fetchNext(projectID) {
+  const res = await api.get(`/project/${projectID}/next`);
   return res;
 }
 
-let sample = fetchNext();
+let sample = fetchNext(params.project_id);
 
 function makeHandleAssess(label) {
   return async () => {
     sample = await sample;
-    await api.post('/assess', {
-      sample_id: sample.sample_id,
+    const { sample_id } = sample;
+    await api.post(`/project/${sample_id.project_id}/assess`, {
+      sample_id: sample_id,
       sample_markup: {
         markup: {
           label,
         },
       },
     });
-    sample = fetchNext();
+    sample = fetchNext(sample_id.project_id);
   };
 }
 
