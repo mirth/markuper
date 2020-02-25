@@ -1,5 +1,5 @@
 <script>
-import Popup from "svelte-atoms/Popup.svelte";
+import Popup from 'svelte-atoms/Popup.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import CreateProjectPopup from './CreateProjectPopup.svelte';
 import ProjectPreview from './ProjectPreview.svelte';

@@ -2,13 +2,11 @@
 <script>
 import _ from 'lodash';
 import { link } from 'svelte-spa-router';
-import api from '../api';
-import PageBlank from './PageBlank.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import jsFileDownload from 'js-file-download';
 
-import axios from 'axios';
-import config from '../config';
+import PageBlank from './PageBlank.svelte';
+import api from '../api';
 
 export let params = {};
 
@@ -21,10 +19,10 @@ function labelsStr(radio) {
 
 function exportProject(p) {
   return async () => {
-    const res = api.downloadFile(`/project/${p.project_id}/export`)
+    const res = api.downloadFile(`/project/${p.project_id}/export`);
     const [data, filename] = await res;
-    jsFileDownload(data, filename)
-  }
+    jsFileDownload(data, filename);
+  };
 }
 </script>
 

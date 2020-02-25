@@ -1,8 +1,8 @@
 <script>
 import Row from 'svelte-atoms/Grids/Row.svelte';
 
-import api from '../api';
 import Button from 'svelte-atoms/Button.svelte';
+import api from '../api';
 import PageBlank from './PageBlank.svelte';
 
 export let params = {};
@@ -17,16 +17,17 @@ let sample = fetchNext(params.project_id);
 function makeHandleAssess(label) {
   return async () => {
     sample = await sample;
-    const { sample_id } = sample;
-    await api.post(`/project/${sample_id.project_id}/assess`, {
-      sample_id: sample_id,
+    const { sample_id: sampleId } = sample;
+    await api.post(`/project/${sampleId.project_id}/assess`, {
+      sample_id: sampleId,
       sample_markup: {
         markup: {
           label,
         },
       },
     });
-    sample = fetchNext(sample_id.project_id);
+    sample = fetchNext(sampleId.project_id);
+    console.log('sample: ', sample)
   };
 }
 
