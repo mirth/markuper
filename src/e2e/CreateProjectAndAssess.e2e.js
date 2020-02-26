@@ -49,13 +49,14 @@ describe('Application launch', function () {
     await app.client.waitUntilTextExists('a', 'testproj0');
     await app.client.element('=testproj0').click();
 
-    await app.client.waitUntilTextExists('h3', 'testproj0');
-    await app.client.waitUntilTextExists('h3', 'classification');
-    await app.client.waitUntilTextExists('h3', path.join(imgDir, '*.jpg'));
+    await app.client.waitUntilTextExists('span', 'testproj0');
+    await app.client.waitUntilTextExists('b', 'classification');
+    // await app.client.waitUntilTextExists('h3', path.join(imgDir, '*.jpg'));
     await app.client.waitUntilTextExists('h3', 'cat, dog, chuk, gek');
 
-    await app.client.waitUntilTextExists('a', 'Begin assess');
-    await app.client.element('=Begin assess').click();
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    const beginAssess = app.client.element("button/*[@innertext='Begin assess']");
+    await beginAssess.click();
 
     await app.client.waitForExist('img');
     const before = await app.client.element('img').getAttribute('src');
