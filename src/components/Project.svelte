@@ -65,6 +65,7 @@ function exportProject(p) {
 {/await}
 </Cell>
 </Row>
+<Spacer size={32} />
 <Row>
 <Cell>
 {#await assessedList then list}
