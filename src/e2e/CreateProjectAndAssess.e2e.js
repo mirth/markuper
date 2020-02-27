@@ -23,7 +23,7 @@ describe('Application launch', function () {
   });
 
   it('Creates project and assesses samples', async () => {
-    await app.client.waitForExist('button');
+    await app.client.waitUntilTextExists('button', 'Create new project');
     await app.client.element('button=Create new project').click();
     await app.client.waitUntilTextExists('button', 'Create');
     await app.client.element('input').setValue('testproj0');
@@ -49,13 +49,14 @@ describe('Application launch', function () {
     await app.client.waitUntilTextExists('a', 'testproj0');
     await app.client.element('=testproj0').click();
 
-    await app.client.waitUntilTextExists('h3', 'testproj0');
-    await app.client.waitUntilTextExists('h3', 'classification');
-    await app.client.waitUntilTextExists('h3', path.join(imgDir, '*.jpg'));
-    await app.client.waitUntilTextExists('h3', 'cat, dog, chuk, gek');
+    await app.client.waitUntilTextExists('span', 'testproj0');
+    await app.client.waitUntilTextExists('b', 'classification');
+    await app.client.waitUntilTextExists('span', path.join(imgDir, '*.jpg'));
+    await app.client.waitUntilTextExists('span', 'cat, dog, chuk, gek');
 
-    await app.client.waitUntilTextExists('a', 'Begin assess');
-    await app.client.element('=Begin assess').click();
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    const beginAssess = app.client.element("button/*[@innertext='Begin assess']");
+    await beginAssess.click();
 
     await app.client.waitForExist('img');
     const before = await app.client.element('img').getAttribute('src');

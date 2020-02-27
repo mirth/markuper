@@ -1,7 +1,8 @@
 <script>
+import Row from 'svelte-atoms/Grids/Row.svelte';
 
+import Button from 'svelte-atoms/Button.svelte';
 import api from '../api';
-import Button from './Button.svelte';
 import PageBlank from './PageBlank.svelte';
 
 export let params = {};
@@ -16,32 +17,64 @@ let sample = fetchNext(params.project_id);
 function makeHandleAssess(label) {
   return async () => {
     sample = await sample;
-    const { sample_id } = sample;
-    await api.post(`/project/${sample_id.project_id}/assess`, {
-      sample_id: sample_id,
+    const { sample_id: sampleId } = sample;
+
+    await api.post(`/project/${sampleId.project_id}/assess`, {
+      sample_id: sampleId,
       sample_markup: {
         markup: {
           label,
         },
       },
     });
-    sample = fetchNext(sample_id.project_id);
+    sample = fetchNext(sampleId.project_id);
+    console.log('sample: ', sample)
   };
 }
 
 </script>
+
+<style>
+li {
+  display: inline;
+}
+
+.image-container {
+  padding: 0 45px 45px 0;
+  width: 100%;
+}
+
+img {
+  max-width: 100%;
+  border: 1px solid black;
+}
+
+</style>
 
 <PageBlank>
 <br />
 {#await sample}
 <p>...waiting</p>
 {:then sample}
-{#each sample.template.radios as field}
-  {#each field.labels as label}
-    <Button on:click={makeHandleAssess(label)}>{label.name}</Button>
+
+<Row>
+  {#each sample.template.radios as field}
+    <Row>
+      <ul>
+        {#each field.labels as label}
+          <li>
+            <Button on:click={makeHandleAssess(label)} style="display: inline; min-width: 60px;">
+              {label.name}
+            </Button>
+          </li>
+        {/each}
+      </ul>
+    </Row>
   {/each}
-{/each}
-<img src="file://{sample.sample.image_uri}" alt="KEK"/>
+</Row>
+<div class="image-container">
+  <img src="file://{sample.sample.image_uri}" alt="KEK"/>
+</div>
 {:catch error}
 	<p style="color: red">{error}</p>
 {/await}

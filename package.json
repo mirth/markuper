@@ -80,6 +80,7 @@
     "axios": "^0.19.0",
     "js-file-download": "^0.4.10",
     "lodash": "^4.17.15",
+    "svelte-atoms": "^0.0.15",
     "svelte-spa-router": "^2.0.0"
   }
 }
