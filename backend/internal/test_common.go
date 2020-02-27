@@ -6,7 +6,10 @@ import (
 )
 
 func openTestDB() *DB {
-	db, _ := OpenDB(true)
+	db, err := OpenDB(true)
+	if err != nil {
+		panic(err)
+	}
 
 	return db
 }

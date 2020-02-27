@@ -184,7 +184,7 @@ func OpenDB(test bool) (*DB, error) {
 	dbFilename := filepath.Join(appDataDir, "db.db")
 
 	if test {
-		tmpdir, _ := ioutil.TempDir("/tmp", "unittest")
+		tmpdir, _ := ioutil.TempDir("", "unittest")
 		dbFilename = path.Join(tmpdir, "testmarkuper.db")
 	}
 
