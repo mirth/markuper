@@ -7,6 +7,7 @@ import Typography from "svelte-atoms/Typography.svelte";
 import Block from "svelte-atoms/Block.svelte";
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte'
 import jsFileDownload from 'js-file-download';
 
 import PageBlank from './PageBlank.svelte';
@@ -49,8 +50,12 @@ button {
 
       <p>Template: <b>{p.template.task}</b></p>
       <p>Data source: {p.data_source.source_uri}</p>
+      {#each p.template.radios as radio}
+        <p>Labels: {labelsStr(radio)}</p>
+      {/each}
     </Cell>
   </Row>
+  <Spacer size={24} />
   <Row>
     <Cell>
       <div style='display: flex; justify-content: space-between; flex-direction: row;'>
@@ -63,9 +68,6 @@ button {
       </div>
     </Cell>
   </Row>
-  {#each p.template.radios as radio}
-    <h3>{labelsStr(radio)}</h3>
-  {/each}
 {/await}
 </Cell>
 </Row>
