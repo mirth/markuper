@@ -47,7 +47,7 @@ button {
     <Cell>
       <Typography type="title" block>{p.description.name}</Typography>
 
-      <p>Task: <b>{p.template.task}</b></p>
+      <p>Template: <b>{p.template.task}</b></p>
       <p>Data source: {p.data_source.source_uri}</p>
     </Cell>
   </Row>
