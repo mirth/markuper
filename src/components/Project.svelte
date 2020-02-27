@@ -32,12 +32,6 @@ function exportProject(p) {
 
 </script>
 
-<style>
-button {
-  display: inline;
-}
-</style>
-
 
 <PageBlank>
 <Block>
