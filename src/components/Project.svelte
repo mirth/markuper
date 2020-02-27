@@ -45,7 +45,7 @@ button {
 {#await project then p}
   <Row>
     <Cell>
-      <Typography type="title" block>{p.description.name}</Typography>
+      <Typography type='title' block>{p.description.name}</Typography>
 
       <p>Template: <b>{p.template.task}</b></p>
       <p>Data source: {p.data_source.source_uri}</p>
