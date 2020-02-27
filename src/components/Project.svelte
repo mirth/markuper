@@ -52,14 +52,16 @@ button {
     </Cell>
   </Row>
   <Row>
-
-      <Button on:click={() => push(`/project/${p.project_id}/assess_sample`)} iconRight='chevron-right'>
-        Begin assess
-      </Button>
-      <Button on:click={exportProject(p)} iconLeft='download'>
-        Export
-      </Button>
-
+    <Cell>
+      <div style='display: flex; justify-content: space-between; flex-direction: row;'>
+        <Button on:click={() => push(`/project/${p.project_id}/assess_sample`)} iconRight='chevron-right'>
+          Begin assess
+        </Button>
+        <Button on:click={exportProject(p)} iconLeft='download'>
+          Export
+        </Button>
+      </div>
+    </Cell>
   </Row>
   {#each p.template.radios as radio}
     <h3>{labelsStr(radio)}</h3>
