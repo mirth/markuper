@@ -65,9 +65,8 @@ function exportProject(p) {
 {/await}
 </Cell>
 </Row>
-</Block>
-
-
+<Row>
+<Cell>
 {#await assessedList then list}
   <ul>
     {#each list.list as forSample}
@@ -77,6 +76,9 @@ function exportProject(p) {
     {/each}
   </ul>
 {/await}
+</Cell>
+</Row>
+</Block>
 </PageBlank>
 
 
