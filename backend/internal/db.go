@@ -174,18 +174,18 @@ func OpenDB(test bool) (*DB, error) {
 	}
 
 	appDataDir := filepath.Join(usr.HomeDir, "Library/Application Support", "com.levchik.markuper")
-	if _, err := os.Stat(appDataDir); os.IsNotExist(err) {
-		err = os.Mkdir(appDataDir, 0755)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-	}
-
 	dbFilename := filepath.Join(appDataDir, "db.db")
 
 	if test {
 		tmpdir, _ := ioutil.TempDir("", "unittest")
 		dbFilename = path.Join(tmpdir, "testmarkuper.db")
+	} else {
+		if _, err := os.Stat(appDataDir); os.IsNotExist(err) {
+			err = os.Mkdir(appDataDir, 0755)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
+		}
 	}
 
 	blt, err := bolt.Open(dbFilename, 0600, opts)
