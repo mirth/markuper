@@ -8,7 +8,7 @@
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
     "start:dev": "yarn _build_backend && concurrently \"yarn _autobuild_frontend\" \"ENV=dev electron .\"",
-    "test": "concurrently \"yarn _test_e2e\" \"yarn _test_backend\"",
+    "test": "cross-env concurrently \"yarn _test_e2e\" \"yarn _test_backend\"",
     "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\"",
     "release": "yarn build && yarn electron-packager . markuper && yarn _dmg",
     "build": "yarn _build_backend && yarn _build_frontend",
@@ -58,6 +58,7 @@
     "babel-polyfill": "^6.26.0",
     "chai": "^4.2.0",
     "concurrently": "^5.0.0",
+    "cross-env": "^7.0.0",
     "electron": "^7.1.2",
     "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^14.1.1",
