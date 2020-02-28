@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"os"
 	"path/filepath"
 	"testing"
@@ -148,12 +149,16 @@ func TestFetchSampleList(t *testing.T) {
 			samples = append(samples, s)
 		}
 
+		j := func(imgPath string) []byte {
+			return []byte(fmt.Sprintf(`{"image_uri":%s}`, strconv.Quote(imgPath)))
+		}
+
 		assert.ElementsMatch(t, [][]byte{
-			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[0])),
-			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[1])),
-			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[2])),
-			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[3])),
-			[]byte(fmt.Sprintf(`{"image_uri":"%s"}`, imgPaths[4])),
+			j(imgPaths[0]),
+			j(imgPaths[1]),
+			j(imgPaths[2]),
+			j(imgPaths[3]),
+			j(imgPaths[4]),
 		}, samples)
 	}
 }
