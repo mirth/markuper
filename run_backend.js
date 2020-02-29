@@ -1,10 +1,20 @@
 const { execFile } = require('child_process');
 const appRootDir = require('app-root-dir').get();
 const path = require('path');
+const os = require('os');
+
+function getBackendBinaryFilename() {
+  if (os.platform() === 'win32') {
+    return 'main.exe';
+  }
+
+  return 'main';
+}
 
 function runBackend() {
-  const backendPath = (process.env.ENV === 'dev' || process.env.ENV === 'test') ? 'backend/bin/main'
-    : path.join(appRootDir, 'backend', 'bin', 'main');
+  const binaryFilename = getBackendBinaryFilename();
+  const backendPath = (process.env.ENV === 'dev' || process.env.ENV === 'test') ? `backend/bin/${binaryFilename}`
+    : path.join(appRootDir, 'backend', 'bin', binaryFilename);
 
   const backend = execFile(backendPath, {
     env: {

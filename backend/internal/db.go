@@ -9,7 +9,8 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
-
+	"runtime"
+	
 	"github.com/pkg/errors"
 	bolt "go.etcd.io/bbolt"
 )
@@ -174,6 +175,11 @@ func OpenDB(test bool) (*DB, error) {
 	}
 
 	appDataDir := filepath.Join(usr.HomeDir, "Library/Application Support", "com.levchik.markuper")
+	if runtime.GOOS == "windows" {
+		appDataDir = filepath.Join(usr.HomeDir, os.Getenv("APPDATA"), "com.levchik.markuper")
+	}
+	
+	
 	dbFilename := filepath.Join(appDataDir, "db.db")
 
 	if test {
