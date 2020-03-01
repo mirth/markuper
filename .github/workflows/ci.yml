@@ -12,9 +12,9 @@ jobs:
   build_and_test:
 
     runs-on: ${{ matrix.os }}
-  strategy:
-    matrix:
-      os: [macos-latest, windows-latest, ubuntu-latest]
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v1
