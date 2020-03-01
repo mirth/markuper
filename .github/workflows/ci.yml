@@ -29,11 +29,15 @@ jobs:
 
     - name: Test MacOs
       if: matrix.os == 'macos-latest'
-        run: BACKEND_BINARY_FILENAME=main yarn test
+        run: |
+          export BACKEND_BINARY_FILENAME=main
+          yarn test
 
     - name: Test Windows
       if: matrix.os == 'windows-latest'
-        run: set BACKEND_BINARY_FILENAME=main.exe yarn test
+        run: |
+          set BACKEND_BINARY_FILENAME=main.exe
+          yarn test
 
     - name: Test Ubuntu
       if: matrix.os == 'ubuntu-latest'
