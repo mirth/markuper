@@ -16,7 +16,7 @@
     "_pack": "yarn build && yarn electron-packager . markuper",
     "_dmg": "yarn electron-installer-dmg markuper-darwin-x64/markuper.app markuper",
     "_test_e2e": "yarn build && cross-env-shell ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
-    "_test_backend": "yarn _build_backend && cd backend && cross-env-shell ENV=test go test ./... && cd ..",
+    "_test_backend": "yarn _build_backend && cd backend && cross-env-shell ENV=test go test -v ./... && cd ..",
     "_lint_backend": "cd backend/cmd && go vet && cd ../../",
     "_lint_frontend": "yarn eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",

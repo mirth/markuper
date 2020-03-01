@@ -5,8 +5,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
@@ -32,26 +34,87 @@ type WithHttpRequest struct {
 	Payload WithProjectIDRequest
 }
 
+func markupKeys(j json.RawMessage) ([]string, error) {
+	return markupToCSVColumns(j, false)
+}
+
+func markupValues(j json.RawMessage) ([]string, error) {
+	return markupToCSVColumns(j, true)
+}
+
+func rawMessageToString(m json.RawMessage) string {
+	return string(m)
+}
+
+func markupToCSVColumns(j json.RawMessage, takeValues bool) ([]string, error) {
+	var objmap map[string]json.RawMessage
+	err := json.Unmarshal(j, &objmap)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	pairs := make([][2]string, len(objmap))
+	i := 0
+	for key, value := range objmap {
+		pairs[i][0] = key
+		pairs[i][1] = rawMessageToString(value)
+		i += 1
+	}
+	sort.Slice(pairs, func(i, j int) bool {
+		return pairs[i][0] < pairs[j][0]
+	})
+
+	var takeValuesI int
+	if takeValues {
+		takeValuesI = 1
+	}
+
+	cells := make([]string, 0)
+	for _, pair := range pairs {
+		cells = append(cells, pair[takeValuesI])
+	}
+
+	return cells, nil
+}
+
 func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error) {
 	list, err := ListMarkup(s.db, req.Payload.ProjectID)
 	if err != nil {
-		return ExportResponse{}, nil
+		return ExportResponse{}, err
+	}
+
+	if len(list.List) == 0 {
+		return ExportResponse{}, errors.New("Markup list is empty")
 	}
 
 	var buf bytes.Buffer
 	w := csv.NewWriter(&buf)
-	rows := [][]string{
-		{"sample_id", "created_at", "markup"},
+
+	firstSample := list.List[0]
+	sampleColumns, err := markupKeys(firstSample.SampleMarkup.Markup)
+	if err != nil {
+		return ExportResponse{}, err
 	}
+
+	header := []string{"sample_id", "created_at"}
+	header = append(header, sampleColumns...)
+	rows := [][]string{
+		header,
+	}
+
 	for _, entry := range list.List {
 		sampleID := strconv.FormatInt(entry.SampleID.SampleID, 10)
 
 		row := []string{
 			sampleID,
 			entry.SampleMarkup.CreatedAt.Format("2006-01-02T15:04:05"),
-			string(entry.SampleMarkup.Markup),
+		}
+		sampleValues, err := markupValues(entry.SampleMarkup.Markup)
+		if err != nil {
+			return ExportResponse{}, err
 		}
 
+		row = append(row, sampleValues...)
 		rows = append(rows, row)
 	}
 
