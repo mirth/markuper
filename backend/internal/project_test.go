@@ -3,9 +3,9 @@ package internal
 import (
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,10 +14,10 @@ import (
 func newTestCreateProjectRequest(name string) CreateProjectRequest {
 	return CreateProjectRequest{
 		Template: DEFAULT_CLASSIFICATION_TEMPLATE,
-		DataSource: DataSource{
+		DataSources: []DataSource{{
 			Type:      "local_directory",
 			SourceURI: "/tmp/*.jpg",
-		},
+		}},
 		Description: ProjectDescription{
 			Name: name,
 		},
@@ -136,8 +136,8 @@ func TestFetchSampleList(t *testing.T) {
 		Type:      "local_directory",
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
 	}
-	proj := NewProject(Template{}, src, ProjectDescription{})
-	err := fetchSampleList(db, proj)
+	proj := NewProject(Template{}, []DataSource{src}, ProjectDescription{})
+	err := fetchSampleList(db, proj, src)
 	assert.Nil(t, err)
 
 	{

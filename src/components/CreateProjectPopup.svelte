@@ -21,7 +21,7 @@ async function createNewProject() {
       name: projectName,
     },
     template: selectedTemplate.template,
-    data_source: dataSource,
+    data_sources: [dataSource],
   });
   await fetchProjectList();
   close();
