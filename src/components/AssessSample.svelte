@@ -28,7 +28,6 @@ function makeHandleAssess(label) {
       },
     });
     sample = fetchNext(sampleId.project_id);
-    console.log('sample: ', sample)
   };
 }
 

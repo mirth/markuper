@@ -20,23 +20,23 @@ type ProjectDescription struct {
 }
 
 type Project struct {
-	CreatedAt  time.Time  `json:"created_at"`
-	ProjectID  ProjectID  `json:"project_id"`
-	Template   Template   `json:"template"`
-	DataSource DataSource `json:"data_source"`
+	CreatedAt   time.Time    `json:"created_at"`
+	ProjectID   ProjectID    `json:"project_id"`
+	Template    Template     `json:"template"`
+	DataSources []DataSource `json:"data_sources"`
 
 	Description ProjectDescription `json:"description"`
 }
 
 type CreateProjectRequest struct {
 	Template    Template           `json:"template"`
-	DataSource  DataSource         `json:"data_source"`
+	DataSources []DataSource       `json:"data_sources"`
 	Description ProjectDescription `json:"description"`
 }
 
 func NewProject(
 	template Template,
-	dataSrc DataSource,
+	dataSrc []DataSource,
 	desc ProjectDescription,
 ) Project {
 	projectID := ProjectID(xid.New().String())
@@ -46,7 +46,7 @@ func NewProject(
 		CreatedAt:   now,
 		ProjectID:   projectID,
 		Template:    template,
-		DataSource:  dataSrc,
+		DataSources: dataSrc,
 		Description: desc,
 	}
 }
@@ -76,17 +76,21 @@ func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	}
 }
 
-func fetchSampleList(db *DB, proj Project) error {
-	fetcher := GetSampleListFetcher(proj.DataSource)
+func fetchSampleList(db *DB, proj Project, src DataSource) ([]Jsonable, error) {
+	fetcher := GetSampleListFetcher(src)
 
 	list, err := fetcher.FetchSampleList()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	return list, nil
+}
+
+func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
 	for i, sample := range list {
 		sID := SampleID{
-			ProjectID: proj.ProjectID,
+			ProjectID: projectID,
 			SampleID:  int64(i), //fixme -> uuid
 		}
 
@@ -105,9 +109,19 @@ func fetchSampleList(db *DB, proj Project) error {
 }
 
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
-	project := NewProject(req.Template, req.DataSource, req.Description)
+	project := NewProject(req.Template, req.DataSources, req.Description)
 
-	err := fetchSampleList(s.db, project)
+	allSamples := make([]Jsonable, 0)
+	for _, src := range project.DataSources {
+		list, err := fetchSampleList(s.db, project, src)
+		if err != nil {
+			return Project{}, errors.Wrapf(err, "Failed to fetchSampleList for [%s]", src.SourceURI)
+		}
+
+		allSamples = append(allSamples, list...)
+	}
+
+	err := putSamples(s.db, project.ProjectID, allSamples)
 	if err != nil {
 		return Project{}, err
 	}

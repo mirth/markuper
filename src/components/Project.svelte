@@ -43,7 +43,9 @@ function exportProject(p) {
       <Typography type='title' block>{p.description.name}</Typography>
 
       <p>Template: <b>{p.template.task}</b></p>
-      <p>Data source: <span>{p.data_source.source_uri}</span></p>
+      {#each p.data_sources as src}
+        <p>Data source: <span>{src.source_uri}</span></p>
+      {/each}
       {#each p.template.radios as radio}
         <p>Labels: <span>{labelsStr(radio)}</span></p>
       {/each}

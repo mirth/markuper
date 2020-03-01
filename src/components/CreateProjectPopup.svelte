@@ -1,8 +1,9 @@
 <script>
+import Input from "svelte-atoms/Input.svelte";
 import { fetchProjectList } from '../store';
 import api from '../api';
 import TemplatePicker from './TemplatePicker.svelte';
-import DataSource from './DataSource.svelte';
+import DataSourcePicker from './DataSourcePicker.svelte';
 
 export let close;
 
@@ -10,9 +11,8 @@ let projectName = '';
 const selectedTemplate = {
   template: null,
 };
-const dataSource = {
-  type: 'local_directory',
-  source_uri: '',
+const dataSources = {
+  dataSources: []
 };
 
 async function createNewProject() {
@@ -21,7 +21,7 @@ async function createNewProject() {
       name: projectName,
     },
     template: selectedTemplate.template,
-    data_source: dataSource,
+    data_sources: dataSources.dataSources,
   });
   await fetchProjectList();
   close();
@@ -30,7 +30,7 @@ async function createNewProject() {
 </script>
 
 
-<input bind:value={projectName} placeholder="New project" minlength="1">
+<Input bind:value={projectName} title="Small" value="Small" size="small" placeholder="New project" />
 <TemplatePicker {selectedTemplate} />
-<DataSource {dataSource} />
+<DataSourcePicker {dataSources} />
 <button on:click={createNewProject}>Create</button>

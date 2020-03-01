@@ -12,9 +12,12 @@ const app = new Application({
   args: [appPath],
 });
 
-
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+// pause
 describe('Application launch', function () {
-  this.timeout(10000);
+  this.timeout(20000);
   beforeEach(() => app.start());
   afterEach(() => {
     if (app && app.isRunning()) {
@@ -26,6 +29,7 @@ describe('Application launch', function () {
     await app.client.waitForVisible('button');
     await app.client.element('button').click();
     await app.client.waitForVisible('input');
+    await sleep(300);
     await app.client.element('input').setValue('testproj0');
 
     const template = "input[value='classification']";
@@ -42,8 +46,14 @@ describe('Application launch', function () {
     await addLabel().click();
 
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
-    const glob = path.join(imgDir, '*.jpg');
-    await app.client.element("input[placeholder='/some/path']").setValue(glob);
+    const glob0 = path.join(imgDir, '*.jpg');
+    await app.client.element("input[placeholder='/some/path']").setValue(glob0);
+    await app.client.element('button=Add source').click();
+
+    const glob1 = path.join(imgDir, '*.png');
+    const inputs = app.client.elements('//li/input[1]');
+    await inputs.setValue(glob1);
+    await app.client.element('button=Add source').click();
     await app.client.element('button=Create').click();
 
     await app.client.waitUntilTextExists('a', 'testproj0');
@@ -65,18 +75,26 @@ describe('Application launch', function () {
     const makeUrl = (filename) => path.normalize('file://' + path.join(imgDir, filename));
 
     expect(path.normalize(before)).to.be.eq(makeUrl('kek0.jpg'));
-
     await app.client.element('button=chuk').click();
 
     await app.client.waitForExist('img');
-    const after = await app.client.element('img').getAttribute('src');
+    let after = await app.client.element('img').getAttribute('src');
     expect(path.normalize(after)).to.be.eq(makeUrl('kek1.jpg'));
     expect(before).to.be.not.eq(after);
-
     await app.client.element('button=dog').click();
 
-    await app.client.element('a=testproj0').click();
+    after = await app.client.element('img').getAttribute('src');
+    expect(path.normalize(after)).to.be.eq(makeUrl('kek2.jpg'));
+    await app.client.element('button=dog').click();
 
+    after = await app.client.element('img').getAttribute('src');
+    expect(path.normalize(after)).to.be.eq(makeUrl('kek3.png'));
+    await app.client.element('button=cat').click();
+
+    after = await app.client.element('img').getAttribute('src');
+    expect(path.normalize(after)).to.be.eq(makeUrl('kek4.png'));
+
+    await app.client.element('a=testproj0').click();
     await app.client.waitForExist('ul');
 
     const getMarkupFor = (sampleID) => app.client.element(`p*=Sample ID: ${sampleID}`);
@@ -84,5 +102,9 @@ describe('Application launch', function () {
     expect(text).to.be.eq('Sample ID: 0|Value: chuk');
     text = await getMarkupFor(1).getText();
     expect(text).to.be.eq('Sample ID: 1|Value: dog');
+    text = await getMarkupFor(2).getText();
+    expect(text).to.be.eq('Sample ID: 2|Value: dog');
+    text = await getMarkupFor(3).getText();
+    expect(text).to.be.eq('Sample ID: 3|Value: cat');
   });
 });
