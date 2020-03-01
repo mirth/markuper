@@ -33,7 +33,9 @@ jobs:
 
     - name: Test Windows
       if: matrix.os == 'windows-latest'
-      run: set BACKEND_BINARY_FILENAME=main.exe yarn test
+      run: |
+          set BACKEND_BINARY_FILENAME=main.exe
+          yarn test
 
     - name: Test Ubuntu
       if: matrix.os == 'ubuntu-latest'
