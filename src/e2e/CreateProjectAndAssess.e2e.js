@@ -25,7 +25,7 @@ describe('Application launch', function () {
   it('Creates project and assesses samples', async () => {
     await app.client.waitForVisible('button');
     await app.client.element('button').click();
-    await app.client.waitForVisible('input')
+    await app.client.waitForVisible('input');
     await app.client.element('input').setValue('testproj0');
 
     const template = "input[value='classification']";
