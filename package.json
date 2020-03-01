@@ -21,7 +21,7 @@
     "_lint_frontend": "yarn eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",
     "_build_frontend": "yarn rollup -c",
-    "_build_backend": "cd backend/cmd && cross-env-shell GO111MODULE=on echo $BACKEND_BINARY_FILENAME"
+    "_build_backend": "cd backend/cmd && cross-env-shell GO111MODULE=on go build -o ../bin/$BACKEND_BINARY_FILENAME . && cd ../.."
   },
   "build": {
     "appId": "com.levchik.markuper",
