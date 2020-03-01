@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,6 +47,7 @@ func TestCreateProject(t *testing.T) {
 	}
 }
 
+// fixme create project with empty source
 func TestGetProject(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
@@ -71,6 +71,7 @@ func TestGetProject(t *testing.T) {
 		assert.Equal(t, req.Template, actual.Template)
 		assert.Equal(t, p.Description, actual.Description)
 		assert.Equal(t, req.Description, actual.Description)
+		assert.Equal(t, req.DataSources, actual.DataSources)
 	}
 }
 
@@ -116,6 +117,7 @@ func TestListProjects(t *testing.T) {
 	}
 }
 
+// fixmet test putSamples
 func TestFetchSampleList(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
@@ -137,28 +139,43 @@ func TestFetchSampleList(t *testing.T) {
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
 	}
 	proj := NewProject(Template{}, []DataSource{src}, ProjectDescription{})
-	err := fetchSampleList(db, proj, src)
+	list, err := fetchSampleList(db, proj, src)
 	assert.Nil(t, err)
 
 	{
-		sIDs, _ := getAllSampleIDsForProject(db, "samples", proj.ProjectID)
-
-		samples := [][]byte{}
-		for _, id := range sIDs {
-			s, _ := db.GetSample(id)
-			samples = append(samples, s)
+		j := func(imgPath string) ImageSample {
+			return ImageSample{
+				ImageURI: (imgPath),
+			}
 		}
 
-		j := func(imgPath string) []byte {
-			return []byte(fmt.Sprintf(`{"image_uri":%s}`, strconv.Quote(imgPath)))
-		}
-
-		assert.ElementsMatch(t, [][]byte{
+		assert.ElementsMatch(t, []ImageSample{
 			j(imgPaths[0]),
 			j(imgPaths[1]),
 			j(imgPaths[2]),
 			j(imgPaths[3]),
 			j(imgPaths[4]),
-		}, samples)
+		}, list)
 	}
+	// {
+	// 	sIDs, _ := getAllSampleIDsForProject(db, "samples", proj.ProjectID)
+
+	// 	samples := [][]byte{}
+	// 	for _, id := range sIDs {
+	// 		s, _ := db.GetSample(id)
+	// 		samples = append(samples, s)
+	// 	}
+
+	// 	j := func(imgPath string) []byte {
+	// 		return []byte(fmt.Sprintf(`{"image_uri":%s}`, strconv.Quote(imgPath)))
+	// 	}
+
+	// 	assert.ElementsMatch(t, [][]byte{
+	// 		j(imgPaths[0]),
+	// 		j(imgPaths[1]),
+	// 		j(imgPaths[2]),
+	// 		j(imgPaths[3]),
+	// 		j(imgPaths[4]),
+	// 	}, samples)
+	// }
 }

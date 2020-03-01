@@ -76,17 +76,21 @@ func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	}
 }
 
-func fetchSampleList(db *DB, proj Project, src DataSource) error {
+func fetchSampleList(db *DB, proj Project, src DataSource) ([]Jsonable, error) {
 	fetcher := GetSampleListFetcher(src)
 
 	list, err := fetcher.FetchSampleList()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	return list, nil
+}
+
+func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
 	for i, sample := range list {
 		sID := SampleID{
-			ProjectID: proj.ProjectID,
+			ProjectID: projectID,
 			SampleID:  int64(i), //fixme -> uuid
 		}
 
@@ -107,16 +111,24 @@ func fetchSampleList(db *DB, proj Project, src DataSource) error {
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
 	project := NewProject(req.Template, req.DataSources, req.Description)
 
+	allSamples := make([]Jsonable, 0)
 	for _, src := range project.DataSources {
-		err := fetchSampleList(s.db, project, src)
+		list, err := fetchSampleList(s.db, project, src)
 		if err != nil {
 			return Project{}, errors.Wrapf(err, "Failed to fetchSampleList for [%s]", src.SourceURI)
 		}
 
-		err = s.db.Put("projects", project.ProjectID, project)
-		if err != nil {
-			return Project{}, errors.WithStack(err)
-		}
+		allSamples = append(allSamples, list...)
+	}
+
+	err := putSamples(s.db, project.ProjectID, allSamples)
+	if err != nil {
+		return Project{}, err
+	}
+
+	err = s.db.Put("projects", project.ProjectID, project)
+	if err != nil {
+		return Project{}, errors.WithStack(err)
 	}
 
 	return project, nil

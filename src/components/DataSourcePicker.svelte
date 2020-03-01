@@ -13,21 +13,21 @@ function newEmptySource() {
 let newSource = newEmptySource();
 
 function addDataSource() {
-  dataSources.push(newSource);
+  dataSources.dataSources = dataSources.dataSources.concat([newSource]);
   newSource = newEmptySource();
 }
 
 </script>
 
 <ul>
-  <li>
-    <DataSource dataSource={newSource} />
-    <Button on:click={addDataSource} iconRight='plus'>Add Source</Button> -->
-  </li>
-
   {#each dataSources as dataSource}
   <li>
     <DataSource {dataSource} />
   </li>
   {/each}
+
+  <li>
+    <DataSource dataSource={newSource} />
+    <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
+  </li>
 </ul>
