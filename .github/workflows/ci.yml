@@ -1,11 +1,20 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  # pull_request:
+  #   branches:
+  #     - master
 
 jobs:
-  build:
+  build_and_test:
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v1
@@ -18,13 +27,20 @@ jobs:
     - name: Install deps
       run: yarn install
 
-    - name: Test
-      run: yarn test
-        
-        # |
-        #   if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        #     export DISPLAY=:99.0
-        #     Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        #   fi
-        #   npm i -g xvfb-maybe
-        #   xvfb-maybe yarn test
+    - name: Test MacOs
+      if: matrix.os == 'macos-latest'
+      run: BACKEND_BINARY_FILENAME=main yarn test
+
+    - name: Test Windows
+      if: matrix.os == 'windows-latest'
+      run:  |
+          $env:BACKEND_BINARY_FILENAME='main.exe'
+          yarn test
+
+    - name: Test Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+          export DISPLAY=:99.0
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          npm i -g xvfb-maybe
+          BACKEND_BINARY_FILENAME=main xvfb-maybe yarn test
