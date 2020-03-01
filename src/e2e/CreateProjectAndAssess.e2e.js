@@ -28,7 +28,9 @@ describe('Application launch', function () {
     await app.client.waitForVisible('input')
     await app.client.element('input').setValue('testproj0');
 
-    await app.client.element("input[value='classification'").click();
+    const template = "input[value='classification']";
+    await app.client.waitForVisible(template);
+    await app.client.element(template).click();
 
     const newLabelInputSelector = "input[placeholder='Label goes here...'";
     const getNewLabelInput = () => app.client.element(newLabelInputSelector);
