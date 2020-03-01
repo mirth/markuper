@@ -83,14 +83,17 @@ describe('Application launch', function () {
     expect(before).to.be.not.eq(after);
     await app.client.element('button=dog').click();
 
+    await app.client.waitForExist('img');
     after = await app.client.element('img').getAttribute('src');
     expect(path.normalize(after)).to.be.eq(makeUrl('kek2.jpg'));
     await app.client.element('button=dog').click();
 
+    await app.client.waitForExist('img');
     after = await app.client.element('img').getAttribute('src');
     expect(path.normalize(after)).to.be.eq(makeUrl('kek3.png'));
     await app.client.element('button=cat').click();
 
+    await app.client.waitForExist('img');
     after = await app.client.element('img').getAttribute('src');
     expect(path.normalize(after)).to.be.eq(makeUrl('kek4.png'));
 
