@@ -2,7 +2,7 @@
 import { fetchProjectList } from '../store';
 import api from '../api';
 import TemplatePicker from './TemplatePicker.svelte';
-import DataSource from './DataSource.svelte';
+import DataSourcePicker from './DataSourcePicker.svelte';
 
 export let close;
 
@@ -10,10 +10,10 @@ let projectName = '';
 const selectedTemplate = {
   template: null,
 };
-const dataSource = {
+const dataSources = [{
   type: 'local_directory',
   source_uri: '',
-};
+}];
 
 async function createNewProject() {
   await api.post('/project', {
@@ -32,5 +32,5 @@ async function createNewProject() {
 
 <input bind:value={projectName} placeholder="New project" minlength="1">
 <TemplatePicker {selectedTemplate} />
-<DataSource {dataSource} />
+<DataSourcePicker {dataSources} />
 <button on:click={createNewProject}>Create</button>
