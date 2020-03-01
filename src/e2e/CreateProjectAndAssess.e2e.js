@@ -29,7 +29,7 @@ describe('Application launch', function () {
     await app.client.element('input').setValue('testproj0');
 
     const template = "input[value='classification']";
-    await app.client.waitForVisible(template);
+    await app.client.waitForExist(template);
     await app.client.element(template).click();
 
     const newLabelInputSelector = "input[placeholder='Label goes here...'";
