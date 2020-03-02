@@ -20,7 +20,7 @@ function addDataSource() {
 </script>
 
 <ul>
-  {#each dataSources as dataSource}
+  {#each dataSources.dataSources as dataSource}
   <li>
     <DataSource {dataSource} />
   </li>

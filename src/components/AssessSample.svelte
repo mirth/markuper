@@ -14,17 +14,16 @@ async function fetchNext(projectID) {
 
 let sample = fetchNext(params.project_id);
 
-function makeHandleAssess(label) {
+function makeHandleAssess(field, label) {
   return async () => {
     sample = await sample;
     const { sample_id: sampleId } = sample;
+    const markup = { [field.name.value]: label.value};
 
     await api.post(`/project/${sampleId.project_id}/assess`, {
       sample_id: sampleId,
       sample_markup: {
-        markup: {
-          label,
-        },
+        markup: markup,
       },
     });
     sample = fetchNext(sampleId.project_id);
@@ -62,7 +61,7 @@ img {
       <ul>
         {#each field.labels as label}
           <li>
-            <Button on:click={makeHandleAssess(label)} style="display: inline; min-width: 60px;">
+            <Button on:click={makeHandleAssess(field, label)} style="display: inline; min-width: 60px;">
               {label.name}
             </Button>
           </li>

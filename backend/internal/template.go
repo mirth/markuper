@@ -18,7 +18,7 @@ type ValueWithName struct {
 }
 
 type RadioField struct {
-	ID     string          `json:"id"`
+	ID     string          `json:"id"` // fixme keep only Name?
 	Type   string          `json:"type"`
 	Name   ValueWithName   `json:"name"`
 	Labels []ValueWithName `json:"labels"`
@@ -34,11 +34,6 @@ func NewRadioField(id string, name ValueWithName) RadioField {
 			{Value: "dog", Name: "dog"},
 		},
 	}
-}
-
-type RadioAnswer struct {
-	FieldType string `json:"type"`
-	Value     string `json:"label"`
 }
 
 func (f RadioField) JSON() ([]byte, error) {

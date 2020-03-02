@@ -30,6 +30,12 @@ function exportProject(p) {
   };
 }
 
+function formatMarkup(markup) {
+  return _(markup).toPairs().map(([labelName, labelValue]) => {
+    return `${labelName}:${labelValue}`
+  }).join('\n');
+}
+
 </script>
 
 
@@ -74,7 +80,7 @@ function exportProject(p) {
   <ul>
     {#each list.list as forSample}
       <li>
-        <p>Sample ID: {forSample.sample_id.sample_id}|Value: {forSample.sample_markup.markup.label.value}</p>
+        <p>Sample ID: {forSample.sample_id.sample_id}|Value: {formatMarkup(forSample.sample_markup.markup)}</p>
       </li>
     {/each}
   </ul>
