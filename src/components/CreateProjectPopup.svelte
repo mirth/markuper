@@ -1,5 +1,6 @@
 <script>
-import Input from "svelte-atoms/Input.svelte";
+import Input from 'svelte-atoms/Input.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 import { fetchProjectList } from '../store';
 import api from '../api';
 import TemplatePicker from './TemplatePicker.svelte';
@@ -30,7 +31,9 @@ async function createNewProject() {
 </script>
 
 
-<Input bind:value={projectName} title="Small" value="Small" size="small" placeholder="New project" />
+<Input bind:value={projectName} title="Project name" size="big" placeholder="New project" />
+<Spacer size={32} />
 <TemplatePicker {selectedTemplate} />
+<Spacer size={24} />
 <DataSourcePicker {dataSources} />
 <button on:click={createNewProject}>Create</button>

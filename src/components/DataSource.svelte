@@ -1,6 +1,7 @@
 <script>
+import Input from 'svelte-atoms/Input.svelte';
 export let dataSource;
 
 </script>
 
-<input bind:value={dataSource.source_uri} placeholder="/some/path" minlength="1"/>
+<Input bind:value={dataSource.source_uri} placeholder="/some/path" minlength="1" size="small"/>
