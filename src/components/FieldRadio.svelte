@@ -1,5 +1,4 @@
 <script>
-import _ from 'lodash';
 import Button from 'svelte-atoms/Button.svelte';
 import Input from 'svelte-atoms/Input.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
@@ -17,8 +16,8 @@ function addLabel() {
   newLabel = '';
 }
 function removeLabel(index) {
-  return function () {
-    field.labels = field.labels.filter((_, iter) => iter !== index);
+  return () => {
+    field.labels = field.labels.filter((_unused, iter) => iter !== index);
   };
 }
 </script>
