@@ -3,6 +3,7 @@ import Button from 'svelte-atoms/Button.svelte';
 import Input from 'svelte-atoms/Input.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Chip from 'svelte-atoms/Chip.svelte';
 
 export let field;
 let newLabel = '';
@@ -13,6 +14,9 @@ function addLabel() {
     name: newLabel,
   });
   newLabel = '';
+}
+function onClose() {
+
 }
 </script>
 
@@ -25,10 +29,28 @@ function addLabel() {
 </Cell>
 </Row>
 
+<Row>
+<Cell>
 <ul>
   {#each field.labels as label}
-    <li>{label.name}</li>
+    <li>
+      <Chip text={label.name} onClose={onClose} />
+    </li>
   {/each}
 </ul>
+</Cell>
+</Row>
 
+<style>
+ul {
+  padding: 0;
+}
 
+li {
+  list-style-type: none;
+  border: 1px solid black;
+  border-radius: 15px;
+  display: inline;
+  margin-right: 10px;
+}
+</style>

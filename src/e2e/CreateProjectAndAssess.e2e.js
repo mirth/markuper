@@ -65,8 +65,8 @@ describe('Application launch', function () {
     it('adds first data source', async () => {
       await app.client.element(srcInput).setValue(glob0);
       await app.client.element('button=Add source').click();
-      await app.client.waitForVisible('//ul[2]/li/div/input');
-      const inputValue = await app.client.element('//ul[2]/li/div/input').getValue();
+      await app.client.waitForVisible('//ul/li/div/input');
+      const inputValue = await app.client.element('//ul/li/div/input').getValue();
       expect(inputValue).to.be.eq(glob0);
     });
 
@@ -75,8 +75,8 @@ describe('Application launch', function () {
       const input = app.client.element(srcInput);
       await input.setValue(glob1);
       await app.client.element('button=Add source').click();
-      await app.client.waitForVisible('//ul[2]/li[2]/div/input');
-      const inputValue = await app.client.element('//ul[2]/li[2]/div/input').getValue();
+      await app.client.waitForVisible('//ul/li[2]/div/input');
+      const inputValue = await app.client.element('//ul/li[2]/div/input').getValue();
       expect(inputValue).to.be.eq(glob1);
     });
 
