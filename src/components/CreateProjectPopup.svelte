@@ -39,4 +39,5 @@ async function createNewProject() {
 <TemplatePicker {selectedTemplate} />
 <Spacer size={24} />
 <DataSourcePicker {dataSources} />
-<Button on:click={createNewProject}>Create</Button>
+<Spacer size={36} />
+<Button on:click={createNewProject} style='float: right; margin-bottom: 20px; margin-right: 20px;'>Create</Button>

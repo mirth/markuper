@@ -22,7 +22,7 @@ function addDataSource() {
 
 </script>
 
-<Typography type="subheader" block>Add data source:</Typography>
+<Typography type='subheader' block>Add data source:</Typography>
 <Row>
   <Cell xs={7}>
     <DataSource dataSource={newSource} />

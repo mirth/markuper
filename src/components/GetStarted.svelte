@@ -35,8 +35,5 @@ function closeNewProjectPopup() {
   <div style='min-width: 400px;'>
     <CreateProjectPopup close={closeNewProjectPopup} />
   </div>
-  <div slot="footer">
-    <Button on:click={closeNewProjectPopup}>Ok</Button>
-  </div>
 </Popup>
 </PageBlank>
