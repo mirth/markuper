@@ -43,7 +43,7 @@ describe('Application launch', function () {
       await app.client.element(template).setValue('classification');
     });
 
-    it('adds two new labels for classification template', async () => {
+    it('adds four new labels for classification template', async () => {
       const newLabelInputSelector = "input[placeholder='Label goes here...'";
       const getNewLabelInput = () => app.client.element(newLabelInputSelector);
       const addLabelSelector = '//div[2]/button';
@@ -52,8 +52,21 @@ describe('Application launch', function () {
       await app.client.waitForVisible(addLabelSelector);
       await addLabel().click();
       await app.client.waitForExist(newLabelInputSelector);
+      await getNewLabelInput().setValue('azaza');
+      await addLabel().click();
+      await app.client.waitForExist(newLabelInputSelector);
       await getNewLabelInput().setValue('gek');
       await addLabel().click();
+      await app.client.waitForExist(newLabelInputSelector);
+      await getNewLabelInput().setValue('lul');
+      await addLabel().click();
+    });
+
+    it("remove 'azaza' and 'lul' lables", async () => {
+      const getNthCross = (nth) => `//li[${nth}]/div/div/button`;
+      await app.client.waitForVisible(getNthCross(4));
+      await app.client.element(getNthCross(4)).click();
+      await app.client.element(getNthCross(5)).click();
     });
 
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');

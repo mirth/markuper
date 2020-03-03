@@ -1,4 +1,5 @@
 <script>
+import _ from 'lodash';
 import Button from 'svelte-atoms/Button.svelte';
 import Input from 'svelte-atoms/Input.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
@@ -15,8 +16,10 @@ function addLabel() {
   });
   newLabel = '';
 }
-function onClose() {
-
+function removeLabel(index) {
+  return function () {
+    field.labels = field.labels.filter((_, iter) => iter !== index);
+  };
 }
 </script>
 
@@ -31,13 +34,17 @@ function onClose() {
 
 <Row>
 <Cell>
+{#if field.labels.length > 0}
 <ul>
-  {#each field.labels as label}
+  {#each field.labels as label, i}
     <li>
-      <Chip text={label.name} onClose={onClose} />
+      <Chip text={label.name} onClose={removeLabel(i)} />
     </li>
   {/each}
 </ul>
+{:else}
+  <p>[No labels]</p>
+{/if}
 </Cell>
 </Row>
 
