@@ -30,11 +30,18 @@ async function createNewProject() {
   close();
 }
 
+$: projectNameError = projectName.length === 0;
 </script>
 
 <Typography type='headline' block>New project</Typography>
 <Spacer size={16} />
-<Input bind:value={projectName} title="Project name" size="big" placeholder="My cool project" />
+<Input
+  bind:value={projectName}
+  name='projectName'
+  title='Project name'
+  size='big'
+  placeholder='My cool project'
+  error={projectNameError} />
 <Spacer size={16} />
 <TemplatePicker {selectedTemplate} />
 <Spacer size={24} />
