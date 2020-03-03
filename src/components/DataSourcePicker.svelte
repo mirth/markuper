@@ -31,10 +31,24 @@ function addDataSource() {
     <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
   </Cell>
 </Row>
-<ul>
-  {#each dataSources.dataSources as dataSource}
-  <li>
-    <DataSource {dataSource} />
-  </li>
-  {/each}
-</ul>
+<Row>
+<Cell>
+  <ul>
+    {#each dataSources.dataSources as dataSource}
+    <li>
+      <DataSource {dataSource} />
+    </li>
+    {/each}
+  </ul>
+</Cell>
+</Row>
+
+<style>
+li {
+  list-style-type: none;
+  margin-bottom: 15px;
+}
+ul {
+  padding: 0;
+}
+</style>
