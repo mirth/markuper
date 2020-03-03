@@ -18,12 +18,12 @@ function makeHandleAssess(field, label) {
   return async () => {
     sample = await sample;
     const { sample_id: sampleId } = sample;
-    const markup = { [field.name.value]: label.value};
+    const markup = { [field.name.value]: label.value };
 
     await api.post(`/project/${sampleId.project_id}/assess`, {
       sample_id: sampleId,
       sample_markup: {
-        markup: markup,
+        markup,
       },
     });
     sample = fetchNext(sampleId.project_id);

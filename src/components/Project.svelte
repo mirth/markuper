@@ -3,11 +3,11 @@
 import _ from 'lodash';
 import { push } from 'svelte-spa-router';
 import Button from 'svelte-atoms/Button.svelte';
-import Typography from "svelte-atoms/Typography.svelte";
-import Block from "svelte-atoms/Block.svelte";
+import Typography from 'svelte-atoms/Typography.svelte';
+import Block from 'svelte-atoms/Block.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
-import Spacer from 'svelte-atoms/Spacer.svelte'
+import Spacer from 'svelte-atoms/Spacer.svelte';
 import jsFileDownload from 'js-file-download';
 
 import PageBlank from './PageBlank.svelte';
@@ -31,9 +31,7 @@ function exportProject(p) {
 }
 
 function formatMarkup(markup) {
-  return _(markup).toPairs().map(([labelName, labelValue]) => {
-    return `${labelName}:${labelValue}`
-  }).join('\n');
+  return _(markup).toPairs().map(([labelName, labelValue]) => `${labelName}:${labelValue}`).join('\n');
 }
 
 </script>

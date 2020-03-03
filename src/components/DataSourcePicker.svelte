@@ -1,10 +1,9 @@
 <script>
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
-import Spacer from 'svelte-atoms/Spacer.svelte';
-import Typography from "svelte-atoms/Typography.svelte";
-import DataSource from './DataSource.svelte';
+import Typography from 'svelte-atoms/Typography.svelte';
 import Button from 'svelte-atoms/Button.svelte';
+import DataSource from './DataSource.svelte';
 
 export let dataSources;
 function newEmptySource() {
@@ -24,6 +23,14 @@ function addDataSource() {
 </script>
 
 <Typography type="subheader" block>Add data source:</Typography>
+<Row>
+  <Cell xs={7}>
+    <DataSource dataSource={newSource} />
+  </Cell>
+  <Cell xs={3}>
+    <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
+  </Cell>
+</Row>
 <ul>
   {#each dataSources.dataSources as dataSource}
   <li>
@@ -31,10 +38,3 @@ function addDataSource() {
   </li>
   {/each}
 </ul>
-<Row>
-  <Cell>
-    <DataSource dataSource={newSource} />
-  </Cell>
-  <!-- <Spacer size={24} /> -->
-  <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
-</Row>
