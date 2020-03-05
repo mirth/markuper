@@ -3,8 +3,11 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
+	"sort"
 
+	"github.com/mattn/go-zglob"
 	"github.com/pkg/errors"
 )
 
@@ -46,10 +49,18 @@ type ImageGlobDataSource struct {
 }
 
 func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
-	matches, err := filepath.Glob(s.SourceURI)
+	sourceURI := s.SourceURI
+	_, err := os.Stat(s.SourceURI)
+	if err == nil {
+		sourceURI = filepath.Join(sourceURI, "*")
+	}
+
+	matches, err := zglob.Glob(sourceURI)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	sort.Strings(matches)
 
 	samples := []SampleData{}
 	for _, path := range matches {
