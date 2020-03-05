@@ -96,7 +96,7 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		return ExportResponse{}, err
 	}
 
-	header := []string{"sample_id", "created_at"}
+	header := []string{"sample_id", "assessed_at"}
 	header = append(header, sampleColumns...)
 	rows := [][]string{
 		header,

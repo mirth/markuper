@@ -32,7 +32,7 @@ func TestExportCSV(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		assert.Equal(t, `sample_id,created_at,aaa,kek
+		assert.Equal(t, `sample_id,assessed_at,aaa,kek
 0,2015-03-07T11:06:39,3,"""mark0"""
 1,2015-03-07T11:06:39,4,"""mark1"""
 2,2015-03-07T11:06:39,5,"""mark2"""
