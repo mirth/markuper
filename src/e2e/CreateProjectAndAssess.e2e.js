@@ -73,7 +73,7 @@ describe('Application launch', function () {
     const glob0 = path.join(imgDir, '*.jpg');
     const glob1 = path.join(imgDir, '*.png');
 
-    const srcInput = "input[placeholder='/some/path']";
+    const srcInput = "input[placeholder='/some/path or /some/glob/*.jpg']";
 
     it('adds first data source', async () => {
       await app.client.element(srcInput).setValue(glob0);
