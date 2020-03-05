@@ -30,7 +30,7 @@ async function createNewProject() {
   close();
 }
 
-$: projectNameError = projectName.length === 0;
+$: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
 </script>
 
 <Typography type='headline' block>New project</Typography>
@@ -42,9 +42,19 @@ $: projectNameError = projectName.length === 0;
   size='big'
   placeholder='My cool project'
   error={projectNameError} />
+{#if projectNameError}
+<span>{projectNameError}</span>
+{/if}
+
 <Spacer size={16} />
 <TemplatePicker {selectedTemplate} />
 <Spacer size={24} />
 <DataSourcePicker {dataSources} />
 <Spacer size={36} />
 <Button on:click={createNewProject} style='float: right; margin-bottom: 20px; margin-right: 20px;'>Create</Button>
+
+<style>
+span {
+  color: red;
+}
+</style>
