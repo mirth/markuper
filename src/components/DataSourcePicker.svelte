@@ -26,6 +26,7 @@ function addDataSource() {
 <Row>
   <Cell xs={7}>
     <DataSource dataSource={newSource} />
+
   </Cell>
   <Cell xs={3}>
     <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
@@ -45,7 +46,7 @@ function addDataSource() {
 <Row>
 <Cell>
 {#if dataSources.dataSources.length === 0}
-<span>There should be at least one data sources</span>
+<span>There should be at least one data source</span>
 {/if}
 </Cell>
 </Row>
