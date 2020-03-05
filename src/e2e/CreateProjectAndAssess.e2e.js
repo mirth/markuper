@@ -37,41 +37,59 @@ describe('Application launch', function () {
       await app.client.element('input').setValue('testproj0');
     });
 
-    it('adds two new labels for classification template', async () => {
-      const template = "input[value='classification']";
+    it('set project task', async () => {
+      const template = "input[placeholder='Select task']";
       await app.client.waitForExist(template);
-      await app.client.element(template).click();
+      await app.client.element(template).setValue('classification');
+    });
+
+    it('adds four new labels for classification template', async () => {
       const newLabelInputSelector = "input[placeholder='Label goes here...'";
       const getNewLabelInput = () => app.client.element(newLabelInputSelector);
-      const addLabel = () => app.client.element('button=+');
+      const addLabelSelector = '//div[2]/button';
+      const addLabel = () => app.client.element(addLabelSelector);
       await getNewLabelInput().setValue('chuk');
+      await app.client.waitForVisible(addLabelSelector);
+      await addLabel().click();
+      await app.client.waitForExist(newLabelInputSelector);
+      await getNewLabelInput().setValue('azaza');
       await addLabel().click();
       await app.client.waitForExist(newLabelInputSelector);
       await getNewLabelInput().setValue('gek');
       await addLabel().click();
+      await app.client.waitForExist(newLabelInputSelector);
+      await getNewLabelInput().setValue('lul');
+      await addLabel().click();
+    });
+
+    it("remove 'azaza' and 'lul' lables", async () => {
+      const getNthCross = (nth) => `//li[${nth}]/div/div/button`;
+      await app.client.waitForVisible(getNthCross(4));
+      await app.client.element(getNthCross(4)).click();
+      await app.client.element(getNthCross(5)).click();
     });
 
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
     const glob0 = path.join(imgDir, '*.jpg');
     const glob1 = path.join(imgDir, '*.png');
+
     const srcInput = "input[placeholder='/some/path']";
 
     it('adds first data source', async () => {
       await app.client.element(srcInput).setValue(glob0);
       await app.client.element('button=Add source').click();
-      await app.client.waitForVisible(srcInput);
-      const inputValue = await app.client.element(srcInput).getValue();
+      await app.client.waitForVisible('//ul/li/div/input');
+      const inputValue = await app.client.element('//ul/li/div/input').getValue();
       expect(inputValue).to.be.eq(glob0);
     });
 
     it('adds second data source', async () => {
-      const inputSelector = '//li[2]/input';
-      await app.client.waitForVisible(inputSelector);
-      const input = app.client.element(inputSelector);
+      await app.client.waitForVisible(srcInput);
+      const input = app.client.element(srcInput);
       await input.setValue(glob1);
       await app.client.element('button=Add source').click();
-      await app.client.waitForVisible(inputSelector);
-      const inputValue = await app.client.element(inputSelector).getValue();
+      await app.client.waitForVisible('//ul/li[2]/div/input');
+      const inputValue = await app.client.element('//ul/li[2]/div/input').getValue();
       expect(inputValue).to.be.eq(glob1);
     });
 

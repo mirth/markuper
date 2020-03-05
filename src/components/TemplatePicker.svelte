@@ -1,12 +1,14 @@
 <script>
 import { onMount } from 'svelte';
 import _ from 'lodash';
+import Select from 'svelte-atoms/Select.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 import api from '../api';
 import TemplatePreview from './TemplatePreview.svelte';
 
 export let selectedTemplate;
 
-let selectedTemplateTask = null;
+let selectedTemplateTask = 'classification';
 let templateList = [];
 
 onMount(async () => {
@@ -21,25 +23,15 @@ $: selectedTemplate.template = {
     { task: selectedTemplateTask },
   ),
 };
+
+$: options = _.map(templateList, (t) => ({
+  label: t.task, value: t.task,
+}));
+
 </script>
 
-<style>
-
-.grid {
-  display: grid;
-}
-
-</style>
-
-
-<div class="grid">
-  {#each templateList as template}
-    <label>
-      <input type=radio bind:group={selectedTemplateTask} value={template.task} />
-    </label>
-  {/each}
-</div>
-
+<Select bind:value={selectedTemplateTask} {options} title='Select project Task' placeholder='Select task' />
+<Spacer size={16} />
 {#if selectedTemplate.template.task}
   <TemplatePreview template={selectedTemplate} />
 {/if}

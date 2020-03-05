@@ -1,6 +1,9 @@
 <script>
-import DataSource from './DataSource.svelte';
+import Row from 'svelte-atoms/Grids/Row.svelte';
+import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Typography from 'svelte-atoms/Typography.svelte';
 import Button from 'svelte-atoms/Button.svelte';
+import DataSource from './DataSource.svelte';
 
 export let dataSources;
 function newEmptySource() {
@@ -19,15 +22,45 @@ function addDataSource() {
 
 </script>
 
-<ul>
-  {#each dataSources.dataSources as dataSource}
-  <li>
-    <DataSource {dataSource} />
-  </li>
-  {/each}
-
-  <li>
+<Typography type='subheader' block>Add data source:</Typography>
+<Row>
+  <Cell xs={7}>
     <DataSource dataSource={newSource} />
+
+  </Cell>
+  <Cell xs={3}>
     <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
-  </li>
-</ul>
+  </Cell>
+</Row>
+<Row>
+<Cell>
+  <ul>
+    {#each dataSources.dataSources as dataSource}
+    <li>
+      <DataSource {dataSource} />
+    </li>
+    {/each}
+  </ul>
+</Cell>
+</Row>
+<Row>
+<Cell>
+{#if dataSources.dataSources.length === 0}
+<span>There should be at least one data source</span>
+{/if}
+</Cell>
+</Row>
+
+<style>
+li {
+  list-style-type: none;
+  margin-bottom: 15px;
+}
+ul {
+  padding: 0;
+}
+
+span {
+  color: red;
+}
+</style>

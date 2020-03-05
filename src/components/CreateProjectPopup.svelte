@@ -1,5 +1,8 @@
 <script>
-import Input from "svelte-atoms/Input.svelte";
+import Input from 'svelte-atoms/Input.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte';
+import Button from 'svelte-atoms/Button.svelte';
+import Typography from 'svelte-atoms/Typography.svelte';
 import { fetchProjectList } from '../store';
 import api from '../api';
 import TemplatePicker from './TemplatePicker.svelte';
@@ -12,10 +15,35 @@ const selectedTemplate = {
   template: null,
 };
 const dataSources = {
-  dataSources: []
+  dataSources: [],
 };
 
+function isProjectValid() {
+  if (projectNameError) {
+    return false;
+  }
+
+  if (!selectedTemplate.template) {
+    return false;
+  }
+
+  const firstRadio = selectedTemplate.template && selectedTemplate.template.radios[0];
+  if (firstRadio.labels.length === 0) {
+    return false;
+  }
+
+  if (dataSources.dataSources.length === 0) {
+    return false;
+  }
+
+  return true;
+}
+
 async function createNewProject() {
+  if (!isProjectValid()) {
+    return;
+  }
+
   await api.post('/project', {
     description: {
       name: projectName,
@@ -27,10 +55,33 @@ async function createNewProject() {
   close();
 }
 
+$: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
+
 </script>
 
+<Typography type='headline' block>New project</Typography>
+<Spacer size={16} />
+<Input
+  bind:value={projectName}
+  name='projectName'
+  title='Project name'
+  size='big'
+  placeholder='My cool project'
+  error={projectNameError} />
 
-<Input bind:value={projectName} title="Small" value="Small" size="small" placeholder="New project" />
+{#if projectNameError}
+<span>{projectNameError}</span>
+{/if}
+
+<Spacer size={16} />
 <TemplatePicker {selectedTemplate} />
+<Spacer size={24} />
 <DataSourcePicker {dataSources} />
-<button on:click={createNewProject}>Create</button>
+<Spacer size={36} />
+<Button on:click={createNewProject} style='float: right; margin-bottom: 20px; margin-right: 20px;'>Create</Button>
+
+<style>
+span {
+  color: red;
+}
+</style>
