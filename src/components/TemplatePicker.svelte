@@ -30,7 +30,7 @@ $: options = _.map(templateList, (t) => ({
 
 </script>
 
-<Select bind:value={selectedTemplateTask} {options} title="Select project Task" placeholder="Select task" />
+<Select bind:value={selectedTemplateTask} {options} title='Select project Task' placeholder='Select task' />
 <Spacer size={16} />
 {#if selectedTemplate.template.task}
   <TemplatePreview template={selectedTemplate} />

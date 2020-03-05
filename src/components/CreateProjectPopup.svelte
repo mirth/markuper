@@ -18,7 +18,32 @@ const dataSources = {
   dataSources: [],
 };
 
+function isProjectValid() {
+  if (projectNameError) {
+    return false;
+  }
+
+  if (!selectedTemplate.template) {
+    return false;
+  }
+
+  const firstRadio = selectedTemplate.template && selectedTemplate.template.radios[0];
+  if (firstRadio.labels.length === 0) {
+    return false;
+  }
+
+  if (dataSources.dataSources.length === 0) {
+    return false;
+  }
+
+  return true;
+}
+
 async function createNewProject() {
+  if (!isProjectValid()) {
+    return;
+  }
+
   await api.post('/project', {
     description: {
       name: projectName,
@@ -31,6 +56,7 @@ async function createNewProject() {
 }
 
 $: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
+
 </script>
 
 <Typography type='headline' block>New project</Typography>
@@ -42,6 +68,7 @@ $: projectNameError = (projectName.trim().length === 0) && 'Project name should 
   size='big'
   placeholder='My cool project'
   error={projectNameError} />
+
 {#if projectNameError}
 <span>{projectNameError}</span>
 {/if}

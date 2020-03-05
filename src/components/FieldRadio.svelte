@@ -33,7 +33,6 @@ function removeLabel(index) {
 
 <Row>
 <Cell>
-{#if field.labels.length > 0}
 <ul>
   {#each field.labels as label, i}
     <li>
@@ -41,8 +40,8 @@ function removeLabel(index) {
     </li>
   {/each}
 </ul>
-{:else}
-  <p>[No labels]</p>
+{#if field.labels.length === 0}
+  <span>There should be at least one label</span>
 {/if}
 </Cell>
 </Row>
@@ -58,5 +57,9 @@ li {
   border-radius: 15px;
   display: inline;
   margin-right: 10px;
+}
+
+span {
+  color: red;
 }
 </style>

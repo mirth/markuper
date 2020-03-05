@@ -42,6 +42,13 @@ function addDataSource() {
   </ul>
 </Cell>
 </Row>
+<Row>
+<Cell>
+{#if dataSources.dataSources.length === 0}
+<span>There should be at least one data sources</span>
+{/if}
+</Cell>
+</Row>
 
 <style>
 li {
@@ -50,5 +57,9 @@ li {
 }
 ul {
   padding: 0;
+}
+
+span {
+  color: red;
 }
 </style>
