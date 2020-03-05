@@ -170,27 +170,30 @@ func TestListMarkup(t *testing.T) {
 
 	{
 		assert.ElementsMatch(t, []MarkupListElement{
-			{
-				SampleID: SampleID{ProjectID: proj0.ProjectID, SampleID: 0},
-				SampleMarkup: SampleMarkup{
+			NewMarkupListElement(
+				SampleID{ProjectID: proj0.ProjectID, SampleID: 0},
+				"sampleuri0",
+				SampleMarkup{
 					CreatedAt: utils.TestNowUTC(),
 					Markup:    json.RawMessage(`{"kek":mark0}`),
 				},
-			},
-			{
-				SampleID: SampleID{ProjectID: proj0.ProjectID, SampleID: 1},
-				SampleMarkup: SampleMarkup{
+			),
+			NewMarkupListElement(
+				SampleID{ProjectID: proj0.ProjectID, SampleID: 1},
+				"sampleuri1",
+				SampleMarkup{
 					CreatedAt: utils.TestNowUTC(),
 					Markup:    json.RawMessage(`{"kek":mark1}`),
 				},
-			},
-			{
-				SampleID: SampleID{ProjectID: proj0.ProjectID, SampleID: 2},
-				SampleMarkup: SampleMarkup{
+			),
+			NewMarkupListElement(
+				SampleID{ProjectID: proj0.ProjectID, SampleID: 2},
+				"sampleuri2",
+				SampleMarkup{
 					CreatedAt: utils.TestNowUTC(),
 					Markup:    json.RawMessage(`{"kek":mark2}`),
 				},
-			},
+			),
 		}, list.List)
 	}
 }

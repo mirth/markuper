@@ -96,7 +96,7 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		return ExportResponse{}, err
 	}
 
-	header := []string{"sample_id", "assessed_at"}
+	header := []string{"sample_id", "sample_uri", "assessed_at"}
 	header = append(header, sampleColumns...)
 	rows := [][]string{
 		header,
@@ -107,6 +107,7 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 
 		row := []string{
 			sampleID,
+			entry.SampleURI,
 			entry.SampleMarkup.CreatedAt.Format("2006-01-02T15:04:05"),
 		}
 		sampleValues, err := markupValues(entry.SampleMarkup.Markup)

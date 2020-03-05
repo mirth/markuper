@@ -31,7 +31,12 @@ type SampleResponse struct {
 	Template Template        `json:"template"`
 }
 
-type MarkupListElement = AssessRequest
+type MarkupListElement struct {
+	SampleID     SampleID     `json:"sample_id"`
+	SampleURI    SampleURI    `json:"sample_uri"`
+	SampleMarkup SampleMarkup `json:"sample_markup"`
+}
+
 type MarkupList struct {
 	List []MarkupListElement `json:"list"`
 }
@@ -49,6 +54,10 @@ type WithProjectIDRequest struct {
 
 type MarkupServiceImpl struct {
 	db *DB
+}
+
+func NewMarkupListElement(id SampleID, uri SampleURI, m SampleMarkup) MarkupListElement {
+	return MarkupListElement{id, uri, m}
 }
 
 func NewMarkupService(db *DB) MarkupService {
@@ -166,23 +175,41 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 
 	samples := []MarkupListElement{}
 	err = db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(Markups)
+		m := tx.Bucket(Markups)
+		s := tx.Bucket(Samples)
 		for _, id := range ids {
 			binID, err := encodeBin(id)
 			if err != nil {
 				return err
 			}
-			smBin := b.Get(binID)
+			smBin := m.Get(binID)
 			sm := SampleMarkup{}
-			err = decodeBin(smBin).Decode(&sm)
-			if err != nil {
-				return err
+			{
+				err := decodeBin(smBin).Decode(&sm)
+				if err != nil {
+					return err
+				}
 			}
 
-			samples = append(samples, MarkupListElement{
-				SampleID:     id,
-				SampleMarkup: sm,
-			})
+			sBin := s.Get(binID)
+			sJson := []byte{}
+			sample := ImageSample{}
+			{
+				err := decodeBin(sBin).Decode(&sJson)
+				if err != nil {
+					return err
+				}
+				err = json.Unmarshal(sJson, &sample)
+				if err != nil {
+					return errors.WithStack(err)
+				}
+			}
+
+			samples = append(samples, NewMarkupListElement(
+				id,
+				sample.ImageURI,
+				sm,
+			))
 		}
 
 		return nil
