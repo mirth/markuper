@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/mattn/go-zglob"
 	"github.com/pkg/errors"
 )
 
@@ -55,7 +54,7 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 		sourceURI = filepath.Join(sourceURI, "*")
 	}
 
-	matches, err := zglob.Glob(sourceURI)
+	matches, err := filepath.Glob(sourceURI)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
