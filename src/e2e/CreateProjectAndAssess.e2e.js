@@ -33,7 +33,7 @@ describe('Application launch', function () {
     });
 
     it('inputs new project name', async () => {
-      await sleep(300);
+      await sleep(2000);
       await app.client.element('input').setValue('testproj0');
     });
 
