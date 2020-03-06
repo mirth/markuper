@@ -1,8 +1,8 @@
 <script>
 import _ from 'lodash';
 import Row from 'svelte-atoms/Grids/Row.svelte';
-import Spacer from 'svelte-atoms/Spacer.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 
 export let makeHandleAssess;

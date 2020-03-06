@@ -1,5 +1,8 @@
 <script>
 import api from '../api';
+import Row from 'svelte-atoms/Grids/Row.svelte';
+import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
 
@@ -45,13 +48,11 @@ img {
 </style>
 
 <PageBlank>
-<br />
 {#await sample then sample}
 <ControlDevice field={sample.template.radios[0]} {makeHandleAssess}/>
-<div class="image-container">
-  <img src="file://{sample.sample.image_uri}" alt="KEK"/>
+<Spacer size={24} />
+<div class='image-container'>
+  <img src='file://{sample.sample.image_uri}' alt='KEK'/>
 </div>
-{:catch error}
-	<p style="color: red">{error}</p>
 {/await}
 </PageBlank>
