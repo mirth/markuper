@@ -39,29 +39,20 @@ async function handleKeyup(event) {
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
 
-<Row>
-<Cell>
-  <ul>
-    {#each labelsWithKeys as [label, key]}
-      <li>
-        <Cell>
-          <Row>
-            <Button on:click={makeHandleAssess(field, label)} style="display: inline; min-width: 60px;">
-              {label.name}
-            </Button>
-          </Row>
-          <Spacer size={8} />
-          <Row>
-            <Cell>
-              <kbd class:kbd-down='{key === keyDown}'>{key}</kbd>
-            </Cell>
-          </Row>
-        </Cell>
-      </li>
-    {/each}
-  </ul>
-</Cell>
-</Row>
+
+<ul>
+{#each labelsWithKeys as [label, key]}
+  <li>
+    <Cell>
+      <Button on:click={makeHandleAssess(field, label)} style='display: inline; min-width: 60px;'>
+        {label.name}
+      </Button>
+      <Spacer size={8} />
+      <kbd class:kbd-down='{key === keyDown}'>{key}</kbd>
+    </Cell>
+  </li>
+{/each}
+</ul>
 
 <style>
 
