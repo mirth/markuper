@@ -46,9 +46,7 @@ img {
 
 <PageBlank>
 <br />
-{#await sample}
-<p>...waiting</p>
-{:then sample}
+{#await sample then sample}
 <ControlDevice field={sample.template.radios[0]} {makeHandleAssess}/>
 <div class="image-container">
   <img src="file://{sample.sample.image_uri}" alt="KEK"/>
