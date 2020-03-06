@@ -1,9 +1,7 @@
 <script>
-import Row from 'svelte-atoms/Grids/Row.svelte';
-
-import Button from 'svelte-atoms/Button.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
+import ControlDevice from './ControlDevice.svelte';
 
 export let params = {};
 
@@ -33,9 +31,6 @@ function makeHandleAssess(field, label) {
 </script>
 
 <style>
-li {
-  display: inline;
-}
 
 .image-container {
   padding: 0 45px 45px 0;
@@ -54,22 +49,7 @@ img {
 {#await sample}
 <p>...waiting</p>
 {:then sample}
-
-<Row>
-  {#each sample.template.radios as field}
-    <Row>
-      <ul>
-        {#each field.labels as label}
-          <li>
-            <Button on:click={makeHandleAssess(field, label)} style="display: inline; min-width: 60px;">
-              {label.name}
-            </Button>
-          </li>
-        {/each}
-      </ul>
-    </Row>
-  {/each}
-</Row>
+<ControlDevice field={sample.template.radios[0]} {makeHandleAssess}/>
 <div class="image-container">
   <img src="file://{sample.sample.image_uri}" alt="KEK"/>
 </div>

@@ -74,6 +74,7 @@ function formatMarkup(markup) {
 <Spacer size={32} />
 <Row>
 <Cell>
+<!-- fixme sort by date -->
 {#await assessedList then list}
   <ul>
     {#each list.list as forSample}
