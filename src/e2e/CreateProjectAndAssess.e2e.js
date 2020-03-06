@@ -124,7 +124,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek0.jpg'));
-      await app.client.element('button=chuk').click();
+      await app.client.keys('3');
     });
 
     it('assesses 2nd jpg sample', async () => {
@@ -138,7 +138,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek2.jpg'));
-      await app.client.element('button=dog').click();
+      await app.client.keys('2');
     });
 
     it('assesses 1st png sample', async () => {
