@@ -1,9 +1,10 @@
 <script>
-import Row from 'svelte-atoms/Grids/Row.svelte';
-
-import Button from 'svelte-atoms/Button.svelte';
 import api from '../api';
+import Row from 'svelte-atoms/Grids/Row.svelte';
+import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 import PageBlank from './PageBlank.svelte';
+import ControlDevice from './ControlDevice.svelte';
 
 export let params = {};
 
@@ -33,9 +34,6 @@ function makeHandleAssess(field, label) {
 </script>
 
 <style>
-li {
-  display: inline;
-}
 
 .image-container {
   padding: 0 45px 45px 0;
@@ -50,30 +48,11 @@ img {
 </style>
 
 <PageBlank>
-<br />
-{#await sample}
-<p>...waiting</p>
-{:then sample}
-
-<Row>
-  {#each sample.template.radios as field}
-    <Row>
-      <ul>
-        {#each field.labels as label}
-          <li>
-            <Button on:click={makeHandleAssess(field, label)} style="display: inline; min-width: 60px;">
-              {label.name}
-            </Button>
-          </li>
-        {/each}
-      </ul>
-    </Row>
-  {/each}
-</Row>
-<div class="image-container">
-  <img src="file://{sample.sample.image_uri}" alt="KEK"/>
+{#await sample then sample}
+<ControlDevice field={sample.template.radios[0]} {makeHandleAssess}/>
+<Spacer size={24} />
+<div class='image-container'>
+  <img src='file://{sample.sample.image_uri}' alt='KEK'/>
 </div>
-{:catch error}
-	<p style="color: red">{error}</p>
 {/await}
 </PageBlank>

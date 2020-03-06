@@ -20,7 +20,9 @@ onMount(fetchProjectList);
     <Cell xs={10}>
       <Container>
         <Row>
-          <slot></slot>
+          <Cell>
+            <slot></slot>
+          </Cell>
         </Row>
       </Container>
     </Cell>
