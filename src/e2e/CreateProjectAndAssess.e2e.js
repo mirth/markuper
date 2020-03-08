@@ -98,10 +98,8 @@ describe('Application launch', function () {
     });
 
     it('navigates to project page', async () => {
-      await app.client.waitUntilTextExists('a', 'testproj0');
-      app.client.refresh(); // fixme remove when router will be fixed
-      await app.client.waitUntilTextExists('a', 'testproj0');
-      await app.client.element('=testproj0').click();
+      await app.client.waitUntilTextExists('span', 'testproj0');
+      await app.client.element("button/*[@innertext='testproj0'").click();
     });
 
     it('displays project description', async () => {
@@ -114,7 +112,9 @@ describe('Application launch', function () {
 
     it('begins assess', async () => {
       await app.client.waitUntilTextExists('span', 'Begin assess');
-      const beginAssess = app.client.element("button/*[@innertext='Begin assess']");
+
+      // fixme
+      const beginAssess = app.client.element('//*[@id="grid"]/div/div[2]/div/div/div/div/div[1]/div/div[3]/div/div/button[1]');
       await beginAssess.click();
     });
 
@@ -155,7 +155,7 @@ describe('Application launch', function () {
     });
 
     it('displays sample markup on project page', async () => {
-      await app.client.element('a=testproj0').click();
+      await app.client.element("button/*[@innertext='testproj0'").click();
       await app.client.waitForExist('ul');
       const getMarkupFor = (sampleID) => app.client.element(`p*=Sample ID: ${sampleID}`);
       let text = await getMarkupFor(0).getText();

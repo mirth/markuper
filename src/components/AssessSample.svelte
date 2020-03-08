@@ -1,8 +1,6 @@
 <script>
-import api from '../api';
-import Row from 'svelte-atoms/Grids/Row.svelte';
-import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
 
