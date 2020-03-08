@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 import api from './api';
 
 export const projects = writable([]);
-export const activeProject = writable({});
+export const activeProject = writable({ assessed: [] });
 
 export async function fetchProjectList() {
   const res = await api.get('/projects');

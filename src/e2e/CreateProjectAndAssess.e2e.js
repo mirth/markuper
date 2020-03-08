@@ -154,6 +154,7 @@ describe('Application launch', function () {
       expect(path.normalize(src)).to.be.eq(makeUrl('kek4.png'));
     });
 
+    // fixme test sample order
     it('displays sample markup on project page', async () => {
       await app.client.element("button/*[@innertext='testproj0'").click();
       await app.client.waitForExist('ul');

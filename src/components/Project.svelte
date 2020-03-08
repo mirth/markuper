@@ -31,6 +31,9 @@ function formatMarkup(markup) {
   return _(markup).toPairs().map(([labelName, labelValue]) => `${labelName}:${labelValue}`).join('\n');
 }
 
+let assessedList = [];
+$: assessedList = _.orderBy($activeProject.assessed.list, 'sample_markup.created_at', 'desc')
+
 onMount(async () => {
   await fetchProject(params.project_id);
 });
@@ -77,7 +80,7 @@ onMount(async () => {
 <Cell>
 <!-- fixme sort by date -->
 <ul>
-  {#each $activeProject.assessed.list as forSample}
+  {#each assessedList as forSample}
     <li>
       <p>Sample ID: {forSample.sample_id.sample_id}|Value: {formatMarkup(forSample.sample_markup.markup)}</p>
     </li>
