@@ -11,7 +11,13 @@ async function fetchNext(projectID) {
   return res;
 }
 
-let sample = fetchNext(params.project_id);
+let sample = (async () => {
+  if (params.sample_id === null) {
+    return fetchNext(params.project_id);
+  }
+
+  return api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
+})();
 
 function makeHandleAssess(field, label) {
   return async () => {

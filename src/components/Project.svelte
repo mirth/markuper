@@ -3,13 +3,13 @@ import _ from 'lodash';
 import { onMount } from 'svelte';
 import jsFileDownload from 'js-file-download';
 import { push } from 'svelte-spa-router';
-import api from '../api';
 import Button from 'svelte-atoms/Button.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import Block from 'svelte-atoms/Block.svelte';
+import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
 
@@ -32,7 +32,7 @@ function formatMarkup(markup) {
 }
 
 let assessedList = [];
-$: assessedList = _.orderBy($activeProject.assessed.list, 'sample_markup.created_at', 'desc')
+$: assessedList = _.orderBy($activeProject.assessed.list, 'sample_markup.created_at', 'desc');
 
 onMount(async () => {
   await fetchProject(params.project_id);
@@ -79,10 +79,16 @@ onMount(async () => {
 <Row>
 <Cell>
 <!-- fixme sort by date -->
+<Typography type='title' block>Assessed samples</Typography>
 <ul>
   {#each assessedList as forSample}
     <li>
-      <p>Sample ID: {forSample.sample_id.sample_id}|Value: {formatMarkup(forSample.sample_markup.markup)}</p>
+      <p>
+        <a href={`#/project/${forSample.sample_id.project_id}/samples/${forSample.sample_id.sample_id}`}>
+          <small>{forSample.sample_uri}: </small>
+        </a>
+        <span>{formatMarkup(forSample.sample_markup.markup)}</span>
+      </p>
     </li>
   {/each}
 </ul>
@@ -91,3 +97,12 @@ onMount(async () => {
 {/if}
 </Block>
 </PageBlank>
+
+<style>
+li {
+  list-style-type: none;
+}
+ul {
+  padding: 0;
+}
+</style>

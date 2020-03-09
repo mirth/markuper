@@ -256,6 +256,14 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 	}, nil
 }
 
+func GetSampleEndpoint(s MarkupService) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := *request.(*SampleID)
+
+		return s.GetSample(req)
+	}
+}
+
 func (s *MarkupServiceImpl) ListMarkup(req WithProjectIDRequest) (MarkupList, error) {
 	return ListMarkup(s.db, req.ProjectID)
 }
