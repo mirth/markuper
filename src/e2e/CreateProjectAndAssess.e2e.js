@@ -17,7 +17,7 @@ function sleep(ms) {
 }
 // pause
 describe('Application launch', function () {
-  this.timeout(20000);
+  this.timeout(30000);
   before(() => app.start());
   after(() => {
     if (app && app.isRunning()) {
@@ -158,15 +158,45 @@ describe('Application launch', function () {
     it('displays sample markup on project page', async () => {
       await app.client.element("button/*[@innertext='testproj0'").click();
       await app.client.waitForExist('ul');
-      const getMarkupFor = (sampleID) => app.client.element(`p*=Sample ID: ${sampleID}`);
-      let text = await getMarkupFor(0).getText();
-      expect(text).to.be.eq('Sample ID: 0|Value: class:chuk');
-      text = await getMarkupFor(1).getText();
-      expect(text).to.be.eq('Sample ID: 1|Value: class:dog');
-      text = await getMarkupFor(2).getText();
-      expect(text).to.be.eq('Sample ID: 2|Value: class:dog');
-      text = await getMarkupFor(3).getText();
-      expect(text).to.be.eq('Sample ID: 3|Value: class:cat');
+      const getPath = (filename) => app.client.element(`small*=${filename}`);
+      const getClass = (filename) => getPath(filename).element('../..').element('./span');
+
+      {
+        const pathText = await getPath('kek0.jpg').getText();
+        const cl = await getClass('kek0.jpg').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
+        expect(cl).to.be.eq('class: chuk');
+      }
+
+      {
+        const pathText = await getPath('kek1.jpg').getText();
+        const cl = await getClass('kek1.jpg').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek1.jpg') + ':');
+        expect(cl).to.be.eq('class: dog');
+      }
+
+      {
+        const pathText = await getPath('kek2.jpg').getText();
+        const cl = await getClass('kek2.jpg').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek2.jpg') + ':');
+        expect(cl).to.be.eq('class: dog');
+      }
+
+      {
+        const pathText = await getPath('kek3.png').getText();
+        const cl = await getClass('kek3.png').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
+        expect(cl).to.be.eq('class: cat');
+      }
+
+      // pathEl.getText();
+      // console.log('text: ', text)
+      // text = await getMarkupFor(1).getText();
+      // expect(text).to.be.eq('Sample ID: 1|Value: class:dog');
+      // text = await getMarkupFor(2).getText();
+      // expect(text).to.be.eq('Sample ID: 2|Value: class:dog');
+      // text = await getMarkupFor(3).getText();
+      // expect(text).to.be.eq('Sample ID: 3|Value: class:cat');
     });
   });
 });
