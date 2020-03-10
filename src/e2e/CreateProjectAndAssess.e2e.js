@@ -188,15 +188,6 @@ describe('Application launch', function () {
         expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
         expect(cl).to.be.eq('class: cat');
       }
-
-      // pathEl.getText();
-      // console.log('text: ', text)
-      // text = await getMarkupFor(1).getText();
-      // expect(text).to.be.eq('Sample ID: 1|Value: class:dog');
-      // text = await getMarkupFor(2).getText();
-      // expect(text).to.be.eq('Sample ID: 2|Value: class:dog');
-      // text = await getMarkupFor(3).getText();
-      // expect(text).to.be.eq('Sample ID: 3|Value: class:cat');
     });
   });
 });
