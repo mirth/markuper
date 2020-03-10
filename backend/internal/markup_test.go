@@ -19,7 +19,7 @@ func fillTestDBWithProj(db *DB, projName string) Project {
 	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName))
 
 	samples := make([]ImageSample, 0)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 5; i++ {
 		samples = append(samples, ImageSample{
 			ImageURI: fmt.Sprintf("sampleuri%d", i),
 		})
@@ -237,4 +237,38 @@ func TestListMarkup(t *testing.T) {
 			),
 		}, list.List)
 	}
+}
+
+func TestOutOfSample(t *testing.T) {
+	db := openTestDB()
+	defer testCloseAndReset(db)
+	proj0 := fillTestDBWithProj(db, "proj0")
+
+	svc := MarkupServiceImpl{
+		db: db,
+	}
+
+	ass := func(sID SampleID) {
+		assessSample(t, &svc, sID)
+	}
+	getNext := func() SampleResponse {
+		s, err := svc.GetNext(WithProjectIDRequest{
+			ProjectID: proj0.ProjectID,
+		})
+		assert.Nil(t, err)
+
+		return s
+	}
+
+	ass(SampleID{proj0.ProjectID, 0})
+	getNext()
+	ass(SampleID{proj0.ProjectID, 1})
+	getNext()
+	ass(SampleID{proj0.ProjectID, 2})
+	getNext()
+	ass(SampleID{proj0.ProjectID, 3})
+	getNext()
+	ass(SampleID{proj0.ProjectID, 4})
+	s := getNext()
+	assert.Nil(t, s.Sample)
 }

@@ -142,11 +142,14 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		toAssess = append(toAssess, sID.(SampleID))
 	})
 
+	if len(toAssess) == 0 {
+		return SampleResponse{}, nil
+	}
+
 	sort.SliceStable(toAssess, func(i, j int) bool {
 		return toAssess[i].SampleID < toAssess[j].SampleID
 	})
 
-	// FIXME empty toAssess
 	sID := toAssess[0]
 	sample, err := s.db.GetSample(sID)
 
