@@ -17,7 +17,7 @@ function sleep(ms) {
 }
 // pause
 describe('Application launch', function () {
-  this.timeout(20000);
+  this.timeout(30000);
   before(() => app.start());
   after(() => {
     if (app && app.isRunning()) {
@@ -98,10 +98,8 @@ describe('Application launch', function () {
     });
 
     it('navigates to project page', async () => {
-      await app.client.waitUntilTextExists('a', 'testproj0');
-      app.client.refresh(); // fixme remove when router will be fixed
-      await app.client.waitUntilTextExists('a', 'testproj0');
-      await app.client.element('=testproj0').click();
+      await app.client.waitUntilTextExists('span', 'testproj0');
+      await app.client.element("button/*[@innertext='testproj0'").click();
     });
 
     it('displays project description', async () => {
@@ -114,7 +112,9 @@ describe('Application launch', function () {
 
     it('begins assess', async () => {
       await app.client.waitUntilTextExists('span', 'Begin assess');
-      const beginAssess = app.client.element("button/*[@innertext='Begin assess']");
+
+      // fixme
+      const beginAssess = app.client.element('//*[@id="grid"]/div/div[2]/div/div/div/div/div[1]/div/div[3]/div/div/button[1]');
       await beginAssess.click();
     });
 
@@ -154,18 +154,70 @@ describe('Application launch', function () {
       expect(path.normalize(src)).to.be.eq(makeUrl('kek4.png'));
     });
 
+    const getPath = (filename) => app.client.element(`small*=${filename}`);
+    const getClass = (filename) => getPath(filename).element('../..').element('./span');
+
+    // fixme test sample order
     it('displays sample markup on project page', async () => {
-      await app.client.element('a=testproj0').click();
+      await app.client.element("button/*[@innertext='testproj0'").click();
       await app.client.waitForExist('ul');
-      const getMarkupFor = (sampleID) => app.client.element(`p*=Sample ID: ${sampleID}`);
-      let text = await getMarkupFor(0).getText();
-      expect(text).to.be.eq('Sample ID: 0|Value: class:chuk');
-      text = await getMarkupFor(1).getText();
-      expect(text).to.be.eq('Sample ID: 1|Value: class:dog');
-      text = await getMarkupFor(2).getText();
-      expect(text).to.be.eq('Sample ID: 2|Value: class:dog');
-      text = await getMarkupFor(3).getText();
-      expect(text).to.be.eq('Sample ID: 3|Value: class:cat');
+
+      {
+        const pathText = await getPath('kek0.jpg').getText();
+        const cl = await getClass('kek0.jpg').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
+        expect(cl).to.be.eq('class: chuk');
+      }
+
+      {
+        const pathText = await getPath('kek1.jpg').getText();
+        const cl = await getClass('kek1.jpg').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek1.jpg') + ':');
+        expect(cl).to.be.eq('class: dog');
+      }
+
+      {
+        const pathText = await getPath('kek2.jpg').getText();
+        const cl = await getClass('kek2.jpg').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek2.jpg') + ':');
+        expect(cl).to.be.eq('class: dog');
+      }
+
+      {
+        const pathText = await getPath('kek3.png').getText();
+        const cl = await getClass('kek3.png').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
+        expect(cl).to.be.eq('class: cat');
+      }
+    });
+
+    it('contains correct pressed button', async () => {
+      await getPath('kek1.jpg').element('../..').click();
+      await app.client.waitForVisible("button/*[@innertext='cat'");
+      await app.client.refresh();
+      await app.client.waitForVisible("button/*[@innertext='cat'");
+
+      const getBtn = (i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/ul/li[${i}]/div/button`);
+      const catCl = await getBtn(1).getAttribute('class');
+      const dogCl = await getBtn(2).getAttribute('class');
+      const chukCl = await getBtn(3).getAttribute('class');
+      const gekCl = await getBtn(4).getAttribute('class');
+
+      expect(catCl).not.to.include('disabled');
+      expect(dogCl).to.include('disabled');
+      expect(chukCl).not.to.include('disabled');
+      expect(gekCl).not.to.include('disabled');
+    });
+
+    it("changes class to 'gek'", async () => {
+      await app.client.element('button=gek').click();
+      await app.client.element("button/*[@innertext='testproj0'").click();
+      await app.client.waitForExist('ul');
+
+      {
+        const cl = await getClass('kek1.jpg').getText();
+        expect(cl).to.be.eq('class: gek');
+      }
     });
   });
 });

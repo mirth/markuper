@@ -31,6 +31,11 @@ type SampleResponse struct {
 	Template Template        `json:"template"`
 }
 
+type SampleWithMarkupResponse struct {
+	SampleResponse
+	SampleMarkup *SampleMarkup `json:"markup"`
+}
+
 type MarkupListElement struct {
 	SampleID     SampleID     `json:"sample_id"`
 	SampleURI    SampleURI    `json:"sample_uri"`
@@ -45,6 +50,7 @@ type MarkupService interface {
 	GetNext(WithProjectIDRequest) (SampleResponse, error)
 	Assess(AssessRequest) error
 
+	GetSample(SampleID) (SampleWithMarkupResponse, error)
 	ListMarkup(WithProjectIDRequest) (MarkupList, error)
 }
 
@@ -222,6 +228,40 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 	return MarkupList{
 		List: samples,
 	}, nil
+}
+
+func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, error) {
+	sample, err := s.db.GetSample(sID)
+	if err != nil {
+		return SampleWithMarkupResponse{}, err
+	}
+
+	markup, err := s.db.GetMarkup(sID)
+	if err != nil {
+		return SampleWithMarkupResponse{}, err
+	}
+
+	proj, err := s.db.GetProject(sID.ProjectID)
+	if err != nil {
+		return SampleWithMarkupResponse{}, err
+	}
+
+	return SampleWithMarkupResponse{
+		SampleResponse: SampleResponse{
+			SampleID: sID,
+			Sample:   sample,
+			Template: proj.Template,
+		},
+		SampleMarkup: markup,
+	}, nil
+}
+
+func GetSampleEndpoint(s MarkupService) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := *request.(*SampleID)
+
+		return s.GetSample(req)
+	}
 }
 
 func (s *MarkupServiceImpl) ListMarkup(req WithProjectIDRequest) (MarkupList, error) {

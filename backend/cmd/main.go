@@ -134,6 +134,14 @@ func main() {
 		streamFile,
 	)
 
+	getSampleEndpoint := httptransport.NewServer(
+		internal.GetSampleEndpoint(ms),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.SampleID{}
+		}),
+		encodeResponse,
+	)
+
 	r := mux.NewRouter()
 	r.Handle("/api/v1/project", createProjectHandler).Methods("POST")
 	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
@@ -142,6 +150,7 @@ func main() {
 	r.Handle("/api/v1/project/{project_id}/assess", assessHandler).Methods("POST")
 	r.Handle("/api/v1/project/{project_id}/assessed", listMarkupHandler).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}/export", exportToCsvEnpoint)
+	r.Handle("/api/v1/project/{project_id}/samples/{sample_id}", getSampleEndpoint)
 	r.Handle("/api/v1/project_templates", listTemplatesEndpoint).Methods("GET")
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {

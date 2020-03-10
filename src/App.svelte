@@ -10,6 +10,7 @@ const routes = {
   '/': GetStarted,
   '/project/:project_id': Project,
   '/project/:project_id/assess_sample': AssessSample,
+  '/project/:project_id/samples/:sample_id': AssessSample,
 };
 </script>
 

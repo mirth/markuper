@@ -82,37 +82,34 @@ func (db *DB) GetSample(sID SampleID) ([]byte, error) {
 	return sample, nil
 }
 
-func (db *DB) GetMarkup(sID SampleID) (SampleMarkup, error) {
+func (db *DB) GetMarkup(sID SampleID) (*SampleMarkup, error) {
 	sIDbin, err := encodeBin(sID)
 	if err != nil {
-		return SampleMarkup{}, err
+		return nil, err
 	}
 
 	var smBin []byte
 	err = db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Markups)
 		smBin = b.Get(sIDbin)
-		if smBin == nil {
-			return errors.New(fmt.Sprintf(
-				"No markup exists for [%s, %d]",
-				sID.ProjectID,
-				sID.SampleID,
-			))
-		}
 
 		return nil
 	})
 	if err != nil {
-		return SampleMarkup{}, err
+		return nil, err
+	}
+
+	if smBin == nil {
+		return nil, nil
 	}
 
 	sm := SampleMarkup{}
 	err = decodeBin(smBin).Decode(&sm)
 	if err != nil {
-		return SampleMarkup{}, err
+		return nil, err
 	}
 
-	return sm, nil
+	return &sm, nil
 }
 
 func (db *DB) Put(bucket string, key, value interface{}) error {

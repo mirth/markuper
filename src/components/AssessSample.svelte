@@ -1,8 +1,6 @@
 <script>
-import api from '../api';
-import Row from 'svelte-atoms/Grids/Row.svelte';
-import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
 
@@ -13,7 +11,13 @@ async function fetchNext(projectID) {
   return res;
 }
 
-let sample = fetchNext(params.project_id);
+let sample = (async () => {
+  if (params.hasOwnProperty('sample_id')) {
+    return api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
+  }
+
+  return fetchNext(params.project_id);
+})();
 
 function makeHandleAssess(field, label) {
   return async () => {
@@ -49,7 +53,7 @@ img {
 
 <PageBlank>
 {#await sample then sample}
-<ControlDevice field={sample.template.radios[0]} {makeHandleAssess}/>
+<ControlDevice {sample} {makeHandleAssess} />
 <Spacer size={24} />
 <div class='image-container'>
   <img src='file://{sample.sample.image_uri}' alt='KEK'/>
