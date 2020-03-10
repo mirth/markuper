@@ -53,7 +53,7 @@ img {
 
 <PageBlank>
 {#await sample then sample}
-<ControlDevice field={sample.template.radios[0]} {makeHandleAssess}/>
+<ControlDevice {sample} {makeHandleAssess} />
 <Spacer size={24} />
 <div class='image-container'>
   <img src='file://{sample.sample.image_uri}' alt='KEK'/>

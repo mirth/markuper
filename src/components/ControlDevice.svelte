@@ -5,8 +5,9 @@ import Spacer from 'svelte-atoms/Spacer.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 
 export let makeHandleAssess;
-export let field;
+export let sample;
 
+const field = sample.template.radios[0];
 const allKeys = _.range(1, 10).map(String);
 const labelsNumber = Math.min(field.labels.length, allKeys.length);
 const keys = allKeys.slice(0, labelsNumber);
@@ -43,7 +44,11 @@ async function handleKeyup(event) {
 {#each labelsWithKeys as [label, key]}
   <li>
     <Cell>
-      <Button on:click={makeHandleAssess(field, label)} style='display: inline; min-width: 60px;'>
+      <Button
+        on:click={makeHandleAssess(field, label)}
+        disabled={sample.markup && sample.markup.markup.class === label.value}
+        style='display: inline; min-width: 60px;'
+      >
         {label.name}
       </Button>
       <Spacer size={8} />

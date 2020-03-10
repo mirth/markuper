@@ -154,12 +154,13 @@ describe('Application launch', function () {
       expect(path.normalize(src)).to.be.eq(makeUrl('kek4.png'));
     });
 
+    const getPath = (filename) => app.client.element(`small*=${filename}`);
+    const getClass = (filename) => getPath(filename).element('../..').element('./span');
+
     // fixme test sample order
     it('displays sample markup on project page', async () => {
       await app.client.element("button/*[@innertext='testproj0'").click();
       await app.client.waitForExist('ul');
-      const getPath = (filename) => app.client.element(`small*=${filename}`);
-      const getClass = (filename) => getPath(filename).element('../..').element('./span');
 
       {
         const pathText = await getPath('kek0.jpg').getText();
@@ -188,6 +189,24 @@ describe('Application launch', function () {
         expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
         expect(cl).to.be.eq('class: cat');
       }
+    });
+
+    it('contains correct pressed button', async () => {
+      await getPath('kek1.jpg').element('../..').click();
+      await app.client.waitForVisible("button/*[@innertext='cat'");
+      await app.client.refresh();
+      await app.client.waitForVisible("button/*[@innertext='cat'");
+
+      const getBtn = (i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/ul/li[${i}]/div/button`);
+      const catCl = await getBtn(1).getAttribute('class');
+      const dogCl = await getBtn(2).getAttribute('class');
+      const chukCl = await getBtn(3).getAttribute('class');
+      const gekCl = await getBtn(4).getAttribute('class');
+
+      expect(catCl).not.to.include('disabled');
+      expect(dogCl).to.include('disabled');
+      expect(chukCl).not.to.include('disabled');
+      expect(gekCl).not.to.include('disabled');
     });
   });
 });
