@@ -205,7 +205,7 @@ describe('Application launch', function () {
     it('contains correct pressed button', async () => {
       await getPath('kek1.jpg').element('../..').click();
       await app.client.waitForVisible("button/*[@innertext='cat'");
-
+      await sleep(500);
       const getBtn = (i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/ul/li[${i}]/div/button`);
       const catCl = await getBtn(1).getAttribute('class');
       const dogCl = await getBtn(2).getAttribute('class');
