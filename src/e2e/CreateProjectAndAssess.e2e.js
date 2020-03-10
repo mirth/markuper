@@ -208,5 +208,16 @@ describe('Application launch', function () {
       expect(chukCl).not.to.include('disabled');
       expect(gekCl).not.to.include('disabled');
     });
+
+    it("changes class to 'gek'", async () => {
+      await app.client.element('button=gek').click();
+      await app.client.element("button/*[@innertext='testproj0'").click();
+      await app.client.waitForExist('ul');
+
+      {
+        const cl = await getClass('kek1.jpg').getText();
+        expect(cl).to.be.eq('class: gek');
+      }
+    });
   });
 });
