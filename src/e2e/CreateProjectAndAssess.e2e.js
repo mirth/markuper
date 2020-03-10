@@ -152,6 +152,11 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek4.png'));
+      await app.client.element('button=cat').click();
+    });
+
+    it('displays that there are no samples left', async () => {
+      await app.client.waitUntilTextExists('span', 'No samples left');
     });
 
     const getPath = (filename) => app.client.element(`small*=${filename}`);
@@ -189,12 +194,16 @@ describe('Application launch', function () {
         expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
         expect(cl).to.be.eq('class: cat');
       }
+      {
+        const pathText = await getPath('kek4.png').getText();
+        const cl = await getClass('kek4.png').getText();
+        expect(pathText).to.be.eq(path.join(imgDir, 'kek4.png') + ':');
+        expect(cl).to.be.eq('class: cat');
+      }
     });
 
     it('contains correct pressed button', async () => {
       await getPath('kek1.jpg').element('../..').click();
-      await app.client.waitForVisible("button/*[@innertext='cat'");
-      await app.client.refresh();
       await app.client.waitForVisible("button/*[@innertext='cat'");
 
       const getBtn = (i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/ul/li[${i}]/div/button`);

@@ -3,6 +3,7 @@ import Spacer from 'svelte-atoms/Spacer.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
+import Typography from "svelte-atoms/Typography.svelte";
 
 export let params = {};
 
@@ -53,10 +54,14 @@ img {
 
 <PageBlank>
 {#await sample then sample}
+{#if sample.sample === null}
+<Typography type="title" block>No samples left</Typography>
+{:else}
 <ControlDevice {sample} {makeHandleAssess} />
 <Spacer size={24} />
 <div class='image-container'>
   <img src='file://{sample.sample.image_uri}' alt='KEK'/>
 </div>
+{/if}
 {/await}
 </PageBlank>
