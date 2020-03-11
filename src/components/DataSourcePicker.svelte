@@ -37,7 +37,7 @@ function addDataSource() {
   <ul>
     {#each dataSources.dataSources as dataSource}
     <li>
-      <DataSource {dataSource} />
+      <DataSource {dataSource} disabled={true} />
     </li>
     {/each}
   </ul>
