@@ -68,7 +68,7 @@ onMount(async () => {
         Begin assess
       </Button>
       <Button on:click={exportProject($activeProject)} iconLeft='download'>
-        Export
+        Export CSV
       </Button>
     </div>
   </Cell>
