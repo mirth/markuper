@@ -13,7 +13,7 @@
     "build": "yarn _build_backend && yarn _build_frontend",
     "release_macos": "yarn _pack && yarn _dmg",
     "release_windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn _pack",
-    "_pack": "yarn build && yarn electron-packager . markuper",
+    "_pack": "yarn build && yarn electron-packager . Markuper --icon=icon.icns",
     "_dmg": "yarn electron-installer-dmg markuper-darwin-x64/markuper.app markuper",
     "_test_e2e": "yarn build && cross-env-shell ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
     "_test_backend": "yarn _build_backend && cd backend && cross-env-shell ENV=test go test -v ./... && cd ..",
