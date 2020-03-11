@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -53,7 +52,7 @@ func removeHiddenPaths(paths []string) []string {
 	filtered := make([]string, 0)
 
 	for _, p := range paths {
-		fn := path.Base(p)
+		fn := filepath.Base(p)
 		if !strings.HasPrefix(fn, ".") {
 			filtered = append(filtered, p)
 		}
@@ -65,7 +64,7 @@ func removeHiddenPaths(paths []string) []string {
 func removeWithoutExtention(paths []string) []string {
 	filtered := make([]string, 0)
 	for _, p := range paths {
-		if len(path.Ext(p)) > 0 {
+		if len(filepath.Ext(p)) > 0 {
 			filtered = append(filtered, p)
 		}
 	}
