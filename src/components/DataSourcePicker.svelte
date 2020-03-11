@@ -31,13 +31,26 @@ function addDataSource() {
   newSource = newEmptySource();
 }
 
+const dirname = (filename) => filename.match(/(.*)[\/\\]/)[1]||''; // fixme fuck
+
+function getDirectory(e) {
+  const files = e.target.files;
+  if(files.length === 0) {
+    return
+  }
+  const dir = dirname(files[0].path);
+  newSource.source_uri = dir
+}
+
 </script>
 
 <Typography type='subheader' block>Add data source:</Typography>
 <Row>
-  <Cell xs={7}>
+  <Cell>
+    <input type='file' on:change={getDirectory} webkitdirectory directory multiple/>
+  </Cell>
+  <Cell xs={9}>
     <DataSource dataSource={newSource} />
-
   </Cell>
   <Cell xs={3}>
     <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
