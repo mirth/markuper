@@ -62,6 +62,7 @@ func TestImageGlobDataSourceAsPath(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		os.Create(joinTmp(fmt.Sprintf("img%d.jpeg", i)))
 	}
+	os.Create(joinTmp(".hidden.jpg"))
 
 	var src SampleListFetcher = ImageGlobDataSource{
 		DataSource{SourceURI: tmpDir},

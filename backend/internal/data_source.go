@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -47,6 +49,19 @@ type ImageGlobDataSource struct {
 	DataSource
 }
 
+func removeHiddenPaths(paths []string) []string {
+	filtered := make([]string, 0)
+
+	for _, p := range paths {
+		fn := path.Base(p)
+		if !strings.HasPrefix(fn, ".") {
+			filtered = append(filtered, p)
+		}
+	}
+
+	return filtered
+}
+
 func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 	sourceURI := s.SourceURI
 	_, err := os.Stat(s.SourceURI)
@@ -59,6 +74,7 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	matches = removeHiddenPaths(matches)
 	sort.Strings(matches)
 
 	samples := []SampleData{}
