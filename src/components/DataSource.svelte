@@ -4,8 +4,9 @@ import Input from 'svelte-atoms/Input.svelte';
 
 export let dataSource;
 export let disabled;
+
 let isNewSourceValid = false;
-$: isNewSourceValid = isGlob(dataSource.source_uri);
+$: isNewSourceValid = dataSource.isValid();
 
 </script>
 

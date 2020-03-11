@@ -1,4 +1,5 @@
 <script>
+import isGlob from 'is-valid-glob';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
@@ -10,12 +11,22 @@ function newEmptySource() {
   return {
     type: 'local_directory',
     source_uri: '',
+    isValid: function() {
+      const uri = this.source_uri.trim()
+      return uri.length !== 0 && isGlob(uri)
+    },
   };
 }
 
 let newSource = newEmptySource();
 
+// fixme e2e
 function addDataSource() {
+  if(!newSource.isValid()) {
+    return
+  }
+
+  newSource.source_uri = newSource.source_uri.trim();
   dataSources.dataSources = dataSources.dataSources.concat([newSource]);
   newSource = newEmptySource();
 }
