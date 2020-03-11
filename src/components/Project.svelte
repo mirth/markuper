@@ -78,8 +78,12 @@ onMount(async () => {
 <Spacer size={32} />
 <Row>
 <Cell>
-<!-- fixme sort by date -->
-<Typography type='title' block>Assessed samples</Typography>
+<!-- fixme e2e no samples assessed yet-->
+{#if assessedList.length === 0}
+<Typography type='title' block>No samples have assessed yet</Typography>
+{:else}
+<Typography type='title' block>Assessed samples:</Typography>
+{/if}
 <ul>
   {#each assessedList as forSample}
     <li>
