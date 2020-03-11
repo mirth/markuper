@@ -124,8 +124,13 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		return ExportResponse{}, errors.WithStack(err)
 	}
 
+	p, err := s.db.GetProject(req.Payload.ProjectID)
+	if err != nil {
+		return ExportResponse{}, err
+	}
+
 	now := utils.NowUTC()
-	filename := fmt.Sprintf("%s_%s.csv", req.Payload.ProjectID, now.Format("2006-01-02T15:04:05"))
+	filename := fmt.Sprintf("%s_%s.csv", p.Description.Name, now.Format("2006-01-02T15:04:05"))
 
 	return ExportResponse{
 		CSV:      buf.Bytes(),
