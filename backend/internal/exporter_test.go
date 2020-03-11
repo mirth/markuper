@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"backend/pkg/utils"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -37,5 +39,12 @@ func TestExportCSV(t *testing.T) {
 1,sampleuri1,2015-03-07T11:06:39,4,"""mark1"""
 2,sampleuri2,2015-03-07T11:06:39,5,"""mark2"""
 `, string(r.CSV))
+
+		assert.Equal(
+			t,
+			fmt.Sprintf("%s_%s.csv", proj.Description.Name,
+				utils.TestNowUTC().Format("2006-01-02T15:04:05")),
+			r.Filename,
+		)
 	}
 }
