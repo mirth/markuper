@@ -6,7 +6,6 @@ import Spacer from 'svelte-atoms/Spacer.svelte';
 import Popup from 'svelte-atoms/Popup.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import CreateProjectPopup from './CreateProjectPopup.svelte';
-import { projects } from '../store';
 import PageBlank from './PageBlank.svelte';
 
 let isNewProjectPopupShown = false;

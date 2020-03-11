@@ -1,9 +1,9 @@
 <script>
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
-import Typography from "svelte-atoms/Typography.svelte";
 
 export let params = {};
 
@@ -13,7 +13,7 @@ async function fetchNext(projectID) {
 }
 
 let sample = (async () => {
-  if (params.hasOwnProperty('sample_id')) {
+  if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
     return api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
   }
 
