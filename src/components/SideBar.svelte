@@ -19,7 +19,14 @@ function goToProject(projectId) {
   </li>
   {#each $projects as project}
   <li>
-    <Button type='empty' on:click={goToProject(project.project_id)}>{project.description.name}</Button>
+    <Button
+      type='empty'
+      on:click={goToProject(project.project_id)}
+      iconRight='chevron-right'
+      style='padding: 0;'
+    >
+      {project.description.name}
+    </Button>
   </li>
   {/each}
 </ul>
@@ -28,4 +35,10 @@ function goToProject(projectId) {
 ul {
   width: 3%;
 }
+
+li {
+  list-style-type: none;
+  margin-bottom: 15px;
+}
+
 </style>
