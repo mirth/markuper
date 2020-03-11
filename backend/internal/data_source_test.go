@@ -63,6 +63,9 @@ func TestImageGlobDataSourceAsPath(t *testing.T) {
 		os.Create(joinTmp(fmt.Sprintf("img%d.jpeg", i)))
 	}
 	os.Create(joinTmp(".hidden.jpg"))
+	os.Create(joinTmp("noextfile"))
+	os.Mkdir(joinTmp("noextdir"), 0755)
+	os.Mkdir(joinTmp("extdir.jpg"), 0755)
 
 	var src SampleListFetcher = ImageGlobDataSource{
 		DataSource{SourceURI: tmpDir},
@@ -84,6 +87,7 @@ func TestImageGlobDataSourceAsPath(t *testing.T) {
 			{ImageURI: joinTmp("img0.jpeg")},
 			{ImageURI: joinTmp("img1.jpeg")},
 			{ImageURI: joinTmp("img2.jpeg")},
+			{ImageURI: joinTmp("extdir.jpg")}, //fixme
 		}, actual)
 	}
 }

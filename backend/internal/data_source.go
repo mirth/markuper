@@ -62,6 +62,17 @@ func removeHiddenPaths(paths []string) []string {
 	return filtered
 }
 
+func removeWithoutExtention(paths []string) []string {
+	filtered := make([]string, 0)
+	for _, p := range paths {
+		if len(path.Ext(p)) > 0 {
+			filtered = append(filtered, p)
+		}
+	}
+
+	return filtered
+}
+
 func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 	sourceURI := s.SourceURI
 	_, err := os.Stat(s.SourceURI)
@@ -75,6 +86,7 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 	}
 
 	matches = removeHiddenPaths(matches)
+	matches = removeWithoutExtention(matches)
 	sort.Strings(matches)
 
 	samples := []SampleData{}
