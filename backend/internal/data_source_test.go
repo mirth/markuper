@@ -25,9 +25,7 @@ func TestImageGlobDataSourceAsGlob(t *testing.T) {
 		os.Create(joinTmp(fmt.Sprintf("img%d.jpeg", i)))
 	}
 
-	src := ImageGlobDataSource{
-		DataSource{SourceURI: joinTmp(fmt.Sprintf("*.jpg"))},
-	}
+	src := NewImageGlobDataSource(joinTmp(fmt.Sprintf("*.jpg")))
 
 	list, err := src.FetchSampleList()
 	assert.Nil(t, err)
@@ -67,9 +65,7 @@ func TestImageGlobDataSourceAsPath(t *testing.T) {
 	os.Mkdir(joinTmp("noextdir"), 0755)
 	os.Mkdir(joinTmp("extdir.jpg"), 0755)
 
-	var src SampleListFetcher = ImageGlobDataSource{
-		DataSource{SourceURI: tmpDir},
-	}
+	var src SampleListFetcher = NewImageGlobDataSource(tmpDir)
 
 	list, err := src.FetchSampleList()
 	assert.Nil(t, err)

@@ -157,25 +157,31 @@ func TestFetchSampleList(t *testing.T) {
 			j(imgPaths[4]),
 		}, list)
 	}
-	// {
-	// 	sIDs, _ := getAllSampleIDsForProject(db, "samples", proj.ProjectID)
+}
 
-	// 	samples := [][]byte{}
-	// 	for _, id := range sIDs {
-	// 		s, _ := db.GetSample(id)
-	// 		samples = append(samples, s)
-	// 	}
+func TestCreateProjectWithMultipleDataSources(t *testing.T) {
+	db := openTestDB()
+	defer testCloseAndReset(db)
+	svc := NewProjectService(db)
 
-	// 	j := func(imgPath string) []byte {
-	// 		return []byte(fmt.Sprintf(`{"image_uri":%s}`, strconv.Quote(imgPath)))
-	// 	}
+	req := newTestCreateProjectRequest("testproject0")
+	// req.DataSources = append(req.DataSources, NewImageGlobDataSource(
 
-	// 	assert.ElementsMatch(t, [][]byte{
-	// 		j(imgPaths[0]),
-	// 		j(imgPaths[1]),
-	// 		j(imgPaths[2]),
-	// 		j(imgPaths[3]),
-	// 		j(imgPaths[4]),
-	// 	}, samples)
-	// }
+	// ))
+
+	c := testGetBucketSize(db, "projects")
+	assert.Zero(t, c)
+
+	p, err := svc.CreateProject(req)
+	assert.Nil(t, err)
+	{
+		c = testGetBucketSize(db, "projects")
+		assert.Equal(t, 1, c)
+
+		actual, err := db.GetProject(p.ProjectID)
+		assert.Nil(t, err)
+
+		assert.Equal(t, req.Template, actual.Template)
+		assert.Equal(t, req.Description, actual.Description)
+	}
 }
