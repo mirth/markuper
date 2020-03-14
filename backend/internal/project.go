@@ -70,9 +70,9 @@ func NewProjectService(db *DB) ProjectService {
 func CreateProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		p := *request.(*CreateProjectRequest)
-		s, _ := s.CreateProject(p)
+		s, err := s.CreateProject(p)
 
-		return s, nil
+		return s, err
 	}
 }
 

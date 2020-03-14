@@ -209,3 +209,45 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 		)
 	}
 }
+
+func TestCreateProjectWithMultipleDataSourcesWhenSourceFail(t *testing.T) {
+	db := openTestDB()
+	defer testCloseAndReset(db)
+	svc := NewProjectService(db)
+
+	tmpDir0, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir0)
+	tmpDir1, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir1)
+	tmpDir2, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir2)
+
+	fillDirWithSamples(tmpDir0, "jpg", 3)
+	fillDirWithSamples(tmpDir1, "png", 2)
+	fillDirWithSamples(tmpDir2, "tiff", 2)
+
+	req := newTestCreateProjectRequest("testproject0")
+	req.DataSources = append(
+		req.DataSources,
+		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
+		NewFailImageGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
+		NewImageGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
+	)
+
+	c := testGetBucketSize(db, "projects")
+	assert.Zero(t, c)
+
+	c = testGetBucketSize(db, "samples")
+	assert.Zero(t, c)
+
+	_, err := svc.CreateProject(req)
+	assert.NotNil(t, err)
+
+	{
+		c := testGetBucketSize(db, "projects")
+		assert.Zero(t, c)
+
+		c = testGetBucketSize(db, "samples")
+		assert.Zero(t, c)
+	}
+}
