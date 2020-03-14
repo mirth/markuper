@@ -18,12 +18,8 @@ func TestImageGlobDataSourceAsGlob(t *testing.T) {
 		return filepath.Join(tmpDir, fn)
 	}
 
-	for i := 0; i < 5; i++ {
-		os.Create(joinTmp(fmt.Sprintf("img%d.jpg", i)))
-	}
-	for i := 0; i < 5; i++ {
-		os.Create(joinTmp(fmt.Sprintf("img%d.jpeg", i)))
-	}
+	fillDirWithSamples(tmpDir, "jpg", 5)
+	fillDirWithSamples(tmpDir, "jpeg", 5)
 
 	src := NewImageGlobDataSource(joinTmp(fmt.Sprintf("*.jpg")))
 
@@ -54,12 +50,9 @@ func TestImageGlobDataSourceAsPath(t *testing.T) {
 		return filepath.Join(tmpDir, fn)
 	}
 
-	for i := 0; i < 3; i++ {
-		os.Create(joinTmp(fmt.Sprintf("img%d.jpg", i)))
-	}
-	for i := 0; i < 3; i++ {
-		os.Create(joinTmp(fmt.Sprintf("img%d.jpeg", i)))
-	}
+	fillDirWithSamples(tmpDir, "jpg", 3)
+	fillDirWithSamples(tmpDir, "jpeg", 3)
+
 	os.Create(joinTmp(".hidden.jpg"))
 	os.Create(joinTmp("noextfile"))
 	os.Mkdir(joinTmp("noextdir"), 0755)

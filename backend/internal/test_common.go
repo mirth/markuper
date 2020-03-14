@@ -1,6 +1,10 @@
 package internal
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+
 	"go.etcd.io/bbolt"
 	bolt "go.etcd.io/bbolt"
 )
@@ -35,4 +39,18 @@ func testGetBucketSize(db *DB, bucket string) int {
 	})
 
 	return size
+}
+
+func fillDirWithSamples(tmpDir, sampleExt string, nSamples int) []string {
+	joinTmp := func(fn string) string {
+		return filepath.Join(tmpDir, fn)
+	}
+	imgPaths := []string{}
+	for i := 0; i < nSamples; i++ {
+		path := joinTmp(fmt.Sprintf("img%d.%s", i, sampleExt))
+		os.Create(path)
+		imgPaths = append(imgPaths, path)
+	}
+
+	return imgPaths
 }

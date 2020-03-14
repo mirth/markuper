@@ -124,16 +124,11 @@ func TestFetchSampleList(t *testing.T) {
 
 	tmpDir, _ := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
+	imgPaths := fillDirWithSamples(tmpDir, "jpg", 5)
+
 	joinTmp := func(fn string) string {
 		return filepath.Join(tmpDir, fn)
 	}
-	imgPaths := []string{}
-	for i := 0; i < 5; i++ {
-		path := joinTmp(fmt.Sprintf("img%d.jpg", i))
-		os.Create(path)
-		imgPaths = append(imgPaths, path)
-	}
-
 	src := DataSource{
 		Type:      "local_directory",
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
