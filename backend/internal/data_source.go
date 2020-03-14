@@ -51,7 +51,7 @@ type ImageGlobDataSource struct {
 func NewImageGlobDataSource(sourceURI string) ImageGlobDataSource {
 	return ImageGlobDataSource{
 		DataSource: DataSource{
-			Type:      "image_glob_datasource",
+			Type:      "local_directory",
 			SourceURI: sourceURI,
 		},
 	}

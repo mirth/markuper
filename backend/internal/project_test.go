@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -159,24 +160,52 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
+	tmpDir0, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir0)
+	tmpDir1, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir1)
+	tmpDir2, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir2)
+
+	imgs0 := fillDirWithSamples(tmpDir0, "jpg", 3)
+	imgs1 := fillDirWithSamples(tmpDir1, "png", 2)
+	fillDirWithSamples(tmpDir2, "tiff", 2)
+
 	req := newTestCreateProjectRequest("testproject0")
-	// req.DataSources = append(req.DataSources, NewImageGlobDataSource(
+	req.DataSources = append(
+		req.DataSources,
+		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
+		NewImageGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
+		NewImageGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
+	)
 
-	// ))
-
-	c := testGetBucketSize(db, "projects")
+	c := testGetBucketSize(db, "samples")
 	assert.Zero(t, c)
 
 	p, err := svc.CreateProject(req)
 	assert.Nil(t, err)
-	{
-		c = testGetBucketSize(db, "projects")
-		assert.Equal(t, 1, c)
 
-		actual, err := db.GetProject(p.ProjectID)
+	{
+		c := testGetBucketSize(db, "samples")
+		assert.Equal(t, 5, c)
+
+		samples, err := getAllSamplesForProject(db, p.ProjectID)
 		assert.Nil(t, err)
 
-		assert.Equal(t, req.Template, actual.Template)
-		assert.Equal(t, req.Description, actual.Description)
+		uris := make([]SampleURI, 0)
+		for _, s := range samples {
+			var objmap map[string]json.RawMessage
+			json.Unmarshal(s, &objmap)
+
+			uri := string(objmap["image_uri"])
+			uri = uri[1 : len(uri)-1] //fixme unqoute
+			uris = append(uris, uri)
+		}
+
+		assert.ElementsMatch(
+			t,
+			append(imgs0, imgs1...),
+			uris,
+		)
 	}
 }
