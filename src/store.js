@@ -5,6 +5,7 @@ import api from './api';
 
 export const projects = writable([]);
 export const activeProject = writable({ assessed: [] });
+export const activeMarkup = writable({});
 
 export async function fetchProjectList() {
   const res = await api.get('/projects');

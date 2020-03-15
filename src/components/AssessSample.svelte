@@ -4,6 +4,7 @@ import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
+import { activeMarkup } from '../store';
 
 export let params = {};
 
@@ -20,20 +21,17 @@ let sample = (async () => {
   return fetchNext(params.project_id);
 })();
 
-function makeHandleAssess(field, label) {
-  return async () => {
-    sample = await sample;
-    const { sample_id: sampleId } = sample;
-    const markup = { [field.name.value]: label.value };
+async function handleFieldComplete() {
+  sample = await sample;
+  const { sample_id: sampleId } = sample;
 
-    await api.post(`/project/${sampleId.project_id}/assess`, {
-      sample_id: sampleId,
-      sample_markup: {
-        markup,
-      },
-    });
-    sample = fetchNext(sampleId.project_id);
-  };
+  await api.post(`/project/${sampleId.project_id}/assess`, {
+    sample_id: sampleId,
+    sample_markup: {
+      markup: $activeMarkup,
+    },
+  });
+  sample = fetchNext(sampleId.project_id);
 }
 
 </script>
@@ -57,7 +55,7 @@ img {
 {#if sample.sample === null}
 <Typography type="title" block>No samples left</Typography>
 {:else}
-<ControlDevice {sample} {makeHandleAssess} />
+<ControlDevice {sample} {handleFieldComplete} />
 <Spacer size={24} />
 <div class='image-container'>
   <img src='file://{sample.sample.image_uri}' alt='KEK'/>
