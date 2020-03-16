@@ -5,8 +5,8 @@ import Spacer from 'svelte-atoms/Spacer.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import { activeMarkup } from '../store';
 
-export let handleFieldComplete;
-export let sample;
+export let handleFieldCompleted;
+export let markup;
 export let field;
 
 const allKeys = _.range(1, 10).map(String);
@@ -33,25 +33,27 @@ async function handleKeyup(event) {
 
   const labelIndex = parseInt(event.key, 10) - 1;
   const label = field.labels[labelIndex];
-  await handleButtonClick(label);
+  await handleButtonClick(label)();
 }
 
-async function handleButtonClick(label) {
-  $activeMarkup[field.name.value] = label.value;
-  await handleFieldComplete(field)();
+function handleButtonClick(label) {
+  return async () => {
+    $activeMarkup[field.name.value] = label.value;
+    await handleFieldCompleted(field);
+  }
 }
 
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
 
-<!-- disabled={sample.markup && sample.markup.markup.class === label.value} -->
 <ul>
 {#each labelsWithKeys as [label, key]}
   <li>
     <Cell>
       <Button
         on:click={handleButtonClick(label)}
+        disabled={markup && markup === label.value}
         style='display: inline; min-width: 60px;'
       >
         {label.name}

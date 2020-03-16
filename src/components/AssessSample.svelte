@@ -21,7 +21,7 @@ let sample = (async () => {
   return fetchNext(params.project_id);
 })();
 
-async function handleFieldComplete() {
+async function handleFieldCompleted(field) {
   sample = await sample;
   const { sample_id: sampleId } = sample;
 
@@ -55,7 +55,7 @@ img {
 {#if sample.sample === null}
 <Typography type="title" block>No samples left</Typography>
 {:else}
-<ControlDevice {sample} {handleFieldComplete} />
+<ControlDevice {sample} {handleFieldCompleted} />
 <Spacer size={24} />
 <div class='image-container'>
   <img src='file://{sample.sample.image_uri}' alt='KEK'/>
