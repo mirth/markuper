@@ -13,8 +13,8 @@ function getBackendBinaryFilename() {
 
 function runBackend() {
   const binaryFilename = getBackendBinaryFilename();
-  const backendPath = (process.env.ENV === 'dev' || process.env.ENV === 'test') ? `backend/bin/${binaryFilename}`
-    : path.join(appRootDir, 'backend', 'bin', binaryFilename);
+  const backendPath = (process.env.ENV === 'dev' || process.env.ENV === 'test') ? `public/${binaryFilename}`
+    : path.join(appRootDir, 'public', binaryFilename);
 
   const backend = execFile(backendPath, {
     env: {
