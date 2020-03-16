@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -124,16 +125,11 @@ func TestFetchSampleList(t *testing.T) {
 
 	tmpDir, _ := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
+	imgPaths := fillDirWithSamples(tmpDir, "jpg", 5)
+
 	joinTmp := func(fn string) string {
 		return filepath.Join(tmpDir, fn)
 	}
-	imgPaths := []string{}
-	for i := 0; i < 5; i++ {
-		path := joinTmp(fmt.Sprintf("img%d.jpg", i))
-		os.Create(path)
-		imgPaths = append(imgPaths, path)
-	}
-
 	src := DataSource{
 		Type:      "local_directory",
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
@@ -157,25 +153,101 @@ func TestFetchSampleList(t *testing.T) {
 			j(imgPaths[4]),
 		}, list)
 	}
-	// {
-	// 	sIDs, _ := getAllSampleIDsForProject(db, "samples", proj.ProjectID)
+}
 
-	// 	samples := [][]byte{}
-	// 	for _, id := range sIDs {
-	// 		s, _ := db.GetSample(id)
-	// 		samples = append(samples, s)
-	// 	}
+func TestCreateProjectWithMultipleDataSources(t *testing.T) {
+	db := openTestDB()
+	defer testCloseAndReset(db)
+	svc := NewProjectService(db)
 
-	// 	j := func(imgPath string) []byte {
-	// 		return []byte(fmt.Sprintf(`{"image_uri":%s}`, strconv.Quote(imgPath)))
-	// 	}
+	tmpDir0, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir0)
+	tmpDir1, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir1)
+	tmpDir2, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir2)
 
-	// 	assert.ElementsMatch(t, [][]byte{
-	// 		j(imgPaths[0]),
-	// 		j(imgPaths[1]),
-	// 		j(imgPaths[2]),
-	// 		j(imgPaths[3]),
-	// 		j(imgPaths[4]),
-	// 	}, samples)
-	// }
+	imgs0 := fillDirWithSamples(tmpDir0, "jpg", 3)
+	imgs1 := fillDirWithSamples(tmpDir1, "png", 2)
+	fillDirWithSamples(tmpDir2, "tiff", 2)
+
+	req := newTestCreateProjectRequest("testproject0")
+	req.DataSources = append(
+		req.DataSources,
+		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
+		NewImageGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
+		NewImageGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
+	)
+
+	c := testGetBucketSize(db, "samples")
+	assert.Zero(t, c)
+
+	p, err := svc.CreateProject(req)
+	assert.Nil(t, err)
+
+	{
+		c := testGetBucketSize(db, "samples")
+		assert.Equal(t, 5, c)
+
+		samples, err := getAllSamplesForProject(db, p.ProjectID)
+		assert.Nil(t, err)
+
+		uris := make([]SampleURI, 0)
+		for _, s := range samples {
+			var objmap map[string]json.RawMessage
+			json.Unmarshal(s, &objmap)
+
+			uri := string(objmap["image_uri"])
+			uri = uri[1 : len(uri)-1] //fixme unqoute
+			uris = append(uris, uri)
+		}
+
+		assert.ElementsMatch(
+			t,
+			append(imgs0, imgs1...),
+			uris,
+		)
+	}
+}
+
+func TestCreateProjectWithMultipleDataSourcesWhenSourceFail(t *testing.T) {
+	db := openTestDB()
+	defer testCloseAndReset(db)
+	svc := NewProjectService(db)
+
+	tmpDir0, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir0)
+	tmpDir1, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir1)
+	tmpDir2, _ := ioutil.TempDir("", "")
+	defer os.RemoveAll(tmpDir2)
+
+	fillDirWithSamples(tmpDir0, "jpg", 3)
+	fillDirWithSamples(tmpDir1, "png", 2)
+	fillDirWithSamples(tmpDir2, "tiff", 2)
+
+	req := newTestCreateProjectRequest("testproject0")
+	req.DataSources = append(
+		req.DataSources,
+		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
+		NewFailImageGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
+		NewImageGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
+	)
+
+	c := testGetBucketSize(db, "projects")
+	assert.Zero(t, c)
+
+	c = testGetBucketSize(db, "samples")
+	assert.Zero(t, c)
+
+	_, err := svc.CreateProject(req)
+	assert.NotNil(t, err)
+
+	{
+		c := testGetBucketSize(db, "projects")
+		assert.Zero(t, c)
+
+		c = testGetBucketSize(db, "samples")
+		assert.Zero(t, c)
+	}
 }

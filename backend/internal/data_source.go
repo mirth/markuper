@@ -48,6 +48,15 @@ type ImageGlobDataSource struct {
 	DataSource
 }
 
+func NewImageGlobDataSource(sourceURI string) ImageGlobDataSource {
+	return ImageGlobDataSource{
+		DataSource: DataSource{
+			Type:      "local_directory",
+			SourceURI: sourceURI,
+		},
+	}
+}
+
 func removeHiddenPaths(paths []string) []string {
 	filtered := make([]string, 0)
 
@@ -101,10 +110,27 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 func GetSampleListFetcher(src DataSource) SampleListFetcher {
 	switch src.Type {
 	case "local_directory":
-		return ImageGlobDataSource{
-			DataSource: src,
-		}
+		return NewImageGlobDataSource(src.SourceURI)
+	case "fail_local_directory":
+		return NewFailImageGlobDataSource(src.SourceURI)
 	}
 
 	return nil
+}
+
+type FailImageGlobDataSource struct {
+	DataSource
+}
+
+func (s FailImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
+	return nil, errors.New("fail")
+}
+
+func NewFailImageGlobDataSource(sourceURI string) FailImageGlobDataSource {
+	return FailImageGlobDataSource{
+		DataSource: DataSource{
+			Type:      "fail_local_directory",
+			SourceURI: sourceURI,
+		},
+	}
 }

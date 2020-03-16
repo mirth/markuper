@@ -115,10 +115,45 @@ func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]Sa
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return sIDs, nil
+}
+
+func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, error) {
+	samples := make([]json.RawMessage, 0)
+
+	err := db.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("samples"))
+		err := b.ForEach(func(k, v []byte) error {
+			sID := SampleID{}
+			s := json.RawMessage{}
+
+			{
+				err := decodeBin(k).Decode(&sID)
+				if err != nil {
+					return errors.WithStack(err)
+				}
+
+				err = decodeBin(v).Decode(&s)
+
+				if sID.ProjectID == projectID {
+					samples = append(samples, s)
+				}
+			}
+
+			return nil
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return samples, nil
 }
 
 func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, error) {
