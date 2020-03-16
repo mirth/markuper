@@ -11,7 +11,7 @@
     "test": "concurrently \"yarn _test_e2e\" \"yarn _test_backend\"",
     "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\"",
     "build": "yarn _build_backend && yarn _build_frontend",
-    "release_macos": "yarn _pack --icon=icon.icns && yarn _dmg",
+    "release_macos": "cross-env BACKEND_BINARY_FILENAME=main yarn _pack --icon=icon.icns && yarn _dmg",
     "release_windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn _pack --platform=win32 --arch=x64 --icon=icon.png",
     "release_linux": "yarn _pack --platform=linux --arch=x64",
     "_pack": "yarn build && yarn electron-packager --overwrite --ignore=\"^.backend\" --ignore=\"(^.src|rollup.config.js|yarn.lock|README.md|markuper.code-workspace|icon.png|icon.icns)\" . Markuper",
