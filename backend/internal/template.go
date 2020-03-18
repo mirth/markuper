@@ -36,8 +36,6 @@ func (f RadioField) JSON() ([]byte, error) {
 }
 
 type Template struct {
-	Task string `json:"task"`
-	// XML  string `json:"xml"`
 	Radios []RadioField `json:"radios"`
 	// FieldsOrder []string `json:"fields_order"`
 }
@@ -63,6 +61,8 @@ var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 	XML: `<content>
 	<radio group="animal" value="cat" vizual="Cat" />
 	<radio group="animal" value="dog" vizual="Dog" />
+	<radio group="animal" value="chuk" vizual="Chuk" />
+	<radio group="animal" value="gek" vizual="Gek" />
 </content>
 `,
 }
