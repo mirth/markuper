@@ -53,6 +53,7 @@ $: options = _.map(templateList, (t) => ({
   bind:value={selectedTemplate.template.xml}
   on:input={validateXML}
   textarea
+  rows={5}
   />
 
 {#if selectedTemplate.error}
