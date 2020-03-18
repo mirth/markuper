@@ -220,7 +220,7 @@ describe('Application launch', function () {
     });
 
     it("changes class to 'gek'", async () => {
-      await app.client.element('button=Gek').click();
+      await app.client.element("button/*[@innertext='Gek']").click();
       await sleep(500);
       await app.client.element("button/*[@innertext='testproj0'").click();
       await app.client.waitForExist('ul');
