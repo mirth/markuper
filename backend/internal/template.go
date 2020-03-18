@@ -59,8 +59,8 @@ type TemplateServiceImpl struct {
 var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 	Task: "classification",
 	XML: `<content>
-	<radio group="animal" value="cat" vizual="Cat" />
-	<radio group="animal" value="dog" vizual="Dog" />
+    <radio group="animal" value="cat" vizual="Cat" />
+    <radio group="animal" value="dog" vizual="Dog" />
 </content>
 `,
 }
