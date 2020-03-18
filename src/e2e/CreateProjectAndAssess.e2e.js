@@ -43,6 +43,17 @@ describe('Application launch', function () {
       await app.client.element(template).setValue('classification');
     });
 
+    it('set xml for template', async () => {
+      await app.client.elements('textarea').setValue(`
+      <content>
+        <radio group="animal" value="cat" vizual="Cat" />
+        <radio group="animal" value="dog" vizual="Dog" />
+        <radio group="animal" value="chuk" vizual="Chuk" />
+        <radio group="animal" value="gek" vizual="Gek" />
+      </content>
+      `);
+    });
+
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
     const glob0 = path.join(imgDir, '*.jpg');
     const glob1 = path.join(imgDir, '*.png');

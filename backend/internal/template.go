@@ -61,8 +61,6 @@ var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 	XML: `<content>
 	<radio group="animal" value="cat" vizual="Cat" />
 	<radio group="animal" value="dog" vizual="Dog" />
-	<radio group="animal" value="chuk" vizual="Chuk" />
-	<radio group="animal" value="gek" vizual="Gek" />
 </content>
 `,
 }
