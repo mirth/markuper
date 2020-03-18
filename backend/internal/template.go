@@ -12,27 +12,22 @@ type AnswerField = Jsonable
 type TaskAnswer struct {
 }
 
-type ValueWithName struct {
-	Value string `json:"value"`
-	Name  string `json:"name"`
+type ValueWithVizual struct {
+	Value  string `json:"value"`
+	Vizual string `json:"vizual"`
 }
 
 type RadioField struct {
-	ID     string          `json:"id"` // fixme keep only Name?
-	Type   string          `json:"type"`
-	Name   ValueWithName   `json:"name"`
-	Labels []ValueWithName `json:"labels"`
+	Type   string            `json:"type"`
+	Group  string            `json:"group"`
+	Labels []ValueWithVizual `json:"labels"`
 }
 
-func NewRadioField(id string, name ValueWithName) RadioField {
+func NewRadioField(group string) RadioField {
 	return RadioField{
-		ID:   id,
-		Name: name,
-		Type: "radio",
-		Labels: []ValueWithName{
-			{Value: "cat", Name: "cat"},
-			{Value: "dog", Name: "dog"},
-		},
+		Group:  group,
+		Type:   "radio",
+		Labels: make([]ValueWithVizual, 0),
 	}
 }
 
@@ -41,13 +36,17 @@ func (f RadioField) JSON() ([]byte, error) {
 }
 
 type Template struct {
-	Task   string       `json:"task"`
 	Radios []RadioField `json:"radios"`
 	// FieldsOrder []string `json:"fields_order"`
 }
 
+type TemplateXML struct {
+	Task string `json:"task"`
+	XML  string `json:"xml"`
+}
+
 type TemplateList struct {
-	Templates []Template `json:"templates"`
+	Templates []TemplateXML `json:"templates"`
 }
 
 type TemplateService interface {
@@ -57,19 +56,18 @@ type TemplateService interface {
 type TemplateServiceImpl struct {
 }
 
-var DEFAULT_CLASSIFICATION_TEMPLATE = Template{
+var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 	Task: "classification",
-	Radios: []RadioField{
-		NewRadioField("1", ValueWithName{
-			Name:  "class",
-			Value: "class",
-		}),
-	},
+	XML: `<content>
+    <radio group="animal" value="cat" vizual="Cat" />
+    <radio group="animal" value="dog" vizual="Dog" />
+</content>
+`,
 }
 
 func (_ *TemplateServiceImpl) ListTemplates() (TemplateList, error) {
 	return TemplateList{
-		Templates: []Template{DEFAULT_CLASSIFICATION_TEMPLATE},
+		Templates: []TemplateXML{DEFAULT_CLASSIFICATION_TEMPLATE},
 	}, nil
 }
 

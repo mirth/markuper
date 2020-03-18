@@ -12,7 +12,10 @@ export let close;
 
 let projectName = '';
 const selectedTemplate = {
-  template: null,
+  template: {
+    xml: '',
+  },
+  error: null,
 };
 const dataSources = {
   dataSources: [],
@@ -23,12 +26,7 @@ function isProjectValid() {
     return false;
   }
 
-  if (!selectedTemplate.template) {
-    return false;
-  }
-
-  const firstRadio = selectedTemplate.template && selectedTemplate.template.radios[0];
-  if (firstRadio.labels.length === 0) {
+  if (selectedTemplate.error) {
     return false;
   }
 

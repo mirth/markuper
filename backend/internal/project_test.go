@@ -43,7 +43,8 @@ func TestCreateProject(t *testing.T) {
 		actual, err := db.GetProject(p.ProjectID)
 		assert.Nil(t, err)
 
-		assert.Equal(t, req.Template, actual.Template)
+		tt, _ := XMLToTemplate(req.Template.XML)
+		assert.Equal(t, tt, actual.Template)
 		assert.Equal(t, req.Description, actual.Description)
 	}
 }
@@ -67,9 +68,10 @@ func TestGetProject(t *testing.T) {
 		})
 		assert.Nil(t, err)
 
+		tt, _ := XMLToTemplate(req.Template.XML)
 		assert.Equal(t, p.ProjectID, actual.ProjectID)
 		assert.Equal(t, p.Template, actual.Template)
-		assert.Equal(t, req.Template, actual.Template)
+		assert.Equal(t, tt, p.Template)
 		assert.Equal(t, p.Description, actual.Description)
 		assert.Equal(t, req.Description, actual.Description)
 		assert.Equal(t, req.DataSources, actual.DataSources)
@@ -134,7 +136,7 @@ func TestFetchSampleList(t *testing.T) {
 		Type:      "local_directory",
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
 	}
-	proj := NewProject(Template{}, []DataSource{src}, ProjectDescription{})
+	proj, _ := NewProject(DEFAULT_CLASSIFICATION_TEMPLATE, []DataSource{src}, ProjectDescription{})
 	list, err := fetchSampleList(db, proj, src)
 	assert.Nil(t, err)
 

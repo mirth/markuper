@@ -38,7 +38,7 @@ async function handleKeyup(event) {
 
 function handleButtonClick(label) {
   return async () => {
-    $activeMarkup[field.name.value] = label.value;
+    $activeMarkup[field.group] = label.value;
     await handleFieldCompleted(field);
   }
 }
@@ -56,7 +56,7 @@ function handleButtonClick(label) {
         disabled={markup && markup === label.value}
         style='display: inline; min-width: 60px;'
       >
-        {label.name}
+        {label.vizual}
       </Button>
       <Spacer size={8} />
       <kbd class:kbd-down='{key === keyDown}'>{key}</kbd>

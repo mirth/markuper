@@ -13,7 +13,7 @@ func TestListTemplates(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		assert.ElementsMatch(t, []Template{
+		assert.ElementsMatch(t, []TemplateXML{
 			DEFAULT_CLASSIFICATION_TEMPLATE,
 		}, l.Templates)
 	}

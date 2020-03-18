@@ -51,7 +51,6 @@ onMount(async () => {
   <Cell>
     <Typography type='title' block>{$activeProject.description.name}</Typography>
 
-    <p>Template: <b>{$activeProject.template.task}</b></p>
     {#each $activeProject.data_sources as src}
       <p>Data source: <span>{src.source_uri}</span></p>
     {/each}

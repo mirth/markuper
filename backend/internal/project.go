@@ -29,26 +29,31 @@ type Project struct {
 }
 
 type CreateProjectRequest struct {
-	Template    Template           `json:"template"`
+	Template    TemplateXML        `json:"template"`
 	DataSources []DataSource       `json:"data_sources"`
 	Description ProjectDescription `json:"description"`
 }
 
 func NewProject(
-	template Template,
+	template TemplateXML,
 	dataSrc []DataSource,
 	desc ProjectDescription,
-) Project {
+) (Project, error) {
 	projectID := ProjectID(xid.New().String())
 	now := utils.NowUTC()
+
+	t, err := XMLToTemplate(template.XML)
+	if err != nil {
+		return Project{}, err
+	}
 
 	return Project{
 		CreatedAt:   now,
 		ProjectID:   projectID,
-		Template:    template,
+		Template:    t,
 		DataSources: dataSrc,
 		Description: desc,
-	}
+	}, nil
 }
 
 type ProjectService interface {
@@ -109,7 +114,10 @@ func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
 }
 
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
-	project := NewProject(req.Template, req.DataSources, req.Description)
+	project, err := NewProject(req.Template, req.DataSources, req.Description)
+	if err != nil {
+		return Project{}, err
+	}
 
 	allSamples := make([]Jsonable, 0)
 	for _, src := range project.DataSources {
@@ -121,7 +129,7 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 		allSamples = append(allSamples, list...)
 	}
 
-	err := putSamples(s.db, project.ProjectID, allSamples)
+	err = putSamples(s.db, project.ProjectID, allSamples)
 	if err != nil {
 		return Project{}, err
 	}

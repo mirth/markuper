@@ -12,6 +12,6 @@ const fields = sample.template.radios;
   <ControlRadio
     {field}
     {handleFieldCompleted}
-    markup={sample.markup && sample.markup.markup[field.name.value]}
+    markup={sample.markup && sample.markup.markup[field.group]}
     />
 {/each}
