@@ -3,6 +3,7 @@ import { onMount } from 'svelte';
 import _ from 'lodash';
 import Select from 'svelte-atoms/Select.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import Input from 'svelte-atoms/Input.svelte';
 import api from '../api';
 import TemplatePreview from './TemplatePreview.svelte';
 
@@ -14,15 +15,33 @@ let templateList = [];
 onMount(async () => {
   const res = await api.get('/project_templates');
   templateList = res.templates;
+  onTemplateSelected({detail: selectedTemplateTask})
 });
 
+function onTemplateSelected(ev) {
+  selectedTemplateTask = ev.detail
+  const template = {
+    ..._.find(
+      templateList,
+      { task: selectedTemplateTask },
+    ),
+  }
+  selectedTemplate.template = template
+}
 
-$: selectedTemplate.template = {
-  ..._.find(
-    templateList,
-    { task: selectedTemplateTask },
-  ),
-};
+function isXMLValid(xml) {
+  const oParser = new DOMParser();
+  const oDOM = oParser.parseFromString(xml, 'text/xml');
+  return oDOM.getElementsByTagName('parsererror').length === 0;
+}
+
+function validateXML(ev) {
+  if(!isXMLValid(ev.target.value)) {
+    selectedTemplate.error = "This doesn't look like valid xml"
+  } else [
+    selectedTemplate.error = null
+  ]
+}
 
 $: options = _.map(templateList, (t) => ({
   label: t.task, value: t.task,
@@ -30,8 +49,26 @@ $: options = _.map(templateList, (t) => ({
 
 </script>
 
-<Select bind:value={selectedTemplateTask} {options} title='Select project Task' placeholder='Select task' />
-<Spacer size={16} />
-{#if selectedTemplate.template.task}
-  <TemplatePreview template={selectedTemplate} />
+<Input
+  bind:value={selectedTemplate.template.xml}
+  on:input={validateXML}
+  textarea
+  />
+
+{#if selectedTemplate.error}
+<span>{selectedTemplate.error}</span>
 {/if}
+
+<Select
+  on:change={onTemplateSelected}
+  value={selectedTemplateTask}
+  {options}
+  title='Select project Task'
+  placeholder='Select task'
+  />
+
+<style>
+span {
+  color: red;
+}
+</style>
