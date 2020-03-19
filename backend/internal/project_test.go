@@ -198,9 +198,8 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 		for _, s := range samples {
 			var objmap map[string]json.RawMessage
 			json.Unmarshal(s, &objmap)
-
-			uri := string(objmap["image_uri"])
-			uri = uri[1 : len(uri)-1] //fixme unqoute
+			uri := ""
+			json.Unmarshal(objmap["image_uri"], &uri)			
 			uris = append(uris, uri)
 		}
 

@@ -85,7 +85,7 @@ describe('Application launch', function () {
     it('navigates to project page', async () => {
       await sleep(500);
       await app.client.waitUntilTextExists('span', 'testproj0');
-      await app.client.element("button/*[@innertext='testproj0'").click();
+      await app.client.element("button/*[@innertext='testproj0']").click();
     });
 
     it('displays project description', async () => {
@@ -161,15 +161,16 @@ describe('Application launch', function () {
       await app.client.waitUntilTextExists('span', 'No samples left');
     });
 
-    const getPath = (filename) => app.client.element(`small*=${filename}`);
-    const getClass = (filename) => getPath(filename).element('../..').element('./span');
+    const getPath = (filename) => app.client.element(`small*=${filename}`);//`a/span[text()="${path.join(imgDir, filename) + ':'}"]`);//app.client.element(`a/*[@innertext='${filename}']`);
+    const getClass = (filename) =>  getPath(filename).element('../..').element('./span');//app.client.element(`p/span/*[@innertext='${filename}']`);
 
     // fixme test sample order
     it('displays sample markup on project page', async () => {
-      await app.client.element("button/*[@innertext='testproj0'").click();
+      await app.client.element("button/*[@innertext='testproj0']").click();
       await app.client.waitForExist('ul');
 
       {
+        // console.log("getPath('kek0.jpg'): ", getPath('kek0.jpg'))
         const pathText = await getPath('kek0.jpg').getText();
         const cl = await getClass('kek0.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
@@ -205,9 +206,9 @@ describe('Application launch', function () {
     });
 
     it('contains correct pressed button', async () => {
-      await getPath('kek1.jpg').element('../..').click();
-      await app.client.waitForVisible("button/*[@innertext='Cat'");
-      await sleep(500);
+      await getPath('kek1.jpg').element('..').click();
+
+      await app.client.waitForVisible("button/*[@innertext='Cat']");
       const catCl = await getBtn(1).getAttribute('class');
       const dogCl = await getBtn(2).getAttribute('class');
       const chukCl = await getBtn(3).getAttribute('class');
@@ -222,7 +223,7 @@ describe('Application launch', function () {
     it("changes class to 'gek'", async () => {
       await getBtn(4).click();
       await sleep(500);
-      await app.client.element("button/*[@innertext='testproj0'").click();
+      await app.client.element("button/*[@innertext='testproj0']").click();
       await app.client.waitForExist('ul');
 
       {
