@@ -11,9 +11,9 @@ function newEmptySource() {
   return {
     type: 'local_directory',
     source_uri: '',
-    isValid: function() {
-      const uri = this.source_uri.trim()
-      return uri.length !== 0 && isGlob(uri)
+    isValid() {
+      const uri = this.source_uri.trim();
+      return uri.length !== 0 && isGlob(uri);
     },
   };
 }
@@ -22,8 +22,8 @@ let newSource = newEmptySource();
 
 // fixme e2e
 function addDataSource() {
-  if(!newSource.isValid()) {
-    return
+  if (!newSource.isValid()) {
+    return;
   }
 
   newSource.source_uri = newSource.source_uri.trim();
@@ -31,15 +31,15 @@ function addDataSource() {
   newSource = newEmptySource();
 }
 
-const dirname = (filename) => filename.match(/(.*)[\/\\]/)[1]||''; // fixme fuck
+const dirname = (filename) => filename.match(/(.*)[/\\]/)[1] || ''; // fixme fuck
 
 function getDirectory(e) {
-  const files = e.target.files;
-  if(files.length === 0) {
-    return
+  const { files } = e.target;
+  if (files.length === 0) {
+    return;
   }
   const dir = dirname(files[0].path);
-  newSource.source_uri = dir
+  newSource.source_uri = dir;
 }
 
 </script>

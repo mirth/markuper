@@ -55,7 +55,7 @@ func (f CheckboxField) JSON() ([]byte, error) {
 
 type Template struct {
 	Radios     []RadioField    `json:"radios"`
-	Checkboxes []CheckboxField `json:"checkbox"`
+	Checkboxes []CheckboxField `json:"checkboxes"`
 
 	FieldsOrder []string `json:"fields_order"`
 }

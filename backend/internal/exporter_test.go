@@ -17,9 +17,24 @@ func TestExportCSV(t *testing.T) {
 		db: db,
 	}
 
-	AssessWithMarkup(t, m, SampleID{ProjectID: proj.ProjectID, SampleID: 0}, `{"kek":"mark0","aaa": 3}`)
-	AssessWithMarkup(t, m, SampleID{ProjectID: proj.ProjectID, SampleID: 1}, `{"kek":"mark1","aaa": 4}`)
-	AssessWithMarkup(t, m, SampleID{ProjectID: proj.ProjectID, SampleID: 2}, `{"kek":"mark2","aaa": 5}`)
+	AssessWithMarkup(
+		t,
+		m,
+		SampleID{ProjectID: proj.ProjectID, SampleID: 0},
+		`{"kek":"mark0","aaa": 3,"lel":["l1", "l2"]}`,
+	)
+	AssessWithMarkup(
+		t,
+		m,
+		SampleID{ProjectID: proj.ProjectID, SampleID: 1},
+		`{"kek":"mark1","aaa": 4,"lel":[]}`,
+	)
+	AssessWithMarkup(
+		t,
+		m,
+		SampleID{ProjectID: proj.ProjectID, SampleID: 2},
+		`{"kek":"mark2","aaa": 5,"lel":["l3"]}`,
+	)
 
 	s := ExporterServiceImpl{
 		db: db,
@@ -34,10 +49,10 @@ func TestExportCSV(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		assert.Equal(t, `sample_id,sample_uri,assessed_at,aaa,kek
-0,sampleuri0,2015-03-07T11:06:39,3,"""mark0"""
-1,sampleuri1,2015-03-07T11:06:39,4,"""mark1"""
-2,sampleuri2,2015-03-07T11:06:39,5,"""mark2"""
+		assert.Equal(t, `sample_id,sample_uri,assessed_at,aaa,kek,lel
+0,sampleuri0,2015-03-07T11:06:39,3,"""mark0""","[""l1"", ""l2""]"
+1,sampleuri1,2015-03-07T11:06:39,4,"""mark1""",[]
+2,sampleuri2,2015-03-07T11:06:39,5,"""mark2""","[""l3""]"
 `, string(r.CSV))
 
 		assert.Equal(

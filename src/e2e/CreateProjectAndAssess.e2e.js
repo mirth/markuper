@@ -92,7 +92,7 @@ describe('Application launch', function () {
       await app.client.waitUntilTextExists('span', 'testproj0');
       await app.client.waitUntilTextExists('span', glob0);
       await app.client.waitUntilTextExists('span', glob1);
-      // await app.client.waitUntilTextExists('span', 'cat, dog, chuk, gek');
+      await app.client.waitUntilTextExists('span', 'cat, dog, chuk, gek');
     });
 
     it('begins assess', async () => {
@@ -104,7 +104,7 @@ describe('Application launch', function () {
     });
 
     const makeUrl = (filename) => path.normalize('file://' + path.join(imgDir, filename));
-    const getBtn = (i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/ul/li[${i}]/div/button`);
+    const getBtn = (i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/div[1]/ul/li[${i}]/div/button`);// `./div/div[2]/div/div/div/ul/li[${i}]/div/button`);
 
     const assertButtonLabels = async () => {
       let btnTxt = await getBtn(1).element('.//span').getText();
@@ -123,6 +123,7 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek0.jpg'));
       await app.client.keys('3');
+      await app.client.keys('Enter');
     });
 
     it('assesses 2nd jpg sample', async () => {
@@ -131,6 +132,7 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek1.jpg'));
       await getBtn(2).click();
+      await app.client.keys('Enter');
     });
 
     it('assesses 3rd jpg sample', async () => {
@@ -139,6 +141,7 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek2.jpg'));
       await app.client.keys('2');
+      await app.client.keys('Enter');
     });
 
     it('assesses 1st png sample', async () => {
@@ -147,6 +150,7 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek3.png'));
       await getBtn(1).click();
+      await app.client.keys('Enter');
     });
 
     it('assesses 2nd png sample', async () => {
@@ -155,14 +159,15 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl('kek4.png'));
       await getBtn(1).click();
+      await app.client.keys('Enter');
     });
 
     it('displays that there are no samples left', async () => {
       await app.client.waitUntilTextExists('span', 'No samples left');
     });
 
-    const getPath = (filename) => app.client.element(`small*=${filename}`);//`a/span[text()="${path.join(imgDir, filename) + ':'}"]`);//app.client.element(`a/*[@innertext='${filename}']`);
-    const getClass = (filename) =>  getPath(filename).element('../..').element('./span');//app.client.element(`p/span/*[@innertext='${filename}']`);
+    const getPath = (filename) => app.client.element(`small*=${filename}`);
+    const getClass = (filename) => getPath(filename).element('../..').element('./span');
 
     // fixme test sample order
     it('displays sample markup on project page', async () => {
@@ -222,10 +227,9 @@ describe('Application launch', function () {
 
     it("changes class to 'gek'", async () => {
       await getBtn(4).click();
-      await sleep(500);
+      await app.client.keys('Enter');
       await app.client.element("button/*[@innertext='testproj0']").click();
       await app.client.waitForExist('ul');
-
       {
         const cl = await getClass('kek1.jpg').getText();
         expect(cl).to.be.eq('animal: gek');

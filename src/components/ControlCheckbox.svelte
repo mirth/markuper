@@ -1,17 +1,15 @@
 <script>
-import Cell from 'svelte-atoms/Grids/Cell.svelte';
+import Checkbox from 'svelte-atoms/Checkbox.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
-import Button from 'svelte-atoms/Button.svelte';
 import { makeLabelsWithKeys } from '../control';
 import { activeMarkup, assessState } from '../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
-export let handleFieldCompleted;
-export let markup;
 export let field;
 
 const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
+const checkedByLabel = {};
 let keyDown;
 
 function handleKeydown(event) {
@@ -22,13 +20,13 @@ function handleKeydown(event) {
   keyDown = event.key;
 }
 
-function handleButtonClick(label) {
-  return async () => {
-    if (field.group === $assessState.focusedGroup) {
-      $activeMarkup[field.group] = label.value;
-      await handleFieldCompleted();
-    }
-  };
+function updateMarkupWith(labelValue) {
+  checkedByLabel[labelValue] = !checkedByLabel[labelValue];
+  $activeMarkup[field.group] = Object.entries(
+    checkedByLabel,
+  )
+    .filter((kv) => kv[1])
+    .map((kv) => kv[0]);
 }
 
 async function handleKeyup(event) {
@@ -46,42 +44,53 @@ async function handleKeyup(event) {
 
   const labelIndex = parseInt(event.key, 10) - 1;
   const label = field.labels[labelIndex];
-  await handleButtonClick(label)();
+
+  updateMarkupWith(label.value);
+
   keyDown = null;
+}
+
+function onChangeFor(label) {
+  return (ev) => {
+    if (ev.target.value === label.value) {
+      updateMarkupWith(label.value);
+    }
+  };
 }
 
 </script>
 
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
-
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
+<div>
 <ul>
 {#each labelsWithKeys as [label, key]}
   <li>
-    <Cell>
-      <Button
-        on:click={handleButtonClick(label)}
-        disabled={markup && markup === label.value}
-        style='display: inline; min-width: 60px;'
+    <Checkbox
+      checked={checkedByLabel[label.value]}
+      on:change={onChangeFor(label.value)}
       >
-        {label.vizual}
-      </Button>
-      <Spacer size={8} />
-      <KeyboardButton {key} isKeyDown={key === keyDown} />
-    </Cell>
+      {label.vizual}
+    </Checkbox>
+    <Spacer size={8} />
+    <KeyboardButton {key} isKeyDown={key === keyDown} />
   </li>
 {/each}
 </ul>
+</div>
 
 <style>
-
 ul {
+  display: inline;
   padding: 0;
 }
 
 li {
   list-style-type: none;
   display: inline-block;
-  text-align: center;
+  margin-right: 20px;
 }
 
+div {
+  padding-top: 25px;
+}
 </style>
