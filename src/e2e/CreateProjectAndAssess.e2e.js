@@ -112,6 +112,7 @@ describe('Application launch', function () {
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek0.jpg'));
       await app.client.keys('3');
       await app.client.keys('Enter');
+      await app.client.keys('Enter');
     });
 
     it('assesses 2nd jpg sample', async () => {
@@ -120,6 +121,7 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek1.jpg'));
       await getBtn(app, 2).click();
+      await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
 
@@ -130,6 +132,7 @@ describe('Application launch', function () {
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek2.jpg'));
       await app.client.keys('2');
       await app.client.keys('Enter');
+      await app.client.keys('Enter');
     });
 
     it('assesses 1st png sample', async () => {
@@ -139,6 +142,7 @@ describe('Application launch', function () {
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek3.png'));
       await getBtn(app, 1).click();
       await app.client.keys('Enter');
+      await app.client.keys('Enter');
     });
 
     it('assesses 2nd png sample', async () => {
@@ -147,6 +151,7 @@ describe('Application launch', function () {
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek4.png'));
       await getBtn(app, 1).click();
+      await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
 
@@ -215,6 +220,7 @@ describe('Application launch', function () {
 
     it("changes class to 'gek'", async () => {
       await getBtn(app, 4).click();
+      await app.client.keys('Enter');
       await app.client.keys('Enter');
       await app.client.element("button/*[@innertext='testproj0']").click();
       await app.client.waitForExist('ul');

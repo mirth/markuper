@@ -6,8 +6,6 @@ import { makeLabelsWithKeys } from '../control';
 import { activeMarkup, assessState } from '../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
-export let handleFieldCompleted;
-export let markup;
 export let field;
 
 const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
@@ -25,7 +23,6 @@ function handleKeydown(event) {
 function handleButtonClick(label) {
   return async () => {
     $activeMarkup[field.group] = label.value;
-    await handleFieldCompleted(field.group);
   };
 }
 

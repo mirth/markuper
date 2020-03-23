@@ -5,7 +5,8 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
-import { getBtn, getChbox, assertButtonLabels } from './test_common';
+import { getBtn, assertButtonLabels } from './test_common';
+import api from '../api';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -69,6 +70,15 @@ function createProjectWithTemplate(xml) {
   });
 }
 
+function itKeepsFocus() {
+  it('keeps the focus', async () => {
+    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
+    expect(device1).to.not.have.string('selected');
+    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
+    expect(device2).to.have.string('selected');
+  });
+}
+
 describe('Application launch', function () {
   this.timeout(30000);
   before(() => app.start());
@@ -90,6 +100,7 @@ describe('Application launch', function () {
     <checkbox group="color" value="pink" vizual="Pink" />
   </content>
   `;
+
 
   createProjectWithTemplate(xml1);
 
@@ -167,12 +178,7 @@ describe('Application launch', function () {
     expect(disabled).to.be.deep.eq([true, false, false, false]);
   });
 
-  it('keeps the focus', async () => {
-    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
-    expect(device1).to.not.have.string('selected');
-    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
-    expect(device2).to.have.string('selected');
-  });
+  itKeepsFocus();
 
   it('displays checkbox 2 as checked', async () => {
     await app.client.keys('2');
@@ -181,6 +187,8 @@ describe('Application launch', function () {
     expect(checked).to.be.deep.eq([false, true, false]);
   });
 
+  itKeepsFocus();
+
   it('displays checkboxes 1,2 as checked', async () => {
     await app.client.keys('1');
 
@@ -188,10 +196,23 @@ describe('Application launch', function () {
     expect(checked).to.be.deep.eq([true, true, false]);
   });
 
-  it('keeps the focus', async () => {
-    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
-    expect(device1).to.not.have.string('selected');
-    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
-    expect(device2).to.have.string('selected');
+  itKeepsFocus();
+
+  it('displays all checkboxes as checked', async () => {
+    await app.client.keys('3');
+
+    const checked = await getChecked();
+    expect(checked).to.be.deep.eq([true, true, true]);
   });
+
+  itKeepsFocus();
+
+  it('displays checkbox 2 as unchecked', async () => {
+    await app.client.keys('2');
+
+    const checked = await getChecked();
+    expect(checked).to.be.deep.eq([true, false, true]);
+  });
+
+  itKeepsFocus();
 });

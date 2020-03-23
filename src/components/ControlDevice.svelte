@@ -14,15 +14,15 @@ if(sample.markup) {
 }
 
 const [fields, groupsOrder] = getFieldsInOrderFor(sample.template);
+const submitGroup = '[submit]';
+
+groupsOrder.push(submitGroup)
 
 let fieldIter = 0;
 let keyDown = null;
 
-function focusOnNextField(lastGroupTouched) {
-  const lastGroupTouchedIndex = groupsOrder.indexOf(lastGroupTouched);
-  if(fieldIter === lastGroupTouchedIndex) {
-    fieldIter += 1;
-  }
+function focusOnNextField() {
+  fieldIter += 1;
 }
 
 function handleKeydown(event) {
@@ -34,8 +34,12 @@ function handleKeyup(event) {
     return;
   }
 
+  // onKeyEnter
   if (event.key === 'Enter') {
-    submitMarkupAndFetchNext();
+    if(fieldIter === groupsOrder.length - 1) {
+      submitMarkupAndFetchNext();
+    }
+    focusOnNextField();
   }
 }
 
@@ -49,22 +53,17 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 {#each fields as field, i }
 <div class:selected={$assessState.focusedGroup === field.group} id={`device${i}`}>
   {#if field.type === 'radio'}
-    <ControlRadio
-      {field}
-      handleFieldCompleted={focusOnNextField}
-      />
+    <ControlRadio {field} />
   {/if}
   {#if field.type === 'checkbox'}
-    <ControlCheckbox
-      {field}
-      handleFieldCompleted={focusOnNextField}
-      />
+    <ControlCheckbox {field} />
   {/if}
 </div>
 {/each}
 <Spacer size={16} />
-<Button on:click={submitMarkupAndFetchNext}>Submit</Button>
-
+<div class:selected={$assessState.focusedGroup === submitGroup}>
+  <Button on:click={submitMarkupAndFetchNext}>Submit</Button>
+</div>
 <style>
 
 .selected {
