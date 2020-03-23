@@ -24,10 +24,8 @@ function handleKeydown(event) {
 
 function handleButtonClick(label) {
   return async () => {
-    if (field.group === $assessState.focusedGroup) {
-      $activeMarkup[field.group] = label.value;
-      await handleFieldCompleted();
-    }
+    $activeMarkup[field.group] = label.value;
+    await handleFieldCompleted(field.group);
   };
 }
 
@@ -60,7 +58,7 @@ async function handleKeyup(event) {
     <Cell>
       <Button
         on:click={handleButtonClick(label)}
-        disabled={markup && markup === label.value}
+        disabled={(markup && markup === label.value) || ($activeMarkup[field.group] == label.value )}
         style='display: inline; min-width: 60px;'
       >
         {label.vizual}

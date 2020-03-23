@@ -5,7 +5,7 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
-import { assertButtonLabels } from './test_common';
+import { getBtn, assertButtonLabels } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -122,10 +122,47 @@ describe('Application launch', function () {
     expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
   });
 
-  it('displays correct selected device', async () => {
+  it('selects first device', async () => {
     const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
     expect(device1).to.have.string('selected');
     const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
     expect(device2).to.not.have.string('selected');
   });
+
+  const getDisabled = async () => {
+    const elements = await app.client.elements('//*[@id="device0"]/ul/li/div/button');
+    const disabled = await Promise.all(elements.value.map(async (el) => {
+      const cl = await app.client.elementIdAttribute(el.ELEMENT, 'class');
+      return cl.value.includes('disabled');
+    }));
+
+    return disabled;
+  }
+
+  it('displays button 3 pressed', async () => {
+    await app.client.keys('3');
+    const disabled = await getDisabled();
+    expect(disabled).to.be.deep.eq([false, false, true, false]);
+  });
+
+  it('changes the focus', async () => {
+    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
+    expect(device1).to.not.have.string('selected');
+    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
+    expect(device2).to.have.string('selected');
+  });
+
+  it('displays button 1 pressed', async () => {
+    await getBtn(app, 1).click();
+    const disabled = await getDisabled();
+    expect(disabled).to.be.deep.eq([true, false, false, false]);
+  });
+
+  it('keeps the focus', async () => {
+    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
+    expect(device1).to.not.have.string('selected');
+    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
+    expect(device2).to.have.string('selected');
+  });
+
 });

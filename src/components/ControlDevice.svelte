@@ -14,8 +14,11 @@ const [fields, groupsOrder] = getFieldsInOrderFor(sample.template);
 let fieldIter = 0;
 let keyDown = null;
 
-function focusOnNextField() {
-  fieldIter += 1;
+function focusOnNextField(lastGroupTouched) {
+  const lastGroupTouchedIndex = groupsOrder.indexOf(lastGroupTouched);
+  if(fieldIter === lastGroupTouchedIndex) {
+    fieldIter += 1;
+  }
 }
 
 function handleKeydown(event) {
