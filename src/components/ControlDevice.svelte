@@ -40,7 +40,7 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
 
 {#each fields as field, i }
-<div class:selected={$assessState.focusedGroup === field.group}>
+<div class:selected={$assessState.focusedGroup === field.group} id={`device${i}`}>
   {#if field.type === 'radio'}
     <ControlRadio
       {field}
