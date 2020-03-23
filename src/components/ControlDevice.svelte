@@ -3,11 +3,15 @@ import Button from 'svelte-atoms/Button.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
-import { assessState } from '../store';
+import { assessState, activeMarkup } from '../store';
 import { getFieldsInOrderFor } from '../template';
 
 export let submitMarkupAndFetchNext;
 export let sample;
+
+if(sample.markup) {
+  $activeMarkup = sample.markup.markup;
+}
 
 const [fields, groupsOrder] = getFieldsInOrderFor(sample.template);
 
@@ -48,14 +52,12 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
     <ControlRadio
       {field}
       handleFieldCompleted={focusOnNextField}
-      markup={sample.markup && sample.markup.markup[field.group]}
       />
   {/if}
   {#if field.type === 'checkbox'}
     <ControlCheckbox
       {field}
       handleFieldCompleted={focusOnNextField}
-      markup={sample.markup && sample.markup.markup[field.group]}
       />
   {/if}
 </div>

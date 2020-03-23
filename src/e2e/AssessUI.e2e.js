@@ -5,7 +5,7 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
-import { getBtn, assertButtonLabels } from './test_common';
+import { getBtn, getChbox, assertButtonLabels } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -137,7 +137,16 @@ describe('Application launch', function () {
     }));
 
     return disabled;
-  }
+  };
+  const getChecked = async () => {
+    const elements = await app.client.elements('//*[@id="device1"]/div/ul/li/label/input');
+    const checked = await Promise.all(elements.value.map(async (el) => {
+      const ch = await app.client.elementIdSelected(el.ELEMENT, 'checked');
+      return ch.value;
+    }));
+
+    return checked;
+  };
 
   it('displays button 3 pressed', async () => {
     await app.client.keys('3');
@@ -165,4 +174,24 @@ describe('Application launch', function () {
     expect(device2).to.have.string('selected');
   });
 
+  it('displays checkbox 2 as checked', async () => {
+    await app.client.keys('2');
+
+    const checked = await getChecked();
+    expect(checked).to.be.deep.eq([false, true, false]);
+  });
+
+  it('displays checkboxes 1,2 as checked', async () => {
+    await app.client.keys('1');
+
+    const checked = await getChecked();
+    expect(checked).to.be.deep.eq([true, true, false]);
+  });
+
+  it('keeps the focus', async () => {
+    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
+    expect(device1).to.not.have.string('selected');
+    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
+    expect(device2).to.have.string('selected');
+  });
 });

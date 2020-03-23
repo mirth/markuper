@@ -58,7 +58,7 @@ async function handleKeyup(event) {
     <Cell>
       <Button
         on:click={handleButtonClick(label)}
-        disabled={(markup && markup === label.value) || ($activeMarkup[field.group] == label.value )}
+        disabled={$activeMarkup[field.group] === label.value}
         style='display: inline; min-width: 60px;'
       >
         {label.vizual}
