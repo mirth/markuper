@@ -61,7 +61,7 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 </div>
 {/each}
 <Spacer size={16} />
-<div class:selected={$assessState.focusedGroup === submitGroup}>
+<div class:selected={$assessState.focusedGroup === submitGroup} id='device_submit'>
   <Button on:click={submitMarkupAndFetchNext}>Submit</Button>
 </div>
 <style>

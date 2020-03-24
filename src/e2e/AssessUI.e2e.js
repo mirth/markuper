@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable prefer-template */
 /* eslint-disable consistent-return */
 /* eslint-disable func-names */
@@ -18,64 +19,45 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-
-function createProjectWithTemplate(xml) {
-  it('opens Create New Project popup', async () => {
-    await app.client.waitForVisible('button');
-    await app.client.element('button').click();
-    await app.client.waitForVisible('input');
-  });
-
-  it('inputs new project name', async () => {
-    await sleep(2000);
-    await app.client.element('input').setValue('testproj0');
-  });
-
-  it('set project task', async () => {
-    const template = "input[placeholder='Select task']";
-    await app.client.waitForExist(template);
-    await app.client.element(template).setValue('classification');
-  });
-
-  it('set xml for template', async () => {
-    await app.client.elements('textarea').setValue(xml);
-  });
-
+async function createProject(xml) {
   const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
   const glob0 = path.join(imgDir, '*.jpg');
   const glob1 = path.join(imgDir, '*.png');
 
-  const srcInput = "input[placeholder='/some/path or /some/glob/*.jpg']";
-
-  it('adds first data source', async () => {
-    await app.client.element(srcInput).setValue(glob0);
-    await app.client.element('button=Add source').click();
-    await app.client.waitForVisible('//ul/li/div/input');
-    const inputValue = await app.client.element('//ul/li/div/input').getValue();
-    expect(inputValue).to.be.eq(glob0);
-  });
-
-  it('adds second data source', async () => {
-    await app.client.waitForVisible(srcInput);
-    const input = app.client.element(srcInput);
-    await input.setValue(glob1);
-    await app.client.element('button=Add source').click();
-    await app.client.waitForVisible('//ul/li[2]/div/input');
-    const inputValue = await app.client.element('//ul/li[2]/div/input').getValue();
-    expect(inputValue).to.be.eq(glob1);
-  });
-
-  it('creates project', async () => {
-    await app.client.element('button=Create').click();
+  await api.post('/project', {
+    description: {
+      name: 'testproj0',
+    },
+    template: {
+      task: 'classification',
+      xml,
+    },
+    data_sources: [
+      { type: 'local_directory', source_uri: glob0 },
+      { type: 'local_directory', source_uri: glob1 },
+    ],
   });
 }
 
-function itKeepsFocus() {
-  it('keeps the focus', async () => {
-    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
-    expect(device1).to.not.have.string('selected');
-    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
-    expect(device2).to.have.string('selected');
+function expectFocusIsOn(device) {
+  it(`focused on device ${device}`, async () => {
+    const device0 = await app.client.element('//*[@id="device0"]').getAttribute('class');
+    const device1 = await app.client.element('//*[@id="device1"]').getAttribute('class');
+    const deviceSubmit = await app.client.element('//*[@id="device_submit"]').getAttribute('class');
+
+    const pairs = [
+      ['device0', device0],
+      ['device1', device1],
+      ['device_submit', deviceSubmit],
+    ];
+
+    for (const [iterName, iterCl] of pairs) {
+      if (iterName === device) {
+        expect(iterCl).to.have.string('selected');
+      } else {
+        expect(iterCl).to.not.have.string('selected');
+      }
+    }
   });
 }
 
@@ -101,12 +83,11 @@ describe('Application launch', function () {
   </content>
   `;
 
-
-  createProjectWithTemplate(xml1);
-
   it('navigates to project page', async () => {
-    await sleep(500);
+    await createProject(xml1);
+    await app.client.refresh();
     await app.client.waitUntilTextExists('span', 'testproj0');
+    await sleep(1500);
     await app.client.element("button/*[@innertext='testproj0']").click();
   });
 
@@ -159,18 +140,21 @@ describe('Application launch', function () {
     return checked;
   };
 
+  expectFocusIsOn('device0');
+
   it('displays button 3 pressed', async () => {
     await app.client.keys('3');
     const disabled = await getDisabled();
     expect(disabled).to.be.deep.eq([false, false, true, false]);
   });
 
-  it('changes the focus', async () => {
-    const device1 = await app.client.element('//*[@id="device0"]').getAttribute('class');
-    expect(device1).to.not.have.string('selected');
-    const device2 = await app.client.element('//*[@id="device1"]').getAttribute('class');
-    expect(device2).to.have.string('selected');
-  });
+  expectFocusIsOn('device0');
+
+  it('submits radio field', async () => {
+    await app.client.keys('Enter');
+  })
+
+  expectFocusIsOn('device1');
 
   it('displays button 1 pressed', async () => {
     await getBtn(app, 1).click();
@@ -178,7 +162,7 @@ describe('Application launch', function () {
     expect(disabled).to.be.deep.eq([true, false, false, false]);
   });
 
-  itKeepsFocus();
+  expectFocusIsOn('device1');
 
   it('displays checkbox 2 as checked', async () => {
     await app.client.keys('2');
@@ -187,7 +171,7 @@ describe('Application launch', function () {
     expect(checked).to.be.deep.eq([false, true, false]);
   });
 
-  itKeepsFocus();
+  expectFocusIsOn('device1');
 
   it('displays checkboxes 1,2 as checked', async () => {
     await app.client.keys('1');
@@ -196,7 +180,7 @@ describe('Application launch', function () {
     expect(checked).to.be.deep.eq([true, true, false]);
   });
 
-  itKeepsFocus();
+  expectFocusIsOn('device1');
 
   it('displays all checkboxes as checked', async () => {
     await app.client.keys('3');
@@ -205,14 +189,15 @@ describe('Application launch', function () {
     expect(checked).to.be.deep.eq([true, true, true]);
   });
 
-  itKeepsFocus();
+  expectFocusIsOn('device1');
 
   it('displays checkbox 2 as unchecked', async () => {
     await app.client.keys('2');
 
     const checked = await getChecked();
     expect(checked).to.be.deep.eq([true, false, true]);
+    await app.client.keys('Enter');
   });
 
-  itKeepsFocus();
+  expectFocusIsOn('device_submit');
 });
