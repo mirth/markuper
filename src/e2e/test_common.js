@@ -6,7 +6,7 @@ export const getBtn = (app, i) => app.client.element('//*[@id="grid"]').element(
 export const getChbox = (app, device, i) => {
   const el = app.client.element(`//*[@id="${device}"]/div/ul/li[${i}]/label/input`);
   return el;
-}
+};
 
 export const assertButtonLabels = async (app) => {
   let btnTxt = await getBtn(app, 1).element('.//span').getText();

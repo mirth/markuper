@@ -152,7 +152,7 @@ describe('Application launch', function () {
 
   it('submits radio field', async () => {
     await app.client.keys('Enter');
-  })
+  });
 
   expectFocusIsOn('device1');
 

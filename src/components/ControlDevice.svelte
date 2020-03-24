@@ -9,14 +9,14 @@ import { getFieldsInOrderFor } from '../template';
 export let submitMarkupAndFetchNext;
 export let sample;
 
-if(sample.markup) {
+if (sample.markup) {
   $activeMarkup = sample.markup.markup;
 }
 
 const [fields, groupsOrder] = getFieldsInOrderFor(sample.template);
 const submitGroup = '[submit]';
 
-groupsOrder.push(submitGroup)
+groupsOrder.push(submitGroup);
 
 let fieldIter = 0;
 let keyDown = null;
@@ -36,7 +36,7 @@ function handleKeyup(event) {
 
   // onKeyEnter
   if (event.key === 'Enter') {
-    if(fieldIter === groupsOrder.length - 1) {
+    if (fieldIter === groupsOrder.length - 1) {
       submitMarkupAndFetchNext();
     }
     focusOnNextField();
