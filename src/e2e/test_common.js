@@ -46,11 +46,11 @@ export const createProject = async (appPath, xml) => {
 
 export const itNavigatesToProject = (app, appPath, xml) => {
   it('navigates to project page', async () => {
-    await sleep(1500);
+    await sleep(2000);
     await createProject(appPath, xml);
     await app.client.refresh();
     await app.client.waitUntilTextExists('span', 'testproj0');
-    await sleep(1500);
+    await sleep(2000);
     await app.client.element("button/*[@innertext='testproj0']").click();
   });
 };

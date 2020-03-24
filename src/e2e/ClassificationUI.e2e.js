@@ -130,6 +130,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
   };
 
   it('displays correct devices labels', async () => {
+    await sleep(2000);
     await assertCheckBoxLabels('device0');
     await assertRadioLabels(app, 'device1', ['Cat', 'Dog', 'Chuk', 'Gek']);
     await assertRadioLabels(app, 'device2', ['Smoll', 'Big']);
