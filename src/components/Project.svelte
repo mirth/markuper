@@ -29,7 +29,11 @@ function exportProject(p) {
 }
 
 function formatMarkup(markup) {
-  return _(markup).toPairs().map(([labelName, labelValue]) => `${labelName}: ${labelValue}`).join('\n');
+  return Object.keys(markup)
+    .sort()
+    .map((labelName) => [labelName, markup[labelName]])
+    .map(([labelName, labelValue]) => `${labelName}: ${labelValue}`)
+    .join(', ');
 }
 
 let assessedList = [];

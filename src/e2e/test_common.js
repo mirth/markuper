@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import api from '../api';
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
-export const getBtn = (app, i) => app.client.element('//*[@id="grid"]').element(`./div/div[2]/div/div/div/div[1]/ul/li[${i}]/div/button`);
+export const getBtn = (app, device, i) => app.client.element(`//*[@id="${device}"]/ul/li[${i}]/div/button`);
 export const getChbox = (app, device, i) => {
   const el = app.client.element(`//*[@id="${device}"]/div/ul/li[${i}]/label/input`);
   return el;
@@ -20,7 +20,7 @@ export const assertRadioLabels = async (app, device, expectedLabels) => {
   expect(actualLabels).to.be.deep.eq(expectedLabels);
 };
 
-function sleep(ms) {
+export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -54,3 +54,6 @@ export const itNavigatesToProject = (app, appPath, xml) => {
     await app.client.element("button/*[@innertext='testproj0']").click();
   });
 };
+
+export const getSamplePath = (app, filename) => app.client.element(`small*=${filename}`);
+export const getSampleClass = (app, filename) => getSamplePath(app, filename).element('../..').element('./span');
