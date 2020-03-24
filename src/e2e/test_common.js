@@ -9,32 +9,22 @@ export const getChbox = (app, device, i) => {
   return el;
 };
 
-export const assertButtonLabels = async (app) => {
-  let btnTxt = await getBtn(app, 1).element('.//span').getText();
-  expect(btnTxt).to.be.eq('Cat');
-  btnTxt = await getBtn(app, 2).element('.//span').getText();
-  expect(btnTxt).to.be.eq('Dog');
-  btnTxt = await getBtn(app, 3).element('.//span').getText();
-  expect(btnTxt).to.be.eq('Chuk');
-  btnTxt = await getBtn(app, 4).element('.//span').getText();
-  expect(btnTxt).to.be.eq('Gek');
+export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
+
+export const assertRadioLabels = async (app, device, expectedLabels) => {
+  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/div/button`);
+  const actualLabels = await Promise.all(elements.value.map(async (el) => {
+    const txt = await app.client.elementIdText(el.ELEMENT);
+    return txt.value;
+  }));
+  expect(actualLabels).to.be.deep.eq(expectedLabels);
 };
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const itNavigatesToProject = (app, appPath, xml) => {
-  it('navigates to project page', async () => {
-    await createProject(appPath, xml);
-    await app.client.refresh();
-    await app.client.waitUntilTextExists('span', 'testproj0');
-    await sleep(1500);
-    await app.client.element("button/*[@innertext='testproj0']").click();
-  });
-}
-
-export const createProject = async(appPath, xml) => {
+export const createProject = async (appPath, xml) => {
   const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
   const glob0 = path.join(imgDir, '*.jpg');
   const glob1 = path.join(imgDir, '*.png');
@@ -52,4 +42,15 @@ export const createProject = async(appPath, xml) => {
       { type: 'local_directory', source_uri: glob1 },
     ],
   });
-}
+};
+
+export const itNavigatesToProject = (app, appPath, xml) => {
+  it('navigates to project page', async () => {
+    await sleep(1500);
+    await createProject(appPath, xml);
+    await app.client.refresh();
+    await app.client.waitUntilTextExists('span', 'testproj0');
+    await sleep(1500);
+    await app.client.element("button/*[@innertext='testproj0']").click();
+  });
+};

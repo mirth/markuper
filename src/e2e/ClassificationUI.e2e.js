@@ -6,15 +6,15 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
-import { getBtn, assertButtonLabels, itNavigatesToProject } from './test_common';
+import {
+  getPath, getBtn, assertRadioLabels, itNavigatesToProject,
+} from './test_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
   path: electronPath,
   args: [appPath],
 });
-
-
 
 
 function expectFocusIsOn(device) {
@@ -58,12 +58,11 @@ const getChecked = async (device) => {
   return checked;
 };
 
-const getPath = (el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 
 async function assertCheckBoxLabels(device) {
   const elements = await app.client.elements(`//*[@id="${device}"]/div/ul/li/label/input`);
   const labels = await Promise.all(elements.value.map(async (el) => {
-    const kek = await getPath(el, '..');
+    const kek = await getPath(app, el, '..');
     const txt = await app.client.elementIdText(kek.value.ELEMENT);
     return txt.value;
   }));
@@ -104,7 +103,7 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
 
   it('displays correct devices labels', async () => {
-    await assertButtonLabels(app);
+    await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
     await assertCheckBoxLabels('device1');
   });
 
@@ -175,4 +174,46 @@ describe('Focus and state [Radio, Checkbox]', function () {
   });
 
   expectFocusIsOn('device_submit');
+});
+
+
+describe('Focus and state [Checkbox, Radio, Radio]', function () {
+  this.timeout(10000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  const xml = `
+  <content>
+    <checkbox group="color" value="black" vizual="Black" />
+    <checkbox group="color" value="white" vizual="White" />
+    <checkbox group="color" value="pink" vizual="Pink" />
+
+    <radio group="animal" value="cat" vizual="Cat" />
+    <radio group="animal" value="dog" vizual="Dog" />
+    <radio group="animal" value="chuk" vizual="Chuk" />
+    <radio group="animal" value="gek" vizual="Gek" />
+
+    <radio group="size" value="big" vizual="Big" />
+    <radio group="size" value="smoll" vizual="Small" />
+  </content>
+  `;
+
+  itNavigatesToProject(app, appPath, xml);
+
+  it('begins assess', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+
+    // fixme
+    const beginAssess = app.client.element('//*[@id="grid"]/div/div[2]/div/div/div/div/div[1]/div/div[3]/div/div/button[1]');
+    await beginAssess.click();
+  });
+
+  it('displays correct devices labels', async () => {
+    await assertCheckBoxLabels('device0');
+    await assertRadioLabels(app, 'device1', ['Cat', 'Dog', 'Chuk', 'Gek']);
+  });
 });

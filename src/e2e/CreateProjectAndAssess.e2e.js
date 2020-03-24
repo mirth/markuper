@@ -5,7 +5,7 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
-import { makeUrl, getBtn, assertButtonLabels } from './test_common';
+import { makeUrl, getBtn, assertRadioLabels } from './test_common';
 
 
 const appPath = path.join(__dirname, '../..');
@@ -107,7 +107,7 @@ describe('Application launch', function () {
 
     it('assesses 1st jpg sample', async () => {
       await app.client.waitForExist('img');
-      await assertButtonLabels(app);
+      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek0.jpg'));
       await app.client.keys('3');
@@ -117,7 +117,7 @@ describe('Application launch', function () {
 
     it('assesses 2nd jpg sample', async () => {
       await app.client.waitForExist('img');
-      await assertButtonLabels(app);
+      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek1.jpg'));
       await getBtn(app, 2).click();
@@ -127,7 +127,7 @@ describe('Application launch', function () {
 
     it('assesses 3rd jpg sample', async () => {
       await app.client.waitForExist('img');
-      await assertButtonLabels(app);
+      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek2.jpg'));
       await app.client.keys('2');
@@ -137,7 +137,7 @@ describe('Application launch', function () {
 
     it('assesses 1st png sample', async () => {
       await app.client.waitForExist('img');
-      await assertButtonLabels(app);
+      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek3.png'));
       await getBtn(app, 1).click();
@@ -147,7 +147,7 @@ describe('Application launch', function () {
 
     it('assesses 2nd png sample', async () => {
       await app.client.waitForExist('img');
-      await assertButtonLabels(app);
+      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek4.png'));
       await getBtn(app, 1).click();
