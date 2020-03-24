@@ -12,6 +12,7 @@ import Block from 'svelte-atoms/Block.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
+import { getFieldsInOrderFor } from '../template';
 
 export let params;
 
@@ -28,7 +29,11 @@ function exportProject(p) {
 }
 
 function formatMarkup(markup) {
-  return _(markup).toPairs().map(([labelName, labelValue]) => `${labelName}: ${labelValue}`).join('\n');
+  return Object.keys(markup)
+    .sort()
+    .map((labelName) => [labelName, markup[labelName]])
+    .map(([labelName, labelValue]) => `${labelName}: ${labelValue}`)
+    .join(', ');
 }
 
 let assessedList = [];
@@ -37,14 +42,15 @@ $: assessedList = _.orderBy($activeProject.assessed.list, 'sample_markup.created
 onMount(async () => {
   await fetchProject(params.project_id);
 });
+
+let fields = [];
+$: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
 </script>
 
 
 
 <PageBlank>
 <Block>
-<!-- fixme -->
-{#if $activeProject.template}
 <Row>
 <Cell>
 <Row>
@@ -54,8 +60,8 @@ onMount(async () => {
     {#each $activeProject.data_sources as src}
       <p>Data source: <span>{src.source_uri}</span></p>
     {/each}
-    {#each $activeProject.template.radios as radio}
-      <p>Labels: <span>{labelsStr(radio)}</span></p>
+    {#each fields as field}
+      <p>Labels: <span>{labelsStr(field)}</span></p>
     {/each}
   </Cell>
 </Row>
@@ -77,7 +83,6 @@ onMount(async () => {
 <Spacer size={32} />
 <Row>
 <Cell>
-<!-- fixme e2e no samples assessed yet-->
 {#if assessedList.length === 0}
 <Typography type='title' block>No samples have assessed yet</Typography>
 {:else}
@@ -97,7 +102,6 @@ onMount(async () => {
 </ul>
 </Cell>
 </Row>
-{/if}
 </Block>
 </PageBlank>
 

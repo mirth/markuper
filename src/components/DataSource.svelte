@@ -1,5 +1,4 @@
 <script>
-import isGlob from 'is-valid-glob';
 import Input from 'svelte-atoms/Input.svelte';
 
 export let dataSource;

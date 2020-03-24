@@ -1,5 +1,6 @@
 <script>
 import './global.svelte';
+import 'svelte-atoms/Variables.svelte';
 
 import Router from 'svelte-spa-router';
 import GetStarted from './components/GetStarted.svelte';

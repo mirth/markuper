@@ -23,8 +23,14 @@ type RadioField struct {
 	Labels []ValueWithVizual `json:"labels"`
 }
 
-func NewRadioField(group string) RadioField {
-	return RadioField{
+type CheckboxField struct {
+	Type   string            `json:"type"`
+	Group  string            `json:"group"`
+	Labels []ValueWithVizual `json:"labels"`
+}
+
+func NewRadioField(group string) *RadioField {
+	return &RadioField{
 		Group:  group,
 		Type:   "radio",
 		Labels: make([]ValueWithVizual, 0),
@@ -35,9 +41,23 @@ func (f RadioField) JSON() ([]byte, error) {
 	return json.Marshal(f)
 }
 
+func NewCheckboxField(group string) *CheckboxField {
+	return &CheckboxField{
+		Group:  group,
+		Type:   "checkbox",
+		Labels: make([]ValueWithVizual, 0),
+	}
+}
+
+func (f CheckboxField) JSON() ([]byte, error) {
+	return json.Marshal(f)
+}
+
 type Template struct {
-	Radios []RadioField `json:"radios"`
-	// FieldsOrder []string `json:"fields_order"`
+	Radios     []RadioField    `json:"radios"`
+	Checkboxes []CheckboxField `json:"checkboxes"`
+
+	FieldsOrder []string `json:"fields_order"`
 }
 
 type TemplateXML struct {

@@ -3,3 +3,8 @@ bundle.*
 backend/bin
 dist*
 .DS_Store
+
+#fixme
+public/cmd
+
+public/main

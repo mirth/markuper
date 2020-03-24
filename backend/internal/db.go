@@ -29,6 +29,17 @@ var (
 	Samples  []byte = []byte("samples")
 )
 
+func fixGob(p Project) Project {
+	if p.Template.Radios == nil {
+		p.Template.Radios = make([]RadioField, 0)
+	}
+	if p.Template.Checkboxes == nil {
+		p.Template.Checkboxes = make([]CheckboxField, 0)
+	}
+
+	return p
+}
+
 func (db *DB) GetProject(pID ProjectID) (Project, error) {
 	proj := Project{}
 	err := db.DB.View(func(tx *bolt.Tx) error {
@@ -49,6 +60,8 @@ func (db *DB) GetProject(pID ProjectID) (Project, error) {
 	if err != nil {
 		return Project{}, err
 	}
+
+	proj = fixGob(proj)
 
 	return proj, nil
 }

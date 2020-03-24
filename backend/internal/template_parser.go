@@ -33,45 +33,60 @@ func XMLToTemplate(s string) (Template, error) {
 	}
 
 	nodes := []Node{}
-	walk([]Node{n}, func(n Node) bool {
-		if n.XMLName.Local == "radio" {
-			nodes = append(nodes, n)
-		}
+	walkFirstLevel([]Node{n}, func(n Node) bool {
+		nodes = append(nodes, n)
 		return true
 	})
 
-	radiosByGroups := map[string]*RadioField{}
+	radiosByGroup := map[string]*RadioField{}
+	checkboxesByGroup := map[string]*CheckboxField{}
 	groupsByOrder := []string{}
 	for _, n := range nodes {
 		g := getGroup(n)
 		groupsByOrder = append(groupsByOrder, g)
 
-		{
-			r, ok := radiosByGroups[g]
-			if !ok {
-				newR := NewRadioField(g)
-				r = &newR
-				radiosByGroups[g] = r
-			}
-
-			r.Labels = append(r.Labels, ValueWithVizual{
+		appendLabels := func(labels []ValueWithVizual) []ValueWithVizual {
+			return append(labels, ValueWithVizual{
 				Vizual: getVizual(n),
 				Value:  getValue(n),
 			})
+		}
+
+		switch n.XMLName.Local {
+		case "radio":
+			f, ok := radiosByGroup[g]
+			if !ok {
+				f = NewRadioField(g)
+				radiosByGroup[g] = f
+			}
+
+			f.Labels = appendLabels(f.Labels)
+		case "checkbox":
+			f, ok := checkboxesByGroup[g]
+			if !ok {
+				f = NewCheckboxField(g)
+				checkboxesByGroup[g] = f
+			}
+
+			f.Labels = appendLabels(f.Labels)
 		}
 	}
 
 	groupsByOrder = utils.Unique(groupsByOrder)
 
-	radios := []RadioField{}
-	for _, group := range groupsByOrder {
-		r, _ := radiosByGroups[group]
-		// fixme assert ok
-		radios = append(radios, *r)
+	radios := make([]RadioField, 0)
+	checkboxes := make([]CheckboxField, 0)
+	for _, v := range radiosByGroup {
+		radios = append(radios, *v)
+	}
+	for _, v := range checkboxesByGroup {
+		checkboxes = append(checkboxes, *v)
 	}
 
 	return Template{
-		Radios: radios,
+		Radios:      radios,
+		Checkboxes:  checkboxes,
+		FieldsOrder: groupsByOrder,
 	}, nil
 }
 
@@ -87,9 +102,12 @@ func getValue(n Node) string {
 	return n.Attrs[1].Value
 }
 
-func walk(nodes []Node, f func(Node) bool) {
-	for _, n := range nodes {
+func walkFirstLevel(nodes []Node, f func(Node) bool) {
+	if len(nodes) == 0 {
+		return
+	}
+
+	for _, n := range nodes[0].Nodes {
 		f(n)
-		walk(n.Nodes, f)
 	}
 }
