@@ -6,8 +6,7 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
-import { getBtn, assertButtonLabels } from './test_common';
-import api from '../api';
+import { getBtn, assertButtonLabels, itNavigatesToProject } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -15,29 +14,8 @@ const app = new Application({
   args: [appPath],
 });
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
-async function createProject(xml) {
-  const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
-  const glob0 = path.join(imgDir, '*.jpg');
-  const glob1 = path.join(imgDir, '*.png');
 
-  await api.post('/project', {
-    description: {
-      name: 'testproj0',
-    },
-    template: {
-      task: 'classification',
-      xml,
-    },
-    data_sources: [
-      { type: 'local_directory', source_uri: glob0 },
-      { type: 'local_directory', source_uri: glob1 },
-    ],
-  });
-}
 
 function expectFocusIsOn(device) {
   it(`focused on device ${device}`, async () => {
@@ -92,8 +70,8 @@ async function assertCheckBoxLabels(device) {
   expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
 }
 
-describe('Radio + Checkbox fields', function () {
-  this.timeout(30000);
+describe('Focus and state [Radio, Checkbox]', function () {
+  this.timeout(10000);
   before(() => app.start());
   after(() => {
     if (app && app.isRunning()) {
@@ -101,7 +79,7 @@ describe('Radio + Checkbox fields', function () {
     }
   });
 
-  const xml1 = `
+  const xml = `
   <content>
     <radio group="animal" value="cat" vizual="Cat" />
     <radio group="animal" value="dog" vizual="Dog" />
@@ -114,13 +92,7 @@ describe('Radio + Checkbox fields', function () {
   </content>
   `;
 
-  it('navigates to project page', async () => {
-    await createProject(xml1);
-    await app.client.refresh();
-    await app.client.waitUntilTextExists('span', 'testproj0');
-    await sleep(1500);
-    await app.client.element("button/*[@innertext='testproj0']").click();
-  });
+  itNavigatesToProject(app, appPath, xml);
 
   it('begins assess', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
