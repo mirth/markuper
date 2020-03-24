@@ -61,7 +61,38 @@ function expectFocusIsOn(device) {
   });
 }
 
-describe('Application launch', function () {
+const getDisabled = async (device) => {
+  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/div/button`);
+  const disabled = await Promise.all(elements.value.map(async (el) => {
+    const cl = await app.client.elementIdAttribute(el.ELEMENT, 'class');
+    return cl.value.includes('disabled');
+  }));
+
+  return disabled;
+};
+const getChecked = async (device) => {
+  const elements = await app.client.elements(`//*[@id="${device}"]/div/ul/li/label/input`);
+  const checked = await Promise.all(elements.value.map(async (el) => {
+    const ch = await app.client.elementIdSelected(el.ELEMENT, 'checked');
+    return ch.value;
+  }));
+
+  return checked;
+};
+
+const getPath = (el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
+
+async function assertCheckBoxLabels(device) {
+  const elements = await app.client.elements(`//*[@id="${device}"]/div/ul/li/label/input`);
+  const labels = await Promise.all(elements.value.map(async (el) => {
+    const kek = await getPath(el, '..');
+    const txt = await app.client.elementIdText(kek.value.ELEMENT);
+    return txt.value;
+  }));
+  expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
+}
+
+describe('Radio + Checkbox fields', function () {
   this.timeout(30000);
   before(() => app.start());
   after(() => {
@@ -99,19 +130,10 @@ describe('Application launch', function () {
     await beginAssess.click();
   });
 
-  const getPath = (el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 
   it('displays correct devices labels', async () => {
     await assertButtonLabels(app);
-
-
-    const elements = await app.client.elements('//*[@id="device1"]/div/ul/li/label/input');
-    const labels = await Promise.all(elements.value.map(async (el) => {
-      const kek = await getPath(el, '..');
-      const txt = await app.client.elementIdText(kek.value.ELEMENT);
-      return txt.value;
-    }));
-    expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
+    await assertCheckBoxLabels('device1');
   });
 
   it('selects first device', async () => {
@@ -121,30 +143,11 @@ describe('Application launch', function () {
     expect(device2).to.not.have.string('selected');
   });
 
-  const getDisabled = async () => {
-    const elements = await app.client.elements('//*[@id="device0"]/ul/li/div/button');
-    const disabled = await Promise.all(elements.value.map(async (el) => {
-      const cl = await app.client.elementIdAttribute(el.ELEMENT, 'class');
-      return cl.value.includes('disabled');
-    }));
-
-    return disabled;
-  };
-  const getChecked = async () => {
-    const elements = await app.client.elements('//*[@id="device1"]/div/ul/li/label/input');
-    const checked = await Promise.all(elements.value.map(async (el) => {
-      const ch = await app.client.elementIdSelected(el.ELEMENT, 'checked');
-      return ch.value;
-    }));
-
-    return checked;
-  };
-
   expectFocusIsOn('device0');
 
   it('displays button 3 pressed', async () => {
     await app.client.keys('3');
-    const disabled = await getDisabled();
+    const disabled = await getDisabled('device0');
     expect(disabled).to.be.deep.eq([false, false, true, false]);
   });
 
@@ -158,7 +161,7 @@ describe('Application launch', function () {
 
   it('displays button 1 pressed', async () => {
     await getBtn(app, 1).click();
-    const disabled = await getDisabled();
+    const disabled = await getDisabled('device0');
     expect(disabled).to.be.deep.eq([true, false, false, false]);
   });
 
@@ -167,7 +170,7 @@ describe('Application launch', function () {
   it('displays checkbox 2 as checked', async () => {
     await app.client.keys('2');
 
-    const checked = await getChecked();
+    const checked = await getChecked('device1');
     expect(checked).to.be.deep.eq([false, true, false]);
   });
 
@@ -176,7 +179,7 @@ describe('Application launch', function () {
   it('displays checkboxes 1,2 as checked', async () => {
     await app.client.keys('1');
 
-    const checked = await getChecked();
+    const checked = await getChecked('device1');
     expect(checked).to.be.deep.eq([true, true, false]);
   });
 
@@ -185,7 +188,7 @@ describe('Application launch', function () {
   it('displays all checkboxes as checked', async () => {
     await app.client.keys('3');
 
-    const checked = await getChecked();
+    const checked = await getChecked('device1');
     expect(checked).to.be.deep.eq([true, true, true]);
   });
 
@@ -194,7 +197,7 @@ describe('Application launch', function () {
   it('displays checkbox 2 as unchecked', async () => {
     await app.client.keys('2');
 
-    const checked = await getChecked();
+    const checked = await getChecked('device1');
     expect(checked).to.be.deep.eq([true, false, true]);
     await app.client.keys('Enter');
   });
