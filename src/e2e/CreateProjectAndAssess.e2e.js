@@ -6,7 +6,8 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  makeUrl, getBtn, assertRadioLabels, getSamplePath, getSampleClass,
+  makeUrl, getBtn, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
+  sleep,
 } from './test_common';
 
 
@@ -16,9 +17,6 @@ const app = new Application({
   args: [appPath],
 });
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 // pause
 describe('Application launch', function () {
   this.timeout(30000);
@@ -30,61 +28,15 @@ describe('Application launch', function () {
   });
 
   describe('Creates project and assesses samples', () => {
-    it('opens Create New Project popup', async () => {
-      await app.client.waitForVisible('button');
-      await app.client.element('button').click();
-      await app.client.waitForVisible('input');
-    });
-
-    it('inputs new project name', async () => {
-      await sleep(2000);
-      await app.client.element('input').setValue('testproj0');
-    });
-
-    it('set project task', async () => {
-      const template = "input[placeholder='Select task']";
-      await app.client.waitForExist(template);
-      await app.client.element(template).setValue('classification');
-    });
-
-    it('set xml for template', async () => {
-      await app.client.elements('textarea').setValue(`
-      <content>
-        <radio group="animal" value="cat" vizual="Cat" />
-        <radio group="animal" value="dog" vizual="Dog" />
-        <radio group="animal" value="chuk" vizual="Chuk" />
-        <radio group="animal" value="gek" vizual="Gek" />
-      </content>
-      `);
-    });
-
-    const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
-    const glob0 = path.join(imgDir, '*.jpg');
-    const glob1 = path.join(imgDir, '*.png');
-
-    const srcInput = "input[placeholder='/some/path or /some/glob/*.jpg']";
-
-    it('adds first data source', async () => {
-      await app.client.element(srcInput).setValue(glob0);
-      await app.client.element('button=Add source').click();
-      await app.client.waitForVisible('//ul/li/div/input');
-      const inputValue = await app.client.element('//ul/li/div/input').getValue();
-      expect(inputValue).to.be.eq(glob0);
-    });
-
-    it('adds second data source', async () => {
-      await app.client.waitForVisible(srcInput);
-      const input = app.client.element(srcInput);
-      await input.setValue(glob1);
-      await app.client.element('button=Add source').click();
-      await app.client.waitForVisible('//ul/li[2]/div/input');
-      const inputValue = await app.client.element('//ul/li[2]/div/input').getValue();
-      expect(inputValue).to.be.eq(glob1);
-    });
-
-    it('creates project', async () => {
-      await app.client.element('button=Create').click();
-    });
+    const xml = `
+    <content>
+      <radio group="animal" value="cat" vizual="Cat" />
+      <radio group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="chuk" vizual="Chuk" />
+      <radio group="animal" value="gek" vizual="Gek" />
+    </content>
+    `;
+    const [imgDir, glob0, glob1] = createProjectWithTemplate(app, appPath, xml);
 
     it('navigates to project page', async () => {
       await sleep(500);

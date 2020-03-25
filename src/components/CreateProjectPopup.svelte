@@ -37,20 +37,30 @@ function isProjectValid() {
   return true;
 }
 
+let createProjectError;
+
 async function createNewProject() {
   if (!isProjectValid()) {
     return;
   }
 
-  await api.post('/project', {
+  const res = await api.post('/project', {
     description: {
       name: projectName,
     },
     template: selectedTemplate.template,
     data_sources: dataSources.dataSources,
   });
-  await fetchProjectList();
-  close();
+
+  if (res.status === 400) {
+    createProjectError = res.data.error;
+  }
+
+  if (!Object.hasOwnProperty.call(res, 'status')) {
+    createProjectError = null;
+    await fetchProjectList();
+    close();
+  }
 }
 
 $: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
@@ -76,7 +86,12 @@ $: projectNameError = (projectName.trim().length === 0) && 'Project name should 
 <Spacer size={24} />
 <DataSourcePicker {dataSources} />
 <Spacer size={36} />
+<div style='display: inline;'>
+{#if createProjectError}
+<span id='create_project_error'>{createProjectError}</span>
+{/if}
 <Button on:click={createNewProject} style='float: right; margin-bottom: 20px; margin-right: 20px;'>Create</Button>
+</div>
 
 <style>
 span {

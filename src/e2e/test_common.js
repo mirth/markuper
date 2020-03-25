@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import path from 'path';
 import { expect } from 'chai';
 import api from '../api';
@@ -57,3 +58,60 @@ export const itNavigatesToProject = (app, appPath, xml) => {
 
 export const getSamplePath = (app, filename) => app.client.element(`small*=${filename}`);
 export const getSampleClass = (app, filename) => getSamplePath(app, filename).element('../..').element('./span');
+
+export function createProjectWithTemplate(app, appPath, xml) {
+  it('opens Create New Project popup', async () => {
+    await app.client.waitForVisible('button');
+    await app.client.element('button').click();
+    await app.client.waitForVisible('input');
+  });
+
+  it('inputs new project name', async () => {
+    await sleep(2000);
+    await app.client.element('input').setValue('testproj0');
+  });
+
+  it('show no project create error', async () => {
+    const errorExists = await app.client.isExisting('//*[@id="create_project_error"]');
+    expect(errorExists).to.be.false;
+  });
+
+  it('set project task', async () => {
+    const template = "input[placeholder='Select task']";
+    await app.client.waitForExist(template);
+    await app.client.element(template).setValue('classification');
+  });
+
+  it('set xml for template', async () => {
+    await app.client.elements('textarea').setValue(xml);
+  });
+
+  const srcInput = "input[placeholder='/some/path or /some/glob/*.jpg']";
+  const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
+  const glob0 = path.join(imgDir, '*.jpg');
+  const glob1 = path.join(imgDir, '*.png');
+
+  it('adds first data source', async () => {
+    await app.client.element(srcInput).setValue(glob0);
+    await app.client.element('button=Add source').click();
+    await app.client.waitForVisible('//ul/li/div/input');
+    const inputValue = await app.client.element('//ul/li/div/input').getValue();
+    expect(inputValue).to.be.eq(glob0);
+  });
+
+  it('adds second data source', async () => {
+    await app.client.waitForVisible(srcInput);
+    const input = app.client.element(srcInput);
+    await input.setValue(glob1);
+    await app.client.element('button=Add source').click();
+    await app.client.waitForVisible('//ul/li[2]/div/input');
+    const inputValue = await app.client.element('//ul/li[2]/div/input').getValue();
+    expect(inputValue).to.be.eq(glob1);
+  });
+
+  it('creates project', async () => {
+    await app.client.element('button=Create').click();
+  });
+
+  return [imgDir, glob0, glob1];
+}
