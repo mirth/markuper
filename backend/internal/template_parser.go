@@ -4,6 +4,8 @@ import (
 	"backend/pkg/utils"
 	"bytes"
 	"encoding/xml"
+	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -83,11 +85,44 @@ func XMLToTemplate(s string) (Template, error) {
 		checkboxes = append(checkboxes, *v)
 	}
 
-	return Template{
+	t := Template{
 		Radios:      radios,
 		Checkboxes:  checkboxes,
 		FieldsOrder: groupsByOrder,
-	}, nil
+	}
+
+	duplicateGroups := duplicatedGroups(t)
+
+	if len(duplicateGroups) > 0 {
+		errMsg := fmt.Sprintf(
+			"Template has duplicate groups: %s",
+			strings.Join(duplicateGroups, ", "),
+		)
+		return Template{}, NewBusinessError(errMsg)
+	}
+
+	return t, nil
+}
+
+func duplicatedGroups(t Template) []string {
+	groupCount := map[string]int{}
+
+	for _, f := range t.Radios {
+		groupCount[f.Group] += 1
+	}
+
+	for _, f := range t.Checkboxes {
+		groupCount[f.Group] += 1
+	}
+
+	dups := make([]string, 0)
+	for l, c := range groupCount {
+		if c > 1 {
+			dups = append(dups, l)
+		}
+	}
+
+	return dups
 }
 
 func getVizual(n Node) string {

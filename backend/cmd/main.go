@@ -10,6 +10,7 @@ import (
 
 	"backend/internal"
 
+	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -62,6 +63,20 @@ func withRequest(ctx context.Context, req *http.Request) (request interface{}, e
 	}, nil
 }
 
+func newServer(
+	e endpoint.Endpoint,
+	dec httptransport.DecodeRequestFunc,
+	enc httptransport.EncodeResponseFunc) *httptransport.Server {
+	return httptransport.NewServer(e, dec, enc, httptransport.ServerErrorEncoder(func(_ context.Context, err error, w http.ResponseWriter) {
+		var e *internal.BusingessLogicError
+
+		if errors.As(err, &e) {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, e.Error())))
+		}
+	}))
+}
+
 func main() {
 	db, err := internal.OpenDB(os.Getenv("ENV") == "test")
 	if err != nil {
@@ -74,7 +89,7 @@ func main() {
 	pts := internal.NewTemplateService()
 	e := internal.NewExporterService(db)
 
-	nextHandler := httptransport.NewServer(
+	nextHandler := newServer(
 		internal.NextSampleEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.WithProjectIDRequest{}
@@ -82,7 +97,7 @@ func main() {
 		encodeResponse,
 	)
 
-	assessHandler := httptransport.NewServer(
+	assessHandler := newServer(
 		internal.AssessEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.AssessRequest{}
@@ -90,7 +105,7 @@ func main() {
 		encodeResponse,
 	)
 
-	listMarkupHandler := httptransport.NewServer(
+	listMarkupHandler := newServer(
 		internal.ListMarkupEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.WithProjectIDRequest{}
@@ -98,7 +113,7 @@ func main() {
 		encodeResponse,
 	)
 
-	createProjectHandler := httptransport.NewServer(
+	createProjectHandler := newServer(
 		internal.CreateProjectEndpoint(ps),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.CreateProjectRequest{}
@@ -106,13 +121,13 @@ func main() {
 		encodeResponse,
 	)
 
-	listProjectsHandler := httptransport.NewServer(
+	listProjectsHandler := newServer(
 		internal.ListProjectsEndpoint(ps),
 		httptransport.NopRequestDecoder,
 		encodeResponse,
 	)
 
-	getProjectEndpoint := httptransport.NewServer(
+	getProjectEndpoint := newServer(
 		internal.GetProjectEndpoint(ps),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.WithProjectIDRequest{}
@@ -120,7 +135,7 @@ func main() {
 		encodeResponse,
 	)
 
-	listTemplatesEndpoint := httptransport.NewServer(
+	listTemplatesEndpoint := newServer(
 		internal.ListTemplatesEndpoint(pts),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.WithProjectIDRequest{}
@@ -128,13 +143,13 @@ func main() {
 		encodeResponse,
 	)
 
-	exportToCsvEnpoint := httptransport.NewServer(
+	exportToCsvEnpoint := newServer(
 		internal.ExportEndpoint(e),
 		withRequest,
 		streamFile,
 	)
 
-	getSampleEndpoint := httptransport.NewServer(
+	getSampleEndpoint := newServer(
 		internal.GetSampleEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
 			return &internal.SampleID{}
