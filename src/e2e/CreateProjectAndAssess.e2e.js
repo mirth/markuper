@@ -170,6 +170,7 @@ describe('Application launch', function () {
 
     it("changes class to 'gek'", async () => {
       await getBtn(app, 'device0', 4).click();
+      await sleep(500);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
       await app.client.element("button/*[@innertext='testproj0']").click();
