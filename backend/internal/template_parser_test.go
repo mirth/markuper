@@ -6,6 +6,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestUnsupportedElement(t *testing.T) {
+	data := `
+	<content>
+		<radio group="animal" value="cat" vizual="Cat" />
+		<radio group="animal" value="dog" vizual="Dog" />
+
+		<kek group="color" value="black" vizual="Black" />
+		<kek group="color" value="white" vizual="White" />
+		<kek group="color" value="pink" vizual="Pink" />
+	</content>
+	`
+	_, err := XMLToTemplate(data)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Unsupported element [kek]", err.Error())
+}
+
 func TestXMLToTemplateRadios(t *testing.T) {
 	{
 		data := `
