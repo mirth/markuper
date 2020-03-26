@@ -71,6 +71,10 @@ func XMLToTemplate(s string) (Template, error) {
 			}
 
 			f.Labels = appendLabels(f.Labels)
+		default:
+			return Template{}, NewBusinessError(
+				fmt.Sprintf("Unsupported element [%s]", n.XMLName.Local),
+			)
 		}
 	}
 
