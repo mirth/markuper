@@ -227,6 +227,13 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   focusIsOn('device0');
 
+  it('tries to submit empty radio field', async () => {
+    await app.client.keys('Enter');
+    await sleep(1500);
+  });
+
+  focusIsOn('device0');
+
   it('displays button 3 pressed', async () => {
     await app.client.keys('3');
     const disabled = await getDisabled('device0');
