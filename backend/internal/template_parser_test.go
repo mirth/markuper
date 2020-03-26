@@ -6,6 +6,47 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestMissingAttribute(t *testing.T) {
+	{
+		data := `
+		<content>
+			<radio group="animal" value="cat" vizual="Cat" />
+			<radio group="animal" value="dog" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Element [radio] missing the attribute [vizual]", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+			<radio group="animal" />
+			<radio group="animal" value="dog" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Element [radio] missing the attribute [value]", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+			<checkbox />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Element [checkbox] missing the attribute [group]", err.Error())
+	}
+
+}
+
 func TestUnsupportedElement(t *testing.T) {
 	data := `
 	<content>

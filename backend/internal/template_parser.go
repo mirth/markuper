@@ -24,6 +24,33 @@ func (n *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return d.DecodeElement((*node)(n), &start)
 }
 
+func missingAttribute(nodes []Node) (Node, string) {
+	for _, n := range nodes {
+		{
+			_, ok := getAttrByName(n, "group")
+			if !ok {
+				return n, "group"
+			}
+		}
+
+		{
+			_, ok := getAttrByName(n, "value")
+			if !ok {
+				return n, "value"
+			}
+		}
+
+		{
+			_, ok := getAttrByName(n, "vizual")
+			if !ok {
+				return n, "vizual"
+			}
+		}
+	}
+
+	return Node{}, ""
+}
+
 func XMLToTemplate(s string) (Template, error) {
 	buf := bytes.NewBuffer([]byte(s))
 	dec := xml.NewDecoder(buf)
@@ -39,6 +66,18 @@ func XMLToTemplate(s string) (Template, error) {
 		nodes = append(nodes, n)
 		return true
 	})
+
+	{
+		targetNode, missingAttr := missingAttribute(nodes)
+		if len(missingAttr) > 0 {
+			errMsg := fmt.Sprintf(
+				"Element [%s] missing the attribute [%s]",
+				targetNode.XMLName.Local,
+				missingAttr,
+			)
+			return Template{}, NewBusinessError(errMsg)
+		}
+	}
 
 	radiosByGroup := map[string]*RadioField{}
 	checkboxesByGroup := map[string]*CheckboxField{}
@@ -95,14 +134,16 @@ func XMLToTemplate(s string) (Template, error) {
 		FieldsOrder: groupsByOrder,
 	}
 
-	duplicateGroups := duplicatedGroups(t)
+	{
+		duplicateGroups := duplicatedGroups(t)
 
-	if len(duplicateGroups) > 0 {
-		errMsg := fmt.Sprintf(
-			"Template has duplicate groups: %s",
-			strings.Join(duplicateGroups, ", "),
-		)
-		return Template{}, NewBusinessError(errMsg)
+		if len(duplicateGroups) > 0 {
+			errMsg := fmt.Sprintf(
+				"Template has duplicate groups: %s",
+				strings.Join(duplicateGroups, ", "),
+			)
+			return Template{}, NewBusinessError(errMsg)
+		}
 	}
 
 	return t, nil
@@ -129,16 +170,29 @@ func duplicatedGroups(t Template) []string {
 	return dups
 }
 
+func getAttrByName(n Node, name string) (xml.Attr, bool) {
+	for _, a := range n.Attrs {
+		if name == a.Name.Local {
+			return a, true
+		}
+	}
+
+	return xml.Attr{}, false
+}
+
 func getVizual(n Node) string {
-	return n.Attrs[2].Value
+	a, _ := getAttrByName(n, "vizual")
+	return a.Value
 }
 
 func getGroup(n Node) string {
-	return n.Attrs[0].Value
+	a, _ := getAttrByName(n, "group")
+	return a.Value
 }
 
 func getValue(n Node) string {
-	return n.Attrs[1].Value
+	a, _ := getAttrByName(n, "value")
+	return a.Value
 }
 
 func walkFirstLevel(nodes []Node, f func(Node) bool) {
