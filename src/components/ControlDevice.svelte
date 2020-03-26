@@ -23,15 +23,15 @@ let keyDown = null;
 
 function isDeviceFilled() {
   const curField = fields[fieldIter];
-  if(curField.type === 'radio' && !Object.hasOwnProperty.call($activeMarkup, curField.group)) {
+  if (curField.type === 'radio' && !Object.hasOwnProperty.call($activeMarkup, curField.group)) {
     return false;
   }
 
-  return true
+  return true;
 }
 
 function focusOnNextField() {
-  if(!isDeviceFilled()) {
+  if (!isDeviceFilled()) {
     return;
   }
 
