@@ -21,7 +21,20 @@ groupsOrder.push(submitGroup);
 let fieldIter = 0;
 let keyDown = null;
 
+function isDeviceFilled() {
+  const curField = fields[fieldIter];
+  if(curField.type === 'radio' && !Object.hasOwnProperty.call($activeMarkup, curField.group)) {
+    return false;
+  }
+
+  return true
+}
+
 function focusOnNextField() {
+  if(!isDeviceFilled()) {
+    return;
+  }
+
   fieldIter += 1;
 }
 
