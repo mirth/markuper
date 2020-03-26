@@ -84,9 +84,9 @@ function expectSampleMarkupToBeEq(markup) {
 function itSubmitsSample() {
   it('submits the sample', async () => {
     await app.client.keys('Enter');
-    await sleep(2500);
+    await sleep(1500);
     await app.client.element("button/*[@innertext='testproj0']").click();
-    await sleep(2500);
+    await sleep(1500);
   });
 }
 

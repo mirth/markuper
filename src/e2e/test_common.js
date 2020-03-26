@@ -49,7 +49,9 @@ export const itNavigatesToProject = (app, appPath, xml) => {
   it('navigates to project page', async () => {
     await sleep(2000);
     await createProject(appPath, xml);
+    await sleep(2000);
     await app.client.refresh();
+    await sleep(1000);
     await app.client.waitUntilTextExists('span', 'testproj0');
     await sleep(2000);
     await app.client.element("button/*[@innertext='testproj0']").click();
