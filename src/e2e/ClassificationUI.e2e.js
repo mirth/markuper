@@ -84,14 +84,14 @@ function expectSampleMarkupToBeEq(markup) {
 function itSubmitsSample() {
   it('submits the sample', async () => {
     await app.client.keys('Enter');
-    await sleep(1500);
+    await sleep(2500);
     await app.client.element("button/*[@innertext='testproj0']").click();
-    await sleep(1500);
+    await sleep(2500);
   });
 }
 
 describe('Focus and state [Checkbox, Radio, Radio]', function () {
-  this.timeout(10000);
+  this.timeout(20000);
   before(() => app.start());
   after(() => {
     if (app && app.isRunning()) {
@@ -177,7 +177,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
 });
 
 describe('Focus and state [Radio, Checkbox]', function () {
-  this.timeout(10000);
+  this.timeout(20000);
   before(() => app.start());
   after(() => {
     if (app && app.isRunning()) {
