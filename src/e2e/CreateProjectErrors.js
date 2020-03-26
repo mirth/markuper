@@ -22,7 +22,7 @@ describe('Application launch', function () {
     }
   });
 
-  describe('Creates project and assesses samples', () => {
+  describe('Unable to create project because of duplicated groups', () => {
     const xml = `
     <content>
       <radio group="animal" value="cat" vizual="Cat" />
@@ -36,6 +36,33 @@ describe('Application launch', function () {
       const el = app.client.element('//*[@id="create_project_error"]');
       const err = await el.getText();
       expect(err).to.be.eq('Template has duplicate groups: animal');
+    });
+  });
+});
+
+describe('Application launch', function () {
+  this.timeout(30000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  describe('Unable to create project because of missing the attribute', () => {
+    const xml = `
+    <content>
+      <radio group="animal" value="cat" vizual="Cat" />
+      <checkbox group="animal" vizual="Dog" />
+    </content>
+    `;
+    createProjectWithTemplate(app, appPath, xml);
+
+    it('display duplicate group error', async () => {
+      await app.client.waitForVisible('//*[@id="create_project_error"]');
+      const el = app.client.element('//*[@id="create_project_error"]');
+      const err = await el.getText();
+      expect(err).to.be.eq('Element [checkbox] missing the attribute [value]');
     });
   });
 });
