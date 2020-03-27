@@ -8,7 +8,7 @@ autoUpdater.setFeedURL({
   repo: 'markuper',
   owner: 'mirth',
   private: true,
-  token: process.env.ENV.GH_TOKEN,
+  token: process.env.GH_TOKEN,
 });
 
 if (process.env.ENV === 'dev') {
