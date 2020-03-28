@@ -16,9 +16,9 @@
     "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\"",
     "build": "yarn _build_backend && yarn _build_frontend",
 
-    "publish_macos": "yarn build && yarn electron-builder publish --mac --x64",
-    "publish_windows": "yarn build && yarn electron-builder publish --win --x64",
-    "publish_linux": "yarn build && yarn electron-builder publish --linux --x64",
+    "publish_macos": "cross-env BACKEND_BINARY_FILENAME=main yarn build && yarn electron-builder publish --mac --x64",
+    "publish_windows": "BACKEND_BINARY_FILENAME=main.exe yarn build && yarn electron-builder publish --win --x64",
+    "publish_linux": "cross-env BACKEND_BINARY_FILENAME=main yarn build && yarn electron-builder publish --linux --x64",
 
     "pack_macos": "cross-env BACKEND_BINARY_FILENAME=main yarn _pack --mac --x64",
     "pack_windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn _pack --win --x64",
