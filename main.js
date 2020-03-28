@@ -41,9 +41,9 @@ function runApp() {
   const backend = runBackend();
 
   if (process.env.ENV === 'dev') {
-    autoUpdater.checkForUpdates();
+  //  autoUpdater.checkForUpdates();
   } else {
-    autoUpdater.checkForUpdatesAndNotify();
+   autoUpdater.checkForUpdatesAndNotify();
   }
 
   createWindow(backend);
