@@ -12,7 +12,7 @@ func TestNowUTC() time.Time {
 }
 
 func NowUTC() time.Time {
-	if os.Getenv("ENV") == "test" {
+	if os.Getenv("NODE_ENV") == "test" {
 		return TestNowUTC()
 	}
 

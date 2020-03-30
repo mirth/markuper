@@ -1,17 +1,34 @@
 const { app, BrowserWindow } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const runBackend = require('./run_backend');
-
+const log = require('electron-log');
 
 autoUpdater.setFeedURL({
-  provider: 'github',
-  repo: 'markuper',
-  owner: 'mirth',
-  private: true,
-  token: process.env.GH_TOKEN,
+  provider: 's3',
+  bucket: 'markuper-release-dev',
+  channel: 'alpha',
 });
 
-if (process.env.ENV === 'dev') {
+function sendStatusToWindow(message) {
+  console.log(message);
+}
+
+log.transports.file.level = 'debug';
+autoUpdater.logger = log;
+
+autoUpdater.on('download-progress', (progressObj) => {
+  let logMessage = `Download speed: ${progressObj.bytesPerSecond}`;
+  logMessage = `${logMessage} - Downloaded ${parseInt(progressObj.percent, 10)}%`;
+  logMessage = `${logMessage} (${progressObj.transferred}/${progressObj.total})`;
+  sendStatusToWindow(logMessage);
+});
+
+autoUpdater.on('update-downloaded', () => {
+
+});
+
+
+if (process.env.NODE_ENV === 'dev') {
   // eslint-disable-next-line global-require
   require('electron-reload')(__dirname);
 }
@@ -40,10 +57,10 @@ function createWindow(backend) {
 function runApp() {
   const backend = runBackend();
 
-  if (process.env.ENV === 'dev') {
-  //  autoUpdater.checkForUpdates();
+  if (process.env.NODE_ENV === 'dev') {
+    autoUpdater.checkForUpdates();
   } else {
-   autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdatesAndNotify();
   }
 
   createWindow(backend);

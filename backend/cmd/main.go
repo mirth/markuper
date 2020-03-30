@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -78,11 +79,14 @@ func newServer(
 }
 
 func main() {
-	db, err := internal.OpenDB(os.Getenv("ENV") == "test")
+	db, err := internal.OpenDB(os.Getenv("NODE_ENV") == "test")
 	if err != nil {
 		panic(err)
 	}
 	defer db.DB.Close()
+
+	appVersion := flag.String("appversion", "", "Set electron app version")
+	flag.Parse()
 
 	ms := internal.NewMarkupService(db)
 	ps := internal.NewProjectService(db)
@@ -170,6 +174,9 @@ func main() {
 
 	r.HandleFunc("/api/v1/healz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("VEGETALS"))
+	})
+	r.HandleFunc("/api/v1/version", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte(*appVersion))
 	})
 
 	port := "3889"
