@@ -1,0 +1,14 @@
+{
+  "productName": "Markuper",
+  "appId": "com.levchik.markuper",
+  "publish": {
+    "provider": "s3",
+    "bucket": "markuper-release-dev",
+    "channel": "alpha"
+  },
+  "files": [
+    "public/*",
+    "main.js",
+    "run_backend.js",
+  ]
+}

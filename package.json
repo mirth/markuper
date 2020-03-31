@@ -27,15 +27,6 @@
     "_build_frontend": "yarn rollup -c",
     "_build_backend": "cd backend/cmd && cross-env-shell GO111MODULE=on go build -o ../../public/$BACKEND_BINARY_FILENAME . && cd ../.."
   },
-  "build": {
-    "productName": "Markuper",
-    "appId": "com.levchik.markuper",
-    "publish": {
-      "provider": "s3",
-      "bucket": "markuper-release-dev",
-      "channel": "alpha"
-    }
-  },
   "babel": {
     "env": {
       "test": {
