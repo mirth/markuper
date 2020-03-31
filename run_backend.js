@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const { execFile } = require('child_process');
 const appRootDir = require('app-root-dir').get();
 const path = require('path');
@@ -13,12 +14,12 @@ function getBackendBinaryFilename() {
 
 function runBackend() {
   const binaryFilename = getBackendBinaryFilename();
-  const backendPath = (process.env.ENV === 'dev' || process.env.ENV === 'test') ? `public/${binaryFilename}`
+  const backendPath = (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') ? `public/${binaryFilename}`
     : path.join(appRootDir, 'public', binaryFilename);
 
-  const backend = execFile(backendPath, {
+  const backend = execFile(backendPath, [`-appversion=${app.getVersion()}`], {
     env: {
-      ENV: process.env.ENV,
+      NODE_ENV: process.env.NODE_ENV,
     },
   });
   backend.stdout.on('data', (chunk) => {

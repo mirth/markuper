@@ -1,40 +1,31 @@
 {
   "name": "markuper",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "description": "Some cool app",
   "main": "main.js",
   "license": "Proprietary",
   "private": true,
   "author": "Anatoly Levchik <endight@gmail.com>",
   "scripts": {
-    "start:dev": "yarn _build_backend && concurrently \"yarn _autobuild_frontend\" \"cross-env-shell ENV=dev electron .\"",
+    "start:dev": "yarn _build_backend && concurrently \"yarn _autobuild_frontend\" \"cross-env-shell NODE_ENV=dev electron .\"",
     "test": "concurrently \"yarn _test_e2e\" \"yarn _test_backend\"",
     "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\"",
     "build": "yarn _build_backend && yarn _build_frontend",
-    "release_macos": "cross-env BACKEND_BINARY_FILENAME=main yarn _pack --icon=icon.icns && yarn _dmg",
-    "release_windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn _pack --platform=win32 --arch=x64 --icon=./icon.ico",
-    "release_linux": "yarn _pack --platform=linux --arch=x64",
-    "_pack": "yarn build && yarn electron-packager --overwrite --ignore=\"^.backend\" --ignore=\"(^.src|rollup.config.js|yarn.lock|README.md|markuper.code-workspace|icon.png|icon.icns)\" . Markuper",
+    "publish:macos": "cross-env BACKEND_BINARY_FILENAME=main yarn build && yarn electron-builder publish --mac --x64",
+    "publish:windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn build && yarn electron-builder publish --win --x64",
+    "publish:linux": "cross-env BACKEND_BINARY_FILENAME=main yarn build && yarn electron-builder publish --linux --x64",
+    "pack:macos": "cross-env BACKEND_BINARY_FILENAME=main yarn _pack --mac --x64 --p never",
+    "pack:windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn _pack --win --x64 --p never",
+    "pack:linux": "yarn _pack --linux --x64 --p never",
+    "_pack": "yarn build && yarn electron-builder",
     "_dmg": "yarn electron-installer-dmg markuper-darwin-x64/markuper.app markuper",
-    "_test_e2e": "yarn build && cross-env-shell ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
-    "_test_backend": "yarn _build_backend && cd backend && cross-env-shell ENV=test go test -v ./... && cd ..",
+    "_test_e2e": "yarn build && cross-env-shell NODE_ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
+    "_test_backend": "yarn _build_backend && cd backend && cross-env-shell NODE_ENV=test go test -v ./... && cd ..",
     "_lint_backend": "cd backend/cmd && go vet && cd ../../",
     "_lint_frontend": "yarn eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",
     "_build_frontend": "yarn rollup -c",
     "_build_backend": "cd backend/cmd && cross-env-shell GO111MODULE=on go build -o ../../public/$BACKEND_BINARY_FILENAME . && cd ../.."
-  },
-  "build": {
-    "appId": "com.levchik.markuper",
-    "extraFiles": [
-      {
-        "from": "backend/bin",
-        "to": "Resources/bin",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
   },
   "babel": {
     "env": {
@@ -63,7 +54,7 @@
     "concurrently": "^5.0.0",
     "cross-env": "^7.0.0",
     "electron": "^7.1.2",
-    "electron-installer-dmg": "^3.0.0",
+    "electron-builder": "^22.4.1",
     "electron-packager": "^14.1.1",
     "electron-reload": "^1.5.0",
     "eslint": "^6.7.2",
@@ -82,6 +73,8 @@
   "dependencies": {
     "app-root-dir": "^1.0.2",
     "axios": "^0.19.0",
+    "electron-log": "^4.1.0",
+    "electron-updater": "^4.2.5",
     "is-glob": "^4.0.1",
     "is-valid-glob": "^1.0.0",
     "js-file-download": "^0.4.10",

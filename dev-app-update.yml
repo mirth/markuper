@@ -1,0 +1,3 @@
+provider: s3
+bucket: markuper-release-dev
+channel: alpha
