@@ -9,6 +9,6 @@
   "files": [
     "public/*",
     "main.js",
-    "run_backend.js",
+    "run_backend.js"
   ]
 }

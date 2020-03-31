@@ -180,7 +180,7 @@ func main() {
 	})
 
 	port := "3889"
-	err = http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, r))
+	err = http.ListenAndServe("127.0.0.1:"+port, handlers.LoggingHandler(os.Stdout, r))
 	if err != nil {
 		panic(err)
 	}
