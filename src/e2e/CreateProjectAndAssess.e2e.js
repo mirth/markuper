@@ -170,11 +170,13 @@ describe('Application launch', function () {
 
     it("changes class to 'gek'", async () => {
       await getBtn(app, 'device0', 4).click();
-      await sleep(500);
+      await sleep(1500);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
+      await sleep(1500);
       await app.client.element("button/*[@innertext='testproj0']").click();
       await app.client.waitForExist('ul');
+      await sleep(1500);
       {
         const cl = await getSampleClass(app, 'kek1.jpg').getText();
         expect(cl).to.be.eq('animal: gek');
