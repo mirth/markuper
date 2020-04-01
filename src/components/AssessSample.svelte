@@ -1,10 +1,12 @@
 <script>
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import Button from 'svelte-atoms/Button.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
 import { activeMarkup } from '../store';
+import { goToProject  } from '../project';
 
 export let params = {};
 
@@ -52,6 +54,13 @@ img {
 
 <PageBlank>
 {#await sample then sample}
+<Button
+  type='empty'
+  on:click={goToProject(sample.project.project_id)}
+  style='padding: 0;'
+>
+  {sample.project.description.name}
+</Button>
 {#if sample.sample === null}
 <Typography type="title" block>No samples left</Typography>
 {:else}

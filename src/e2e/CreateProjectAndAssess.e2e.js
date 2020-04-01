@@ -7,7 +7,7 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   makeUrl, getBtn, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
-  sleep,
+  sleep, clickText,
 } from './test_common';
 
 
@@ -39,9 +39,8 @@ describe('Application launch', function () {
     const [imgDir, glob0, glob1] = createProjectWithTemplate(app, appPath, xml);
 
     it('navigates to project page', async () => {
-      await sleep(500);
-      await app.client.waitUntilTextExists('span', 'testproj0');
-      await app.client.element("button/*[@innertext='testproj0']").click();
+      await clickText(app, 'span', 'testproj0');
+      await app.client.waitForText('span', 'Begin assess');
     });
 
     it('displays project description', async () => {
@@ -53,10 +52,7 @@ describe('Application launch', function () {
 
     it('begins assess', async () => {
       await app.client.waitUntilTextExists('span', 'Begin assess');
-
-      // fixme
-      const beginAssess = app.client.element('//*[@id="grid"]/div/div[2]/div/div/div/div/div[1]/div/div[3]/div/div/button[1]');
-      await beginAssess.click();
+      await clickText(app, 'span', 'Begin assess');
     });
 
     it('assesses 1st jpg sample', async () => {
@@ -115,7 +111,7 @@ describe('Application launch', function () {
 
     // fixme test sample order
     it('displays sample markup on project page', async () => {
-      await app.client.element("button/*[@innertext='testproj0']").click();
+      await clickText(app, 'span', 'testproj0');
       await app.client.waitForExist('ul');
 
       {
@@ -174,7 +170,7 @@ describe('Application launch', function () {
       await app.client.keys('Enter');
       await app.client.keys('Enter');
       await sleep(1500);
-      await app.client.element("button/*[@innertext='testproj0']").click();
+      await clickText(app, 'span', 'testproj0');
       await app.client.waitForExist('ul');
       await sleep(1500);
       {

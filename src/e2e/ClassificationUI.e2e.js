@@ -9,6 +9,7 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   getPath, getBtn, assertRadioLabels, itNavigatesToProject, getSamplePath, getSampleClass, sleep,
+  clickText,
 } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
@@ -57,11 +58,13 @@ const getChecked = async (device) => {
 };
 
 
-async function assertCheckBoxLabels(device) {
-  const elements = await app.client.elements(`//*[@id="${device}"]/div/ul/li/label/input`);
+async function assertCheckboxLabels(device) {
+  const inputs = `//*[@id="${device}"]/div/ul/li/label/input`;
+  await app.client.waitForExist(inputs);
+  const elements = await app.client.elements(inputs);
   const labels = await Promise.all(elements.value.map(async (el) => {
-    const kek = await getPath(app, el, '..');
-    const txt = await app.client.elementIdText(kek.value.ELEMENT);
+    const pth = await getPath(app, el, '..');
+    const txt = await app.client.elementIdText(pth.value.ELEMENT);
     return txt.value;
   }));
   expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
@@ -69,7 +72,7 @@ async function assertCheckBoxLabels(device) {
 
 function expectSampleMarkupToBeEq(markup) {
   it('displays sample markup on project page', async () => {
-    await app.client.element("button/*[@innertext='testproj0']").click();
+    await clickText(app, 'span', 'testproj0');
     await app.client.waitForExist('ul');
 
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
@@ -119,10 +122,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
 
   it('begins assess', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
-
-    // fixme
-    const beginAssess = app.client.element('//*[@id="grid"]/div/div[2]/div/div/div/div/div[1]/div/div[3]/div/div/button[1]');
-    await beginAssess.click();
+    await clickText(app, 'span', 'Begin assess');
   });
 
   const focusIsOn = (device) => {
@@ -130,8 +130,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
   };
 
   it('displays correct devices labels', async () => {
-    await sleep(2000);
-    await assertCheckBoxLabels('device0');
+    await assertCheckboxLabels('device0');
     await assertRadioLabels(app, 'device1', ['Cat', 'Dog', 'Chuk', 'Gek']);
     await assertRadioLabels(app, 'device2', ['Smoll', 'Big']);
   });
@@ -205,17 +204,14 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   it('begins assess', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
-
-    // fixme
-    const beginAssess = app.client.element('//*[@id="grid"]/div/div[2]/div/div/div/div/div[1]/div/div[3]/div/div/button[1]');
-    await beginAssess.click();
+    await clickText(app, 'span', 'Begin assess');
   });
 
 
   it('displays correct devices labels', async () => {
     await sleep(2000);
     await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
-    await assertCheckBoxLabels('device1');
+    await assertCheckboxLabels('device1');
   });
 
   it('selects first device', async () => {

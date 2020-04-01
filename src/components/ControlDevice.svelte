@@ -4,7 +4,7 @@ import Spacer from 'svelte-atoms/Spacer.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
 import { assessState, activeMarkup } from '../store';
-import { getFieldsInOrderFor } from '../template';
+import { getFieldsInOrderFor } from '../project';
 
 export let submitMarkupAndFetchNext;
 export let sample;
@@ -13,7 +13,7 @@ if (sample.markup) {
   $activeMarkup = sample.markup.markup;
 }
 
-const [fields, groupsOrder] = getFieldsInOrderFor(sample.template);
+const [fields, groupsOrder] = getFieldsInOrderFor(sample.project.template);
 const submitGroup = '[submit]';
 
 groupsOrder.push(submitGroup);

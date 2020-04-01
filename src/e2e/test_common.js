@@ -13,7 +13,9 @@ export const getChbox = (app, device, i) => {
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 
 export const assertRadioLabels = async (app, device, expectedLabels) => {
-  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/div/button`);
+  const buttons = `//*[@id="${device}"]/ul/li/div/button`;
+  await app.client.waitForExist(buttons);
+  const elements = await app.client.elements(buttons);
   const actualLabels = await Promise.all(elements.value.map(async (el) => {
     const txt = await app.client.elementIdText(el.ELEMENT);
     return txt.value;
@@ -45,16 +47,25 @@ export const createProject = async (appPath, xml) => {
   });
 };
 
+export const clickText = async (app, tag, text) => {
+  await app.client.waitForText(tag, text);
+  await app.client.element(`${tag}*=${text}`).click();
+};
+
 export const itNavigatesToProject = (app, appPath, xml) => {
   it('navigates to project page', async () => {
-    await sleep(2000);
     await createProject(appPath, xml);
-    await sleep(2000);
-    await app.client.refresh();
-    await sleep(1000);
-    await app.client.waitUntilTextExists('span', 'testproj0');
-    await sleep(2000);
-    await app.client.element("button/*[@innertext='testproj0']").click();
+    try {
+      await app.client.refresh();
+    } catch (error) {
+      const errorIsNavigatedError = error.message.includes('Inspected target navigated or closed');
+
+      if (!errorIsNavigatedError) {
+        throw error;
+      }
+    }
+    await clickText(app, 'span', 'testproj0');
+    await app.client.waitForText('span', 'Begin assess');
   });
 };
 

@@ -28,7 +28,7 @@ type AssessRequest struct {
 type SampleResponse struct {
 	SampleID SampleID        `json:"sample_id"`
 	Sample   json.RawMessage `json:"sample"`
-	Template Template        `json:"template"`
+	Project  Project         `json:"project"`
 }
 
 type SampleWithMarkupResponse struct {
@@ -157,8 +157,6 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 }
 
 func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, error) {
-	// fixme lock sample
-
 	tmp, err := getAllSampleIDsForProject(s.db, "markups", req.ProjectID)
 	if err != nil {
 		return SampleResponse{}, err
@@ -177,8 +175,15 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		toAssess = append(toAssess, sID.(SampleID))
 	})
 
+	proj, err := s.db.GetProject(req.ProjectID)
+	if err != nil {
+		return SampleResponse{}, errors.WithStack(err)
+	}
+
 	if len(toAssess) == 0 {
-		return SampleResponse{}, nil
+		return SampleResponse{
+			Project: proj,
+		}, nil
 	}
 
 	sort.SliceStable(toAssess, func(i, j int) bool {
@@ -192,15 +197,10 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		return SampleResponse{}, err
 	}
 
-	proj, err := s.db.GetProject(sID.ProjectID)
-	if err != nil {
-		return SampleResponse{}, errors.WithStack(err)
-	}
-
 	return SampleResponse{
 		SampleID: sID,
 		Sample:   sample,
-		Template: proj.Template,
+		Project:  proj,
 	}, err
 }
 
@@ -288,7 +288,7 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 		SampleResponse: SampleResponse{
 			SampleID: sID,
 			Sample:   sample,
-			Template: proj.Template,
+			Project:  proj,
 		},
 		SampleMarkup: markup,
 	}, nil
