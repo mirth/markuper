@@ -2,18 +2,9 @@ const { app } = require('electron');
 const { execFile } = require('child_process');
 const appRootDir = require('app-root-dir').get();
 const path = require('path');
-const os = require('os');
-
-function getBackendBinaryFilename() {
-  if (os.platform() === 'win32') {
-    return 'main.exe';
-  }
-
-  return 'main';
-}
 
 function runBackend() {
-  const binaryFilename = getBackendBinaryFilename();
+  const binaryFilename = 'main.exe';
   const backendPath = (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') ? `public/${binaryFilename}`
     : path.join(appRootDir, 'public', binaryFilename);
 

@@ -11,11 +11,11 @@
     "test": "concurrently \"yarn _test_e2e\" \"yarn _test_backend\"",
     "lint": "concurrently \"yarn _lint_frontend\" \"yarn _lint_backend\"",
     "build": "yarn _build_backend && yarn _build_frontend",
-    "publish:macos": "cross-env BACKEND_BINARY_FILENAME=main yarn build && yarn electron-builder publish --mac --x64",
-    "publish:windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn build && yarn electron-builder publish --win --x64",
-    "publish:linux": "cross-env BACKEND_BINARY_FILENAME=main yarn build && yarn electron-builder publish --linux --x64",
-    "pack:macos": "cross-env BACKEND_BINARY_FILENAME=main yarn _pack --mac --x64 --p never",
-    "pack:windows": "cross-env BACKEND_BINARY_FILENAME=main.exe yarn _pack --win --x64 --p never",
+    "publish:macos": "cross-env yarn build && yarn electron-builder publish --mac --x64",
+    "publish:windows": "cross-env yarn build && yarn electron-builder publish --win --x64",
+    "publish:linux": "cross-env yarn build && yarn electron-builder publish --linux --x64",
+    "pack:macos": "cross-env yarn _pack --mac --x64 --p never",
+    "pack:windows": "cross-env yarn _pack --win --x64 --p never",
     "pack:linux": "yarn _pack --linux --x64 --p never",
     "_pack": "yarn build && yarn electron-builder",
     "_dmg": "yarn electron-installer-dmg markuper-darwin-x64/markuper.app markuper",
@@ -25,7 +25,7 @@
     "_lint_frontend": "yarn eslint --fix --ignore-path .gitignore --ext .svelte --ext .js .",
     "_autobuild_frontend": "yarn rollup -c -w",
     "_build_frontend": "yarn rollup -c",
-    "_build_backend": "cd backend/cmd && cross-env-shell GO111MODULE=on go build -o ../../public/$BACKEND_BINARY_FILENAME . && cd ../.."
+    "_build_backend": "cd backend/cmd && cross-env-shell GO111MODULE=on go build -o ../../public/main.exe . && cd ../.."
   },
   "babel": {
     "env": {
