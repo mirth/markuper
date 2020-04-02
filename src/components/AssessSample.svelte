@@ -1,12 +1,13 @@
 <script>
-import Spacer from 'svelte-atoms/Spacer.svelte';
 import Button from 'svelte-atoms/Button.svelte';
+import Row from 'svelte-atoms/Grids/Row.svelte';
+import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
 import { activeMarkup } from '../store';
-import { goToProject  } from '../project';
+import { goToProject } from '../project';
 
 export let params = {};
 
@@ -53,22 +54,27 @@ img {
 </style>
 
 <PageBlank>
+<Row>
 {#await sample then sample}
-<Button
-  type='empty'
-  on:click={goToProject(sample.project.project_id)}
-  style='padding: 0;'
->
-  {sample.project.description.name}
-</Button>
-{#if sample.sample === null}
-<Typography type="title" block>No samples left</Typography>
-{:else}
-<ControlDevice {sample} {submitMarkupAndFetchNext} />
-<Spacer size={24} />
-<div class='image-container'>
-  <img src='file://{sample.sample.image_uri}' alt='KEK'/>
-</div>
-{/if}
+  <Cell xs={8}>
+    <Button
+      type='empty'
+      on:click={goToProject(sample.project.project_id)}
+      style='padding: 0;'
+    >
+      {sample.project.description.name}
+    </Button>
+    {#if sample.sample === null}
+      <Typography type="title" block>No samples left</Typography>
+    {:else}
+      <div class='image-container'>
+        <img src='file://{sample.sample.image_uri}' alt='KEK'/>
+      </div>
+    {/if}
+  </Cell>
+  <Cell xs={4}>
+    <ControlDevice {sample} {submitMarkupAndFetchNext} />
+  </Cell>
 {/await}
+</Row>
 </PageBlank>

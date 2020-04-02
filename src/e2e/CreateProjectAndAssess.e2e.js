@@ -6,8 +6,8 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  makeUrl, getBtn, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
-  sleep, clickText,
+  makeUrl, getRadio, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
+  sleep, clickText, getRadioState,
 } from './test_common';
 
 
@@ -70,7 +70,7 @@ describe('Application launch', function () {
       await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek1.jpg'));
-      await getBtn(app, 'device0', 2).click();
+      await getRadio(app, 'device0', 2).click();
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -90,7 +90,7 @@ describe('Application launch', function () {
       await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek3.png'));
-      await getBtn(app, 'device0', 1).click();
+      await getRadio(app, 'device0', 1).click();
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -100,7 +100,7 @@ describe('Application launch', function () {
       await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek4.png'));
-      await getBtn(app, 'device0', 1).click();
+      await getRadio(app, 'device0', 1).click();
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -149,23 +149,16 @@ describe('Application launch', function () {
       }
     });
 
-    it('contains correct pressed button', async () => {
+    it('contains correct selected radios', async () => {
       await getSamplePath(app, 'kek1.jpg').element('..').click();
-
       await app.client.waitForVisible("button/*[@innertext='Cat']");
-      const catCl = await getBtn(app, 'device0', 1).getAttribute('class');
-      const dogCl = await getBtn(app, 'device0', 2).getAttribute('class');
-      const chukCl = await getBtn(app, 'device0', 3).getAttribute('class');
-      const gekCl = await getBtn(app, 'device0', 4).getAttribute('class');
 
-      expect(catCl).not.to.include('disabled');
-      expect(dogCl).to.include('disabled');
-      expect(chukCl).not.to.include('disabled');
-      expect(gekCl).not.to.include('disabled');
+      const selected = await getRadioState(app, 'device0');
+      expect(selected).to.be.deep.eq([false, true, false, false]);
     });
 
     it("changes class to 'gek'", async () => {
-      await getBtn(app, 'device0', 4).click();
+      await getRadio(app, 'device0', 4).click();
       await sleep(1500);
       await app.client.keys('Enter');
       await app.client.keys('Enter');

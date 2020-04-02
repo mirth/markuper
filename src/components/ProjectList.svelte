@@ -2,12 +2,12 @@
 import _ from 'lodash';
 import { onMount } from 'svelte';
 import Button from 'svelte-atoms/Button.svelte';
-import { projects, fetchProject } from '../store';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
-import { fetchProjectList } from '../store';
 import Container from 'svelte-atoms/Grids/Container.svelte';
-import { goToProject  } from '../project';
+import { fetchProjectList, projects } from '../store';
+
+import { goToProject } from '../project';
 
 
 let grouped = [];

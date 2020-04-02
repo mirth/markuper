@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const runBackend = require('./run_backend');
 const log = require('electron-log');
+const runBackend = require('./run_backend');
 
 autoUpdater.setFeedURL({
   provider: 's3',
@@ -10,6 +10,7 @@ autoUpdater.setFeedURL({
 });
 
 function sendStatusToWindow(message) {
+  // eslint-disable-next-line no-console
   console.log(message);
 }
 
@@ -41,7 +42,7 @@ function createWindow(backend) {
       nodeIntegration: false,
     },
   });
-
+  win.maximize();
   win.loadFile('public/index.html', { hash: '#' });
   win.on('closed', () => {
     // Dereference the window object, usually you would store windows

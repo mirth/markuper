@@ -7,7 +7,6 @@ import Popup from 'svelte-atoms/Popup.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import Container from 'svelte-atoms/Grids/Container.svelte';
 import CreateProjectPopup from './CreateProjectPopup.svelte';
-import PageBlank from './PageBlank.svelte';
 import ProjectList from './ProjectList.svelte';
 
 
