@@ -48,16 +48,8 @@ export const createProject = async (appPath, xml) => {
 };
 
 export const clickText = async (app, tag, text) => {
-  try {
-    await app.client.waitForText(tag, text);
-    await app.client.element(`${tag}*=${text}`).click();
-  } catch (error) {
-    const errorIsElementReceiveClick = error.message.includes('Other element would receive the click');
-
-    if (!errorIsElementReceiveClick) {
-      throw error;
-    }
-  }
+  await app.client.waitForText(tag, text);
+  await app.client.element(`${tag}*=${text}`).element('..').click();
 };
 
 export const itNavigatesToProject = (app, appPath, xml) => {
