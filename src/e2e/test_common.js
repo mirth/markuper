@@ -49,7 +49,7 @@ export const createProject = async (appPath, xml) => {
 
 export const clickButton = async (app, tag, text) => {
   await app.client.waitForText(tag, text);
-  // await sleep(1500)
+  await sleep(1500);
   const el = await app.client.element(`${tag}=${text}`).element('../../button');
   await app.client.elementIdClick(el.value.ELEMENT);
 };
