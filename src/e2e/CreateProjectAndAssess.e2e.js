@@ -7,7 +7,7 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   makeUrl, getRadio, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
-  sleep, clickText, getRadioState,
+  sleep, clickButton, getRadioState, clickLink,
 } from './test_common';
 
 
@@ -39,7 +39,7 @@ describe('Application launch', function () {
     const [imgDir, glob0, glob1] = createProjectWithTemplate(app, appPath, xml);
 
     it('navigates to project page', async () => {
-      await clickText(app, 'span', 'testproj0');
+      await clickButton(app, 'span', 'testproj0');
       await app.client.waitForText('span', 'Begin assess');
     });
 
@@ -52,7 +52,7 @@ describe('Application launch', function () {
 
     it('begins assess', async () => {
       await app.client.waitUntilTextExists('span', 'Begin assess');
-      await clickText(app, 'span', 'Begin assess');
+      await clickButton(app, 'span', 'Begin assess');
     });
 
     it('assesses 1st jpg sample', async () => {
@@ -111,9 +111,8 @@ describe('Application launch', function () {
 
     // fixme test sample order
     it('displays sample markup on project page', async () => {
-      await clickText(app, 'span', 'testproj0');
+      await clickButton(app, 'span', 'testproj0');
       await app.client.waitForExist('ul');
-
       {
         const pathText = await getSamplePath(app, 'kek0.jpg').getText();
         const cl = await getSampleClass(app, 'kek0.jpg').getText();
@@ -163,7 +162,7 @@ describe('Application launch', function () {
       await app.client.keys('Enter');
       await app.client.keys('Enter');
       await sleep(1500);
-      await clickText(app, 'span', 'testproj0');
+      await clickButton(app, 'span', 'testproj0');
       await app.client.waitForExist('ul');
       await sleep(1500);
       {

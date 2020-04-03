@@ -47,7 +47,14 @@ export const createProject = async (appPath, xml) => {
   });
 };
 
-export const clickText = async (app, tag, text) => {
+export const clickButton = async (app, tag, text) => {
+  await app.client.waitForText(tag, text);
+  // await sleep(1500)
+  const el = await app.client.element(`${tag}=${text}`).element('../../button');
+  await app.client.elementIdClick(el.value.ELEMENT);
+};
+
+export const clickLink = async (app, tag, text) => {
   await app.client.waitForText(tag, text);
   await app.client.element(`${tag}*=${text}`).element('..').click();
 };
@@ -64,7 +71,7 @@ export const itNavigatesToProject = (app, appPath, xml) => {
         throw error;
       }
     }
-    await clickText(app, 'span', 'testproj0');
+    await clickButton(app, 'span', 'testproj0');
     await app.client.waitForText('span', 'Begin assess');
   });
 };

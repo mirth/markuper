@@ -9,7 +9,7 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, getSampleClass, sleep,
-  clickText, getRadioState, getChecked,
+  clickButton, getRadioState, getChecked, clickLink,
 } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
@@ -52,7 +52,7 @@ async function assertCheckboxLabels(device) {
 
 function expectSampleMarkupToBeEq(markup) {
   it('displays sample markup on project page', async () => {
-    await clickText(app, 'span', 'testproj0');
+    await clickLink(app, 'span', 'testproj0');
     await app.client.waitForExist('ul');
 
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
@@ -68,7 +68,7 @@ function itSubmitsSample() {
   it('submits the sample', async () => {
     await app.client.keys('Enter');
     await sleep(1500);
-    await clickText(app, 'span', 'testproj0');
+    await clickButton(app, 'span', 'testproj0');
     await sleep(1500);
   });
 }
@@ -96,7 +96,7 @@ describe('Device state keep for assessed samples', function () {
 
   it('begins assess', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
-    await clickText(app, 'span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
   });
 
   it('displays button 2 pressed', async () => {
@@ -119,7 +119,7 @@ describe('Device state keep for assessed samples', function () {
 
   it('goes to next new sample', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
-    await clickText(app, 'span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
 
     const selected = await getRadioState(app, 'device0');
     expect(selected).to.be.deep.eq([false, false]);
@@ -128,7 +128,7 @@ describe('Device state keep for assessed samples', function () {
   });
 
   it('goes back to first assessed sample', async () => {
-    await clickText(app, 'span', 'testproj0');
+    await clickButton(app, 'span', 'testproj0');
     await app.client.waitForText('span', 'Begin assess');
     await getSamplePath(app, 'kek0.jpg').element('..').click();
     await app.client.waitForVisible("button/*[@innertext='Cat']");
@@ -169,7 +169,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
 
   it('begins assess', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
-    await clickText(app, 'span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
   });
 
   const focusIsOn = (device) => {
@@ -252,7 +252,7 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   it('begins assess', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
-    await clickText(app, 'span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
   });
 
 
