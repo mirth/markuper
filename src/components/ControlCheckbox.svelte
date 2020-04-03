@@ -9,9 +9,10 @@ export let field;
 
 const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
-const checkedByLabel = {};
 let keyDown;
+let checked = new Set([]);
 let isSelected = false;
+$: checked = new Set($activeMarkup[field.group] || []);
 $: isSelected = isFieldSelected(field, $assessState);
 
 function handleKeydown(event) {
@@ -23,12 +24,13 @@ function handleKeydown(event) {
 }
 
 function updateMarkupWith(labelValue) {
-  checkedByLabel[labelValue] = !checkedByLabel[labelValue];
-  $activeMarkup[field.group] = Object.entries(
-    checkedByLabel,
-  )
-    .filter((kv) => kv[1])
-    .map((kv) => kv[0]);
+  if(checked.has(labelValue)) {
+    checked.delete(labelValue)
+  } else {
+    checked.add(labelValue);
+  }
+
+  $activeMarkup[field.group] = Array.from(checked);
 }
 
 async function handleKeyup(event) {
@@ -52,11 +54,9 @@ async function handleKeyup(event) {
   keyDown = null;
 }
 
-function onChangeFor(label) {
+function onChangeFor(labelValue) {
   return (ev) => {
-    if (ev.target.value === label.value) {
-      updateMarkupWith(label.value);
-    }
+    updateMarkupWith(labelValue);
   };
 }
 
@@ -67,15 +67,15 @@ function onChangeFor(label) {
 {#each labelsWithKeys as [label, key]}
   <li>
     <Checkbox
-      checked={checkedByLabel[label.value]}
+      checked={checked.has(label.value)}
       on:change={onChangeFor(label.value)}
       >
       {label.vizual}
     </Checkbox>
     <Spacer size={8} />
-{#if isSelected}
-    <KeyboardButton {key} isKeyDown={key === keyDown} />
-{/if}
+    {#if isSelected}
+      <KeyboardButton {key} isKeyDown={key === keyDown} />
+    {/if}
   </li>
 {/each}
 </ul>

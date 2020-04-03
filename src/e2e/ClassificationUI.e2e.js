@@ -73,6 +73,73 @@ function itSubmitsSample() {
   });
 }
 
+describe('Device state keep for assessed samples', function () {
+  this.timeout(20000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  const xml = `
+  <content>
+    <radio group="animal" value="cat" vizual="Cat" />
+    <radio group="animal" value="dog" vizual="Dog" />
+
+    <checkbox group="color" value="black" vizual="Black" />
+    <checkbox group="color" value="white" vizual="White" />
+  </content>
+  `;
+
+  itNavigatesToProject(app, appPath, xml);
+
+  it('begins assess', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    await clickText(app, 'span', 'Begin assess');
+  });
+
+  it('displays button 2 pressed', async () => {
+    await getRadio(app, 'device0', 2).click();
+
+    const selected = await getRadioState(app, 'device0');
+    expect(selected).to.be.deep.eq([false, true]);
+    await app.client.keys('Enter');
+  });
+
+  it('displays checkbox 1 as checked', async () => {
+    await app.client.keys('1');
+
+    const checked = await getChecked(app, 'device1');
+    expect(checked).to.be.deep.eq([true, false]);
+    await app.client.keys('Enter');
+  });
+
+  itSubmitsSample();
+
+  it('goes to next new sample', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    await clickText(app, 'span', 'Begin assess');
+
+    const selected = await getRadioState(app, 'device0');
+    expect(selected).to.be.deep.eq([false, false]);
+    const checked = await getChecked(app, 'device1');
+    expect(checked).to.be.deep.eq([false, false]);
+  });
+
+  it('goes back to first assessed sample', async () => {
+    await clickText(app, 'span', 'testproj0');
+    await app.client.waitForText('span', 'Begin assess');
+    await getSamplePath(app, 'kek0.jpg').element('..').click();
+    await app.client.waitForVisible("button/*[@innertext='Cat']");
+
+    const selected = await getRadioState(app, 'device0');
+    expect(selected).to.be.deep.eq([false, true]);
+    const checked = await getChecked(app, 'device1');
+    expect(checked).to.be.deep.eq([true, false]);
+  });
+});
+
 describe('Focus and state [Checkbox, Radio, Radio]', function () {
   this.timeout(20000);
   before(() => app.start());
@@ -135,6 +202,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
     await getRadio(app, 'device1', 1).click();
     await getRadio(app, 'device1', 1).click();
     await getRadio(app, 'device1', 4).click();
+
     const selected = await getRadioState(app, 'device1');
     expect(selected).to.be.deep.eq([false, false, false, true]);
     await app.client.keys('Enter');
