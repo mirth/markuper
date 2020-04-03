@@ -3,6 +3,7 @@ import Button from 'svelte-atoms/Button.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
+import Block from 'svelte-atoms/Block.svelte';
 import { assessState, activeMarkup } from '../store';
 import { getFieldsInOrderFor } from '../project';
 
@@ -63,22 +64,28 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
 
 {#each fields as field, i }
-<div class:selected={$assessState.focusedGroup === field.group} id={`device${i}`}>
-  {#if field.type === 'radio'}
-    <ControlRadio {field} />
-  {/if}
-  {#if field.type === 'checkbox'}
-    <ControlCheckbox {field} />
-  {/if}
-</div>
+  <div id={`device${i}`}>
+    <Block type={$assessState.focusedGroup === field.group ? 'selected' : 'block1'}>
+      {#if field.type === 'radio'}
+        <ControlRadio {field} />
+      {/if}
+      {#if field.type === 'checkbox'}
+        <ControlCheckbox {field} />
+      {/if}
+    </Block>
+  </div>
 {/each}
 <Spacer size={16} />
-<div class:selected={$assessState.focusedGroup === submitGroup} id='device_submit'>
-  <Button on:click={submitMarkupAndFetchNext}>Submit</Button>
+<div id='device_submit'>
+  <Button
+    on:click={submitMarkupAndFetchNext}
+    type={$assessState.focusedGroup === submitGroup ? 'filled': 'flat'}
+    id='device_submit'
+    >
+      Submit
+  </Button>
 </div>
-<style>
 
-.selected {
-  border: 1px solid red;
-}
+
+<style>
 </style>
