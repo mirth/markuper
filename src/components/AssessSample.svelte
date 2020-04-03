@@ -39,6 +39,37 @@ async function submitMarkupAndFetchNext() {
 
 </script>
 
+<PageBlank>
+<Row>
+{#await sample then sample}
+  <Cell xs={8}>
+    {#if sample.sample === null}
+      <Typography type="title" block>No samples left</Typography>
+    {:else}
+      <div class='image-container'>
+        <img src='file://{sample.sample.image_uri}' alt='KEK'/>
+      </div>
+    {/if}
+  </Cell>
+  <Cell xs={4}>
+    <ControlDevice {sample} {submitMarkupAndFetchNext} />
+    <hr />
+    <span>
+      Project:
+      <Button
+        type='empty'
+        on:click={goToProject(sample.project.project_id)}
+        style='padding: 0; display: inline;'
+      >
+        {sample.project.description.name}
+      </Button>
+    </span>
+  </Cell>
+{/await}
+</Row>
+</PageBlank>
+
+
 <style>
 
 .image-container {
@@ -51,30 +82,10 @@ img {
   border: 1px solid black;
 }
 
-</style>
+hr {
+  border: none;
+  background-color: lightgray;
+  height: 1px;
+}
 
-<PageBlank>
-<Row>
-{#await sample then sample}
-  <Cell xs={8}>
-    <Button
-      type='empty'
-      on:click={goToProject(sample.project.project_id)}
-      style='padding: 0;'
-    >
-      {sample.project.description.name}
-    </Button>
-    {#if sample.sample === null}
-      <Typography type="title" block>No samples left</Typography>
-    {:else}
-      <div class='image-container'>
-        <img src='file://{sample.sample.image_uri}' alt='KEK'/>
-      </div>
-    {/if}
-  </Cell>
-  <Cell xs={4}>
-    <ControlDevice {sample} {submitMarkupAndFetchNext} />
-  </Cell>
-{/await}
-</Row>
-</PageBlank>
+</style>
