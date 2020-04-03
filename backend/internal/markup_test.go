@@ -100,7 +100,7 @@ func TestMarkupNext(t *testing.T) {
 		e := SampleResponse{
 			SampleID: sID,
 			Sample:   json.RawMessage(fmt.Sprintf(`{"image_uri":"sampleuri%d"}`, i)),
-			Template: proj.Template,
+			Project:  proj,
 		}
 		assert.Equal(t, e, a)
 
@@ -148,7 +148,7 @@ func TestGetSample(t *testing.T) {
 
 		assert.Equal(t, es, []byte(s.Sample))
 		assert.Equal(t, sID, s.SampleID)
-		assert.Equal(t, proj0.Template, s.Template)
+		assert.Equal(t, proj0, s.Project)
 		assert.Nil(t, s.SampleMarkup)
 	}
 
@@ -161,7 +161,7 @@ func TestGetSample(t *testing.T) {
 		em, _ := db.GetMarkup(sID)
 		assert.Equal(t, es, []byte(s.Sample))
 		assert.Equal(t, sID, s.SampleID)
-		assert.Equal(t, proj0.Template, s.Template)
+		assert.Equal(t, proj0, s.Project)
 		assert.Equal(t, em, s.SampleMarkup)
 	}
 }
@@ -239,7 +239,7 @@ func TestListMarkup(t *testing.T) {
 	}
 }
 
-func TestOutOfSample(t *testing.T) {
+func TestOutOfSamples(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
 	proj0 := fillTestDBWithProj(db, "proj0")
@@ -271,4 +271,5 @@ func TestOutOfSample(t *testing.T) {
 	ass(SampleID{proj0.ProjectID, 4})
 	s := getNext()
 	assert.Nil(t, s.Sample)
+	assert.Equal(t, s.Project, proj0)
 }

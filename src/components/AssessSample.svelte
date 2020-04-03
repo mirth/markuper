@@ -1,10 +1,13 @@
 <script>
-import Spacer from 'svelte-atoms/Spacer.svelte';
+import Button from 'svelte-atoms/Button.svelte';
+import Row from 'svelte-atoms/Grids/Row.svelte';
+import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './ControlDevice.svelte';
 import { activeMarkup } from '../store';
+import { goToProject } from '../project';
 
 export let params = {};
 
@@ -36,6 +39,37 @@ async function submitMarkupAndFetchNext() {
 
 </script>
 
+<PageBlank>
+<Row>
+{#await sample then sample}
+  <Cell xs={8}>
+    {#if sample.sample === null}
+      <Typography type="title" block>No samples left</Typography>
+    {:else}
+      <div class='image-container'>
+        <img src='file://{sample.sample.image_uri}' alt='KEK'/>
+      </div>
+    {/if}
+  </Cell>
+  <Cell xs={4}>
+    <ControlDevice {sample} {submitMarkupAndFetchNext} />
+    <hr />
+    <span>
+      Project:
+      <Button
+        type='empty'
+        on:click={goToProject(sample.project.project_id)}
+        style='padding: 0; display: inline;'
+      >
+        {sample.project.description.name}
+      </Button>
+    </span>
+  </Cell>
+{/await}
+</Row>
+</PageBlank>
+
+
 <style>
 
 .image-container {
@@ -46,20 +80,16 @@ async function submitMarkupAndFetchNext() {
 img {
   max-width: 100%;
   border: 1px solid black;
+
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+hr {
+  border: none;
+  background-color: lightgray;
+  height: 1px;
 }
 
 </style>
-
-<PageBlank>
-{#await sample then sample}
-{#if sample.sample === null}
-<Typography type="title" block>No samples left</Typography>
-{:else}
-<ControlDevice {sample} {submitMarkupAndFetchNext} />
-<Spacer size={24} />
-<div class='image-container'>
-  <img src='file://{sample.sample.image_uri}' alt='KEK'/>
-</div>
-{/if}
-{/await}
-</PageBlank>

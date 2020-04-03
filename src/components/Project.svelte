@@ -12,7 +12,7 @@ import Block from 'svelte-atoms/Block.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
-import { getFieldsInOrderFor } from '../template';
+import { getFieldsInOrderFor } from '../project';
 
 export let params;
 

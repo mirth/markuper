@@ -1,9 +1,9 @@
 <script>
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
-import Button from 'svelte-atoms/Button.svelte';
+import Radio from 'svelte-atoms/Radio.svelte';
 import { makeLabelsWithKeys } from '../control';
-import { activeMarkup, assessState } from '../store';
+import { activeMarkup, assessState, isFieldSelected } from '../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
 export let field;
@@ -11,23 +11,24 @@ export let field;
 const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
 let keyDown;
+let isSelected = false;
+$: isSelected = isFieldSelected(field, $assessState);
+let radio = $activeMarkup[field.group];
+$: if (radio) {
+  $activeMarkup[field.group] = radio;
+}
+
 
 function handleKeydown(event) {
-  if (field.group !== $assessState.focusedGroup) {
+  if (!isSelected) {
     return;
   }
 
   keyDown = event.key;
 }
 
-function handleButtonClick(label) {
-  return async () => {
-    $activeMarkup[field.group] = label.value;
-  };
-}
-
 async function handleKeyup(event) {
-  if (field.group !== $assessState.focusedGroup) {
+  if (!isSelected) {
     return;
   }
 
@@ -41,7 +42,7 @@ async function handleKeyup(event) {
 
   const labelIndex = parseInt(event.key, 10) - 1;
   const label = field.labels[labelIndex];
-  await handleButtonClick(label)();
+  radio = label.value;
   keyDown = null;
 }
 
@@ -53,15 +54,16 @@ async function handleKeyup(event) {
 {#each labelsWithKeys as [label, key]}
   <li>
     <Cell>
-      <Button
-        on:click={handleButtonClick(label)}
-        disabled={$activeMarkup[field.group] === label.value}
-        style='display: inline; min-width: 60px;'
+      <Radio
+        bind:group={radio}
+        value={label.value}
       >
         {label.vizual}
-      </Button>
+      </Radio>
       <Spacer size={8} />
-      <KeyboardButton {key} isKeyDown={key === keyDown} />
+      {#if isSelected}
+        <KeyboardButton {key} isKeyDown={key === keyDown} />
+      {/if}
     </Cell>
   </li>
 {/each}

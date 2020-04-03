@@ -35,3 +35,7 @@ export async function fetchProject(projectId) {
 
   activeProject.set(proj);
 }
+
+export function isFieldSelected(field, state) {
+  return field.group === state.focusedGroup;
+}

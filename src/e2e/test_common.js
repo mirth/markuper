@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import api from '../api';
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
-export const getBtn = (app, device, i) => app.client.element(`//*[@id="${device}"]/ul/li[${i}]/div/button`);
+export const getRadio = (app, device, i) => app.client.element(`//*[@id="${device}"]/ul/li[${i}]/div/label`);
 export const getChbox = (app, device, i) => {
   const el = app.client.element(`//*[@id="${device}"]/div/ul/li[${i}]/label/input`);
   return el;
@@ -13,7 +13,9 @@ export const getChbox = (app, device, i) => {
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 
 export const assertRadioLabels = async (app, device, expectedLabels) => {
-  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/div/button`);
+  const radios = `//*[@id="${device}"]/ul/li/div/label`;
+  await app.client.waitForExist(radios);
+  const elements = await app.client.elements(radios);
   const actualLabels = await Promise.all(elements.value.map(async (el) => {
     const txt = await app.client.elementIdText(el.ELEMENT);
     return txt.value;
@@ -45,16 +47,25 @@ export const createProject = async (appPath, xml) => {
   });
 };
 
+export const clickText = async (app, tag, text) => {
+  await app.client.waitForText(tag, text);
+  await app.client.element(`${tag}*=${text}`).click();
+};
+
 export const itNavigatesToProject = (app, appPath, xml) => {
   it('navigates to project page', async () => {
-    await sleep(2000);
     await createProject(appPath, xml);
-    await sleep(2000);
-    await app.client.refresh();
-    await sleep(1000);
-    await app.client.waitUntilTextExists('span', 'testproj0');
-    await sleep(2000);
-    await app.client.element("button/*[@innertext='testproj0']").click();
+    try {
+      await app.client.refresh();
+    } catch (error) {
+      const errorIsNavigatedError = error.message.includes('Inspected target navigated or closed');
+
+      if (!errorIsNavigatedError) {
+        throw error;
+      }
+    }
+    await clickText(app, 'span', 'testproj0');
+    await app.client.waitForText('span', 'Begin assess');
   });
 };
 
@@ -117,3 +128,22 @@ export function createProjectWithTemplate(app, appPath, xml) {
 
   return [imgDir, glob0, glob1];
 }
+
+export const getRadioState = async (app, device) => {
+  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/div/label/input`);
+  const disabled = await Promise.all(elements.value.map(async (el) => {
+    const isSelected = await app.client.elementIdSelected(el.ELEMENT);
+    return isSelected.value;
+  }));
+
+  return disabled;
+};
+export const getChecked = async (app, device) => {
+  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/label/input`);
+  const checked = await Promise.all(elements.value.map(async (el) => {
+    const ch = await app.client.elementIdSelected(el.ELEMENT, 'checked');
+    return ch.value;
+  }));
+
+  return checked;
+};

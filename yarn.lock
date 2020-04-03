@@ -6209,10 +6209,10 @@ supports-color@~5.0.0:
   dependencies:
     has-flag "^2.0.0"
 
-svelte-atoms@^0.0.15:
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/svelte-atoms/-/svelte-atoms-0.0.15.tgz#1b5bfc6764af0386791e9aced13d29f4f4499a3a"
-  integrity sha512-OoS1wkck7Dtc4JCWvcOzF2YPtGnZPBpB4gJoHBPGXDCwyJPlX7KnE+SNVIup0X4xElx1wqBKhCLjKoqm5/2ifA==
+svelte-atoms@^0.0.17:
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/svelte-atoms/-/svelte-atoms-0.0.17.tgz#1fee8edacad837a2011aa09736e45bcb935f55a3"
+  integrity sha512-yAa+6DEwGBjXhA2NsDXdXsQR9wdOLnXN1tUhykrMNtkmKAEpiZa3CXkYwTiCeE/CDSP9lmmJ6zd9b8HdTYx1oA==
 
 svelte-preprocess@^3.3.0:
   version "3.3.0"
