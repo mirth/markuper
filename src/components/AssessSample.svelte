@@ -80,6 +80,10 @@ async function submitMarkupAndFetchNext() {
 img {
   max-width: 100%;
   border: 1px solid black;
+
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 hr {
