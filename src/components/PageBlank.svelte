@@ -4,8 +4,6 @@ import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import SideBar from './SideBar.svelte';
 
-
-
 </script>
 
 

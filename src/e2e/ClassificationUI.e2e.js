@@ -36,7 +36,7 @@ function expectFocusIsOn(devices, device) {
       }
     }
 
-    const devSubmitCl = await app.client.element('//*[@id="device_submit"]/button').getAttribute('class');
+    const devSubmitCl = await app.client.element('//*[@id="device_submit"]/div/button').getAttribute('class');
 
     if (device === 'devSubmit') {
       expect(devSubmitCl).to.have.string('filled');

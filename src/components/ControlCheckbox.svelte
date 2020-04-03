@@ -24,8 +24,8 @@ function handleKeydown(event) {
 }
 
 function updateMarkupWith(labelValue) {
-  if(checked.has(labelValue)) {
-    checked.delete(labelValue)
+  if (checked.has(labelValue)) {
+    checked.delete(labelValue);
   } else {
     checked.add(labelValue);
   }
@@ -55,7 +55,7 @@ async function handleKeyup(event) {
 }
 
 function onChangeFor(labelValue) {
-  return (ev) => {
+  return () => {
     updateMarkupWith(labelValue);
   };
 }

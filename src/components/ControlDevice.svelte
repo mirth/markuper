@@ -1,11 +1,12 @@
 <script>
-import Button from 'svelte-atoms/Button.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import Block from 'svelte-atoms/Block.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
-import Block from 'svelte-atoms/Block.svelte';
+import ControlSubmit from './ControlSubmit.svelte';
 import { assessState, activeMarkup } from '../store';
 import { getFieldsInOrderFor } from '../project';
+import { submitGroup } from '../control';
 
 export let submitMarkupAndFetchNext;
 export let sample;
@@ -14,7 +15,6 @@ export let sample;
 $: $activeMarkup = (sample.markup && sample.markup.markup) || {};
 
 const [fields, groupsOrder] = getFieldsInOrderFor(sample.project.template);
-const submitGroup = '[submit]';
 
 groupsOrder.push(submitGroup);
 
@@ -48,9 +48,7 @@ function handleKeyup(event) {
   }
 
   if (event.key === 'Enter') {
-    if (fieldIter === groupsOrder.length - 1) {
-      submitMarkupAndFetchNext();
-    } else {
+    if (fieldIter < groupsOrder.length - 1) {
       focusOnNextField();
     }
   }
@@ -77,13 +75,10 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 {/each}
 <Spacer size={16} />
 <div id='device_submit'>
-  <Button
-    on:click={submitMarkupAndFetchNext}
-    type={$assessState.focusedGroup === submitGroup ? 'filled': 'flat'}
-    id='device_submit'
-    >
-      Submit
-  </Button>
+  <ControlSubmit
+    {submitMarkupAndFetchNext}
+    isSelected={$assessState.focusedGroup === submitGroup}
+    />
 </div>
 
 
