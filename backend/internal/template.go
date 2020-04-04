@@ -16,17 +16,14 @@ type ValueWithVizual struct {
 	Vizual string `json:"vizual"`
 }
 
-type RadioField struct {
+type ClassificationField struct {
 	Type   string            `json:"type"`
 	Group  string            `json:"group"`
 	Labels []ValueWithVizual `json:"labels"`
 }
 
-type CheckboxField struct {
-	Type   string            `json:"type"`
-	Group  string            `json:"group"`
-	Labels []ValueWithVizual `json:"labels"`
-}
+type RadioField = ClassificationField
+type CheckboxField = ClassificationField
 
 func NewRadioField(group string) *RadioField {
 	return &RadioField{
@@ -49,6 +46,20 @@ type Template struct {
 	Checkboxes []CheckboxField `json:"checkboxes"`
 
 	FieldsOrder []string `json:"fields_order"`
+}
+
+func (t *Template) getClassificationFields() []ClassificationField {
+	fields := []ClassificationField{}
+
+	for _, f := range t.Radios {
+		fields = append(fields, f)
+	}
+
+	for _, f := range t.Checkboxes {
+		fields = append(fields, f)
+	}
+
+	return fields
 }
 
 type TemplateXML struct {

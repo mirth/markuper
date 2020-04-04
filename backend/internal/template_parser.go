@@ -166,12 +166,7 @@ func XMLToTemplate(s string) (Template, error) {
 
 func duplicatedGroups(t Template) []string {
 	groupCount := map[string]int{}
-
-	for _, f := range t.Radios {
-		groupCount[f.Group] += 1
-	}
-
-	for _, f := range t.Checkboxes {
+	for _, f := range t.getClassificationFields() {
 		groupCount[f.Group] += 1
 	}
 
@@ -198,19 +193,7 @@ func findCountsGt1(m map[string]int) []string {
 
 func duplicatedLabels(t Template) map[string][]string {
 	dups := map[string][]string{}
-	for _, f := range t.Radios {
-		labelCount := map[string]int{}
-		for _, l := range f.Labels {
-			labelCount[l.Value] += 1
-		}
-
-		d := findCountsGt1(labelCount)
-		if len(d) > 0 {
-			dups[f.Group] = d
-		}
-	}
-
-	for _, f := range t.Checkboxes {
+	for _, f := range t.getClassificationFields() {
 		labelCount := map[string]int{}
 		for _, l := range f.Labels {
 			labelCount[l.Value] += 1
