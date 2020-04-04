@@ -1,24 +1,12 @@
 <script>
+import { push } from 'svelte-spa-router';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Block from 'svelte-atoms/Block.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
-import Popup from 'svelte-atoms/Popup.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import Container from 'svelte-atoms/Grids/Container.svelte';
-import CreateProjectPopup from './CreateProjectPopup.svelte';
 import ProjectList from './ProjectList.svelte';
-
-
-let isNewProjectPopupShown = false;
-
-function showNewProjectPopup() {
-  isNewProjectPopupShown = true;
-}
-
-function closeNewProjectPopup() {
-  isNewProjectPopupShown = false;
-}
 
 </script>
 
@@ -29,7 +17,7 @@ function closeNewProjectPopup() {
   <Spacer size={128} />
   <div>
     <Button
-      on:click={showNewProjectPopup}
+      on:click={() => push('/create_project')}
       iconRight='chevron-right'
       style='display: inline;'
     >
@@ -42,11 +30,6 @@ function closeNewProjectPopup() {
 <ProjectList />
 </Container>
 
-<Popup isOpen={isNewProjectPopupShown} on:close={closeNewProjectPopup}>
-  <div style='min-width: 600px;'>
-    <CreateProjectPopup close={closeNewProjectPopup} />
-  </div>
-</Popup>
 
 <style>
 div {
