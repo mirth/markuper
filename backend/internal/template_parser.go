@@ -135,12 +135,27 @@ func XMLToTemplate(s string) (Template, error) {
 	}
 
 	{
-		duplicateGroups := duplicatedGroups(t)
+		dups := duplicatedGroups(t)
 
-		if len(duplicateGroups) > 0 {
+		if len(dups) > 0 {
 			errMsg := fmt.Sprintf(
 				"Template has duplicate groups: %s",
-				strings.Join(duplicateGroups, ", "),
+				strings.Join(dups, ", "),
+			)
+			return Template{}, NewBusinessError(errMsg)
+		}
+	}
+	{
+		dups := []string{}
+		for g, l := range duplicatedLabels(t) {
+			dl := strings.Join(l, ", ")
+			dups = append(dups, fmt.Sprintf("group [%s] labels [%s]", g, dl))
+		}
+
+		if len(dups) > 0 {
+			errMsg := fmt.Sprintf(
+				"Template has duplicate labels: %s",
+				strings.Join(dups, ", "),
 			)
 			return Template{}, NewBusinessError(errMsg)
 		}
@@ -164,6 +179,46 @@ func duplicatedGroups(t Template) []string {
 	for l, c := range groupCount {
 		if c > 1 {
 			dups = append(dups, l)
+		}
+	}
+
+	return dups
+}
+
+func findCountsGt1(m map[string]int) []string {
+	dups := make([]string, 0)
+	for key, c := range m {
+		if c > 1 {
+			dups = append(dups, key)
+		}
+	}
+
+	return dups
+}
+
+func duplicatedLabels(t Template) map[string][]string {
+	dups := map[string][]string{}
+	for _, f := range t.Radios {
+		labelCount := map[string]int{}
+		for _, l := range f.Labels {
+			labelCount[l.Value] += 1
+		}
+
+		d := findCountsGt1(labelCount)
+		if len(d) > 0 {
+			dups[f.Group] = d
+		}
+	}
+
+	for _, f := range t.Checkboxes {
+		labelCount := map[string]int{}
+		for _, l := range f.Labels {
+			labelCount[l.Value] += 1
+		}
+
+		d := findCountsGt1(labelCount)
+		if len(d) > 0 {
+			dups[f.Group] = d
 		}
 	}
 

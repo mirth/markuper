@@ -113,6 +113,104 @@ func TestXMLToTemplateRadios(t *testing.T) {
 
 		assert.Equal(t, "Template has duplicate groups: animal", err.Error())
 	}
+
+	{
+		data := `
+		<content>
+			<radio group="animal" value="cat" vizual="Cat" />
+			<radio group="animal" value="cat" vizual="Dog" />
+
+			<checkbox group="color" value="black" vizual="Black" />
+			<checkbox group="color" value="white" vizual="White" />
+			<checkbox group="color" value="white" vizual="white" />
+		</content>
+		`
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Template has duplicate labels: group [animal] labels [cat], group [color] labels [white]", err.Error())
+	}
+}
+
+// fixme test empty labels
+func TestDuplicatedLabels(t *testing.T) {
+	{
+		tmplt := Template{
+			Radios: []RadioField{{
+				Type:   "radio",
+				Group:  "animal",
+				Labels: []ValueWithVizual{{"dog", "Dog"}},
+			}},
+			Checkboxes: []CheckboxField{{
+				Type:   "checkbox",
+				Group:  "color",
+				Labels: []ValueWithVizual{{"white", "White"}},
+			}},
+		}
+
+		dups := duplicatedLabels(tmplt)
+		assert.Empty(t, dups)
+	}
+
+	{
+		tmplt := Template{
+			Radios: []RadioField{{
+				Type:   "radio",
+				Group:  "animal",
+				Labels: []ValueWithVizual{{"dog", "Dog"}, {"dog", "Dogh"}},
+			}},
+		}
+
+		dups := duplicatedLabels(tmplt)
+		assert.Equal(t, map[string][]string{
+			"animal": {"dog"},
+		}, dups)
+	}
+
+	{
+		tmplt := Template{
+			Checkboxes: []CheckboxField{{
+				Type:  "checkbox",
+				Group: "color",
+				Labels: []ValueWithVizual{
+					{"white", "White"},
+					{"white", "White"},
+					{"black", "Black"},
+					{"black", "Black"},
+				},
+			}},
+		}
+
+		dups := duplicatedLabels(tmplt)
+		assert.Equal(t, map[string][]string{
+			"color": {"white", "black"},
+		}, dups)
+	}
+
+	{
+		tmplt := Template{
+			Radios: []RadioField{{
+				Type:   "radio",
+				Group:  "animal",
+				Labels: []ValueWithVizual{{"dog", "Dog"}, {"dog", "Dogh"}},
+			}},
+			Checkboxes: []CheckboxField{{
+				Type:  "checkbox",
+				Group: "color",
+				Labels: []ValueWithVizual{
+					{"white", "White"},
+					{"white", "White"},
+					{"black", "Black"},
+					{"black", "Black"},
+				},
+			}},
+		}
+
+		dups := duplicatedLabels(tmplt)
+		assert.Equal(t, map[string][]string{
+			"animal": {"dog"},
+			"color":  {"white", "black"},
+		}, dups)
+	}
 }
 
 func TestDuplicatedGroups(t *testing.T) {

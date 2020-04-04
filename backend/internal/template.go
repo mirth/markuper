@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -37,20 +36,12 @@ func NewRadioField(group string) *RadioField {
 	}
 }
 
-func (f RadioField) JSON() ([]byte, error) {
-	return json.Marshal(f)
-}
-
 func NewCheckboxField(group string) *CheckboxField {
 	return &CheckboxField{
 		Group:  group,
 		Type:   "checkbox",
 		Labels: make([]ValueWithVizual, 0),
 	}
-}
-
-func (f CheckboxField) JSON() ([]byte, error) {
-	return json.Marshal(f)
 }
 
 type Template struct {
