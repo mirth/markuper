@@ -44,7 +44,44 @@ func TestMissingAttribute(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, "Element [checkbox] missing the attribute [group]", err.Error())
 	}
+}
 
+func TestEmptyAttribute(t *testing.T) {
+	{
+		data := `
+		<content>
+			<radio group="animal" value="" vizual="Cat" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Element [radio] has an empty attribute [value]", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+			<radio group="animal" value="cat" vizual="" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Element [radio] has an empty attribute [vizual]", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+			<checkbox group="" value="cat" vizual="Cat" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Element [checkbox] has an empty attribute [group]", err.Error())
+	}
 }
 
 func TestUnsupportedElement(t *testing.T) {
@@ -131,7 +168,6 @@ func TestXMLToTemplateRadios(t *testing.T) {
 	}
 }
 
-// fixme test empty labels
 func TestDuplicatedLabels(t *testing.T) {
 	{
 		tmplt := Template{

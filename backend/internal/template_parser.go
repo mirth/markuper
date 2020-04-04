@@ -51,6 +51,33 @@ func missingAttribute(nodes []Node) (Node, string) {
 	return Node{}, ""
 }
 
+func emptyAttribute(nodes []Node) (Node, string) {
+	for _, n := range nodes {
+		{
+			a, _ := getAttrByName(n, "group")
+			if len(a.Value) == 0 {
+				return n, "group"
+			}
+		}
+
+		{
+			a, _ := getAttrByName(n, "value")
+			if len(a.Value) == 0 {
+				return n, "value"
+			}
+		}
+
+		{
+			a, _ := getAttrByName(n, "vizual")
+			if len(a.Value) == 0 {
+				return n, "vizual"
+			}
+		}
+	}
+
+	return Node{}, ""
+}
+
 func XMLToTemplate(s string) (Template, error) {
 	buf := bytes.NewBuffer([]byte(s))
 	dec := xml.NewDecoder(buf)
@@ -68,12 +95,24 @@ func XMLToTemplate(s string) (Template, error) {
 	})
 
 	{
-		targetNode, missingAttr := missingAttribute(nodes)
-		if len(missingAttr) > 0 {
+		targetNode, attr := missingAttribute(nodes)
+		if len(attr) > 0 {
 			errMsg := fmt.Sprintf(
 				"Element [%s] missing the attribute [%s]",
 				targetNode.XMLName.Local,
-				missingAttr,
+				attr,
+			)
+			return Template{}, NewBusinessError(errMsg)
+		}
+	}
+
+	{
+		targetNode, attr := emptyAttribute(nodes)
+		if len(attr) > 0 {
+			errMsg := fmt.Sprintf(
+				"Element [%s] has an empty attribute [%s]",
+				targetNode.XMLName.Local,
+				attr,
 			)
 			return Template{}, NewBusinessError(errMsg)
 		}
