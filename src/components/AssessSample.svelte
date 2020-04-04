@@ -5,7 +5,7 @@ import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
-import ControlDevice from './ControlDevice.svelte';
+import ControlDevice from './controls/ControlDevice.svelte';
 import { activeMarkup } from '../store';
 import { goToProject } from '../project';
 

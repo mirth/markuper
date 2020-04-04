@@ -1,9 +1,9 @@
 <script>
 import { onMount } from 'svelte';
 import { push } from 'svelte-spa-router';
-import api from '../api';
 import IconButton from 'svelte-atoms/IconButton.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import api from '../api';
 
 let version;
 onMount(async () => {
@@ -16,7 +16,7 @@ onMount(async () => {
   <Spacer size={16} />
   <IconButton
     icon='monitor'
-    on:click={() => push(`/`)}
+    on:click={() => push('/')}
     type='filled' status='primary'
     style='display: inline;'
   />

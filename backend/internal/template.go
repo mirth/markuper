@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -17,17 +16,14 @@ type ValueWithVizual struct {
 	Vizual string `json:"vizual"`
 }
 
-type RadioField struct {
+type ClassificationField struct {
 	Type   string            `json:"type"`
 	Group  string            `json:"group"`
 	Labels []ValueWithVizual `json:"labels"`
 }
 
-type CheckboxField struct {
-	Type   string            `json:"type"`
-	Group  string            `json:"group"`
-	Labels []ValueWithVizual `json:"labels"`
-}
+type RadioField = ClassificationField
+type CheckboxField = ClassificationField
 
 func NewRadioField(group string) *RadioField {
 	return &RadioField{
@@ -35,10 +31,6 @@ func NewRadioField(group string) *RadioField {
 		Type:   "radio",
 		Labels: make([]ValueWithVizual, 0),
 	}
-}
-
-func (f RadioField) JSON() ([]byte, error) {
-	return json.Marshal(f)
 }
 
 func NewCheckboxField(group string) *CheckboxField {
@@ -49,15 +41,25 @@ func NewCheckboxField(group string) *CheckboxField {
 	}
 }
 
-func (f CheckboxField) JSON() ([]byte, error) {
-	return json.Marshal(f)
-}
-
 type Template struct {
 	Radios     []RadioField    `json:"radios"`
 	Checkboxes []CheckboxField `json:"checkboxes"`
 
 	FieldsOrder []string `json:"fields_order"`
+}
+
+func (t *Template) getClassificationFields() []ClassificationField {
+	fields := []ClassificationField{}
+
+	for _, f := range t.Radios {
+		fields = append(fields, f)
+	}
+
+	for _, f := range t.Checkboxes {
+		fields = append(fields, f)
+	}
+
+	return fields
 }
 
 type TemplateXML struct {

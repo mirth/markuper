@@ -1,8 +1,8 @@
 <script>
 import Checkbox from 'svelte-atoms/Checkbox.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
-import { makeLabelsWithKeys } from '../control';
-import { activeMarkup, assessState, isFieldSelected } from '../store';
+import { makeLabelsWithKeys } from '../../control';
+import { activeMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
 export let field;
@@ -24,8 +24,8 @@ function handleKeydown(event) {
 }
 
 function updateMarkupWith(labelValue) {
-  if(checked.has(labelValue)) {
-    checked.delete(labelValue)
+  if (checked.has(labelValue)) {
+    checked.delete(labelValue);
   } else {
     checked.add(labelValue);
   }
@@ -55,7 +55,7 @@ async function handleKeyup(event) {
 }
 
 function onChangeFor(labelValue) {
-  return (ev) => {
+  return () => {
     updateMarkupWith(labelValue);
   };
 }

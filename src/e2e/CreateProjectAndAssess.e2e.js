@@ -7,7 +7,7 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   makeUrl, getRadio, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
-  sleep, clickButton, getRadioState, clickLink,
+  sleep, clickButton, getRadioState,
 } from './test_common';
 
 

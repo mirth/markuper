@@ -3,17 +3,18 @@ import path from 'path';
 import { expect } from 'chai';
 import api from '../api';
 
+
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
-export const getRadio = (app, device, i) => app.client.element(`//*[@id="${device}"]/ul/li[${i}]/div/label`);
+export const getRadio = (app, device, i) => app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/div/label`);
 export const getChbox = (app, device, i) => {
-  const el = app.client.element(`//*[@id="${device}"]/div/ul/li[${i}]/label/input`);
+  const el = app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/label/input`);
   return el;
 };
 
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 
 export const assertRadioLabels = async (app, device, expectedLabels) => {
-  const radios = `//*[@id="${device}"]/ul/li/div/label`;
+  const radios = `//*[@id="${device}"]/div/label/ul/li/div/label`;
   await app.client.waitForExist(radios);
   const elements = await app.client.elements(radios);
   const actualLabels = await Promise.all(elements.value.map(async (el) => {
@@ -137,7 +138,7 @@ export function createProjectWithTemplate(app, appPath, xml) {
 }
 
 export const getRadioState = async (app, device) => {
-  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/div/label/input`);
+  const elements = await app.client.elements(`//*[@id="${device}"]/div/label/ul/li/div/label/input`);
   const disabled = await Promise.all(elements.value.map(async (el) => {
     const isSelected = await app.client.elementIdSelected(el.ELEMENT);
     return isSelected.value;
@@ -146,7 +147,7 @@ export const getRadioState = async (app, device) => {
   return disabled;
 };
 export const getChecked = async (app, device) => {
-  const elements = await app.client.elements(`//*[@id="${device}"]/ul/li/label/input`);
+  const elements = await app.client.elements(`//*[@id="${device}"]/div/label/ul/li/label/input`);
   const checked = await Promise.all(elements.value.map(async (el) => {
     const ch = await app.client.elementIdSelected(el.ELEMENT, 'checked');
     return ch.value;

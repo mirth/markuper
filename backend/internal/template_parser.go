@@ -51,6 +51,33 @@ func missingAttribute(nodes []Node) (Node, string) {
 	return Node{}, ""
 }
 
+func emptyAttribute(nodes []Node) (Node, string) {
+	for _, n := range nodes {
+		{
+			a, _ := getAttrByName(n, "group")
+			if len(a.Value) == 0 {
+				return n, "group"
+			}
+		}
+
+		{
+			a, _ := getAttrByName(n, "value")
+			if len(a.Value) == 0 {
+				return n, "value"
+			}
+		}
+
+		{
+			a, _ := getAttrByName(n, "vizual")
+			if len(a.Value) == 0 {
+				return n, "vizual"
+			}
+		}
+	}
+
+	return Node{}, ""
+}
+
 func XMLToTemplate(s string) (Template, error) {
 	buf := bytes.NewBuffer([]byte(s))
 	dec := xml.NewDecoder(buf)
@@ -68,12 +95,24 @@ func XMLToTemplate(s string) (Template, error) {
 	})
 
 	{
-		targetNode, missingAttr := missingAttribute(nodes)
-		if len(missingAttr) > 0 {
+		targetNode, attr := missingAttribute(nodes)
+		if len(attr) > 0 {
 			errMsg := fmt.Sprintf(
 				"Element [%s] missing the attribute [%s]",
 				targetNode.XMLName.Local,
-				missingAttr,
+				attr,
+			)
+			return Template{}, NewBusinessError(errMsg)
+		}
+	}
+
+	{
+		targetNode, attr := emptyAttribute(nodes)
+		if len(attr) > 0 {
+			errMsg := fmt.Sprintf(
+				"Element [%s] has an empty attribute [%s]",
+				targetNode.XMLName.Local,
+				attr,
 			)
 			return Template{}, NewBusinessError(errMsg)
 		}
@@ -135,12 +174,27 @@ func XMLToTemplate(s string) (Template, error) {
 	}
 
 	{
-		duplicateGroups := duplicatedGroups(t)
+		dups := duplicatedGroups(t)
 
-		if len(duplicateGroups) > 0 {
+		if len(dups) > 0 {
 			errMsg := fmt.Sprintf(
 				"Template has duplicate groups: %s",
-				strings.Join(duplicateGroups, ", "),
+				strings.Join(dups, ", "),
+			)
+			return Template{}, NewBusinessError(errMsg)
+		}
+	}
+	{
+		dups := []string{}
+		for g, l := range duplicatedLabels(t) {
+			dl := strings.Join(l, ", ")
+			dups = append(dups, fmt.Sprintf("group [%s] labels [%s]", g, dl))
+		}
+
+		if len(dups) > 0 {
+			errMsg := fmt.Sprintf(
+				"Template has duplicate labels: %s",
+				strings.Join(dups, ", "),
 			)
 			return Template{}, NewBusinessError(errMsg)
 		}
@@ -151,19 +205,35 @@ func XMLToTemplate(s string) (Template, error) {
 
 func duplicatedGroups(t Template) []string {
 	groupCount := map[string]int{}
-
-	for _, f := range t.Radios {
+	for _, f := range t.getClassificationFields() {
 		groupCount[f.Group] += 1
 	}
 
-	for _, f := range t.Checkboxes {
-		groupCount[f.Group] += 1
-	}
+	return findCountsGt1(groupCount)
+}
 
+func findCountsGt1(m map[string]int) []string {
 	dups := make([]string, 0)
-	for l, c := range groupCount {
+	for key, c := range m {
 		if c > 1 {
-			dups = append(dups, l)
+			dups = append(dups, key)
+		}
+	}
+
+	return dups
+}
+
+func duplicatedLabels(t Template) map[string][]string {
+	dups := map[string][]string{}
+	for _, f := range t.getClassificationFields() {
+		labelCount := map[string]int{}
+		for _, l := range f.Labels {
+			labelCount[l.Value] += 1
+		}
+
+		d := findCountsGt1(labelCount)
+		if len(d) > 0 {
+			dups[f.Group] = d
 		}
 	}
 

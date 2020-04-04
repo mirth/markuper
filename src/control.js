@@ -8,3 +8,5 @@ export function makeLabelsWithKeys(fieldLabels) {
 
   return [keys, labelsWithKeys];
 }
+
+export const submitGroup = '[submit]';

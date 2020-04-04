@@ -22,7 +22,7 @@ const app = new Application({
 function expectFocusIsOn(devices, device) {
   it(`focused on device ${device}`, async () => {
     const cls = await Promise.all(devices.map(async (dev) => {
-      const cl = await app.client.element(`//*[@id="${dev}"]`).getAttribute('class');
+      const cl = await app.client.element(`//*[@id="${dev}"]/div`).getAttribute('class');
       return cl;
     }));
 
@@ -35,11 +35,17 @@ function expectFocusIsOn(devices, device) {
         expect(iterCl).to.not.have.string('selected');
       }
     }
+
+    const devSubmitCl = await app.client.element('//*[@id="device_submit"]/div/button').getAttribute('class');
+
+    if (device === 'devSubmit') {
+      expect(devSubmitCl).to.have.string('filled');
+    }
   });
 }
 
 async function assertCheckboxLabels(device) {
-  const inputs = `//*[@id="${device}"]/ul/li/label/input`;
+  const inputs = `//*[@id="${device}"]/div/label/ul/li/label/input`;
   await app.client.waitForExist(inputs);
   const elements = await app.client.elements(inputs);
   const labels = await Promise.all(elements.value.map(async (el) => {
@@ -99,7 +105,7 @@ describe('Device state keep for assessed samples', function () {
     await clickButton(app, 'span', 'Begin assess');
   });
 
-  it('displays button 2 pressed', async () => {
+  it('displays radio 2 selected', async () => {
     await getRadio(app, 'device0', 2).click();
 
     const selected = await getRadioState(app, 'device0');
@@ -173,7 +179,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
   });
 
   const focusIsOn = (device) => {
-    expectFocusIsOn(['device0', 'device1', 'device2', 'device_submit'], device);
+    expectFocusIsOn(['device0', 'device1', 'device2'], device);
   };
 
   it('displays correct devices labels', async () => {
@@ -198,7 +204,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
 
   focusIsOn('device1');
 
-  it('displays button 4 pressed', async () => {
+  it('displays radio 4 selected', async () => {
     await getRadio(app, 'device1', 1).click();
     await getRadio(app, 'device1', 1).click();
     await getRadio(app, 'device1', 4).click();
@@ -210,7 +216,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
 
   focusIsOn('device2');
 
-  it('displays button 2 pressed', async () => {
+  it('displays radio 2 selected', async () => {
     await getRadio(app, 'device2', 2).click();
     const selected = await getRadioState(app, 'device2');
     expect(selected).to.be.deep.eq([false, true]);
@@ -246,7 +252,7 @@ describe('Focus and state [Radio, Checkbox]', function () {
   `;
 
   const focusIsOn = (device) => {
-    expectFocusIsOn(['device0', 'device1', 'device_submit'], device);
+    expectFocusIsOn(['device0', 'device1'], device);
   };
   itNavigatesToProject(app, appPath, xml);
 
@@ -271,7 +277,7 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   focusIsOn('device0');
 
-  it('displays button 3 pressed', async () => {
+  it('displays radio 3 selected', async () => {
     await app.client.keys('3');
     const selected = await getRadioState(app, 'device0');
     expect(selected).to.be.deep.eq([false, false, true, false]);
@@ -285,7 +291,7 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   focusIsOn('device1');
 
-  it('displays button 1 pressed', async () => {
+  it('displays radio 1 selected', async () => {
     await getRadio(app, 'device0', 1).click();
     const selected = await getRadioState(app, 'device0');
     expect(selected).to.be.deep.eq([true, false, false, false]);
