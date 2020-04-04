@@ -4,9 +4,9 @@ import Block from 'svelte-atoms/Block.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
 import ControlSubmit from './ControlSubmit.svelte';
-import { assessState, activeMarkup } from '../store';
-import { getFieldsInOrderFor } from '../project';
-import { submitGroup } from '../control';
+import { assessState, activeMarkup } from '../../store';
+import { getFieldsInOrderFor } from '../../project';
+import { submitGroup } from '../../control';
 
 export let submitMarkupAndFetchNext;
 export let sample;

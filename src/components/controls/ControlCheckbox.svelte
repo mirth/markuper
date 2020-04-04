@@ -1,8 +1,8 @@
 <script>
 import Checkbox from 'svelte-atoms/Checkbox.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
-import { makeLabelsWithKeys } from '../control';
-import { activeMarkup, assessState, isFieldSelected } from '../store';
+import { makeLabelsWithKeys } from '../../control';
+import { activeMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
 export let field;
