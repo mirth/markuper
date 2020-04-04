@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -219,6 +220,8 @@ func findCountsGt1(m map[string]int) []string {
 			dups = append(dups, key)
 		}
 	}
+
+	sort.Strings(dups)
 
 	return dups
 }

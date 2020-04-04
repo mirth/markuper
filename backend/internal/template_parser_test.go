@@ -218,7 +218,7 @@ func TestDuplicatedLabels(t *testing.T) {
 
 		dups := duplicatedLabels(tmplt)
 		assert.Equal(t, map[string][]string{
-			"color": {"white", "black"},
+			"color": {"black", "white"},
 		}, dups)
 	}
 
@@ -244,7 +244,7 @@ func TestDuplicatedLabels(t *testing.T) {
 		dups := duplicatedLabels(tmplt)
 		assert.Equal(t, map[string][]string{
 			"animal": {"dog"},
-			"color":  {"white", "black"},
+			"color":  {"black", "white"},
 		}, dups)
 	}
 }
