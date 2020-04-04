@@ -64,12 +64,15 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 {#each fields as field, i }
   <div id={`device${i}`}>
     <Block type={$assessState.focusedGroup === field.group ? 'selected' : 'block1'}>
-      {#if field.type === 'radio'}
-        <ControlRadio {field} />
-      {/if}
-      {#if field.type === 'checkbox'}
-        <ControlCheckbox {field} />
-      {/if}
+      <label>
+        <span>{field.group}</span>
+        {#if field.type === 'radio'}
+          <ControlRadio {field} />
+        {/if}
+        {#if field.type === 'checkbox'}
+          <ControlCheckbox {field} />
+        {/if}
+      </label>
     </Block>
   </div>
 {/each}
@@ -83,4 +86,9 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 
 
 <style>
+
+span {
+  display: block;
+  margin-bottom: 5px;
+}
 </style>

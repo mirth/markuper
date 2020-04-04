@@ -45,7 +45,7 @@ function expectFocusIsOn(devices, device) {
 }
 
 async function assertCheckboxLabels(device) {
-  const inputs = `//*[@id="${device}"]/div/ul/li/label/input`;
+  const inputs = `//*[@id="${device}"]/div/label/ul/li/label/input`;
   await app.client.waitForExist(inputs);
   const elements = await app.client.elements(inputs);
   const labels = await Promise.all(elements.value.map(async (el) => {
