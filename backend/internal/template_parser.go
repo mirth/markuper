@@ -170,14 +170,7 @@ func duplicatedGroups(t Template) []string {
 		groupCount[f.Group] += 1
 	}
 
-	dups := make([]string, 0)
-	for l, c := range groupCount {
-		if c > 1 {
-			dups = append(dups, l)
-		}
-	}
-
-	return dups
+	return findCountsGt1(groupCount)
 }
 
 func findCountsGt1(m map[string]int) []string {
