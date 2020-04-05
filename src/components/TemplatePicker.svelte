@@ -1,9 +1,10 @@
 <script>
 import { onMount } from 'svelte';
 import _ from 'lodash';
+import api from '../api';
 import Select from 'svelte-atoms/Select.svelte';
 import Input from 'svelte-atoms/Input.svelte';
-import api from '../api';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 
 export let selectedTemplate;
 
@@ -47,6 +48,14 @@ $: options = _.map(templateList, (t) => ({
 
 </script>
 
+<Select
+  on:change={onTemplateSelected}
+  value={selectedTemplateTask}
+  {options}
+  title='Select project Task'
+  placeholder='Select task'
+  />
+<Spacer size={6} />
 <Input
   bind:value={selectedTemplate.template.xml}
   on:input={validateXML}
@@ -57,14 +66,6 @@ $: options = _.map(templateList, (t) => ({
 {#if selectedTemplate.error}
 <span>{selectedTemplate.error}</span>
 {/if}
-
-<Select
-  on:change={onTemplateSelected}
-  value={selectedTemplateTask}
-  {options}
-  title='Select project Task'
-  placeholder='Select task'
-  />
 
 <style>
 span {
