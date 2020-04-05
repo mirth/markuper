@@ -79,7 +79,7 @@ type TemplateServiceImpl struct {
 }
 
 var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
-	Task: "classification",
+	Task: "Classification",
 	XML: `<content>
     <radio group="animal" value="cat" vizual="Cat" />
     <radio group="animal" value="dog" vizual="Dog" />
@@ -87,9 +87,21 @@ var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 `,
 }
 
+var DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE = TemplateXML{
+	Task: "Multi-label classification",
+	XML: `<content>
+    <checkbox group="color" value="black" vizual="Black" />
+    <checkbox group="color" value="white" vizual="White" />
+</content>
+`,
+}
+
 func (_ *TemplateServiceImpl) ListTemplates() (TemplateList, error) {
 	return TemplateList{
-		Templates: []TemplateXML{DEFAULT_CLASSIFICATION_TEMPLATE},
+		Templates: []TemplateXML{
+			DEFAULT_CLASSIFICATION_TEMPLATE,
+			DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE,
+		},
 	}, nil
 }
 

@@ -98,9 +98,9 @@ export function createProjectWithTemplate(app, appPath, xml) {
   });
 
   it('set project task', async () => {
-    const template = "input[placeholder='Select task']";
+    const template = "input[placeholder='Select template']";
     await app.client.waitForExist(template);
-    await app.client.element(template).setValue('classification');
+    await app.client.element(template).setValue('Classification');
   });
 
   it('set xml for template', async () => {

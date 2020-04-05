@@ -38,11 +38,6 @@ describe('Application launch', function () {
     `;
     const [imgDir, glob0, glob1] = createProjectWithTemplate(app, appPath, xml);
 
-    it('navigates to project page', async () => {
-      await clickButton(app, 'span', 'testproj0');
-      await app.client.waitForText('span', 'Begin assess');
-    });
-
     it('displays project description', async () => {
       await app.client.waitUntilTextExists('span', 'testproj0');
       await app.client.waitUntilTextExists('span', glob0);

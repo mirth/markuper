@@ -20,14 +20,17 @@ function newEmptySource() {
 
 let newSource = newEmptySource();
 
+let isNewSourceValid = false;
+$: isNewSourceValid = newSource.isValid();
+
 // fixme e2e
 function addDataSource() {
-  if (!newSource.isValid()) {
+  if (!isNewSourceValid) {
     return;
   }
 
   newSource.source_uri = newSource.source_uri.trim();
-  dataSources.dataSources = dataSources.dataSources.concat([newSource]);
+  dataSources = dataSources.concat([newSource]);
   newSource = newEmptySource();
 }
 
@@ -50,16 +53,21 @@ function getDirectory(e) {
     <input type='file' on:change={getDirectory} webkitdirectory directory multiple/>
   </Cell>
   <Cell xs={9}>
-    <DataSource dataSource={newSource} />
+    <DataSource bind:dataSource={newSource} />
   </Cell>
   <Cell xs={3}>
-    <Button on:click={addDataSource} iconRight='plus'>Add source</Button>
+    <Button
+      on:click={addDataSource} iconRight='plus'
+      type={isNewSourceValid ? 'filled' : 'flat'}
+      >
+      Add source
+    </Button>
   </Cell>
 </Row>
 <Row>
 <Cell>
   <ul>
-    {#each dataSources.dataSources as dataSource}
+    {#each dataSources as dataSource}
     <li>
       <DataSource {dataSource} disabled={true} />
     </li>
@@ -69,7 +77,7 @@ function getDirectory(e) {
 </Row>
 <Row>
 <Cell>
-{#if dataSources.dataSources.length === 0}
+{#if dataSources.length === 0}
 <span>There should be at least one data source</span>
 {/if}
 </Cell>

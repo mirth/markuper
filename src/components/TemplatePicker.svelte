@@ -1,13 +1,14 @@
 <script>
 import { onMount } from 'svelte';
 import _ from 'lodash';
+import api from '../api';
 import Select from 'svelte-atoms/Select.svelte';
 import Input from 'svelte-atoms/Input.svelte';
-import api from '../api';
+import Spacer from 'svelte-atoms/Spacer.svelte';
 
 export let selectedTemplate;
 
-let selectedTemplateTask = 'classification';
+let selectedTemplateTask = 'Classification';
 let templateList = [];
 
 function onTemplateSelected(ev) {
@@ -47,24 +48,25 @@ $: options = _.map(templateList, (t) => ({
 
 </script>
 
+<Select
+  on:change={onTemplateSelected}
+  value={selectedTemplateTask}
+  {options}
+  title='Select project template'
+  placeholder='Select template'
+  />
+<Spacer size={6} />
 <Input
   bind:value={selectedTemplate.template.xml}
   on:input={validateXML}
   textarea
-  rows={5}
+  rows={12}
+  size='medium'
   />
 
 {#if selectedTemplate.error}
 <span>{selectedTemplate.error}</span>
 {/if}
-
-<Select
-  on:change={onTemplateSelected}
-  value={selectedTemplateTask}
-  {options}
-  title='Select project Task'
-  placeholder='Select task'
-  />
 
 <style>
 span {
