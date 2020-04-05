@@ -8,7 +8,7 @@ import Spacer from 'svelte-atoms/Spacer.svelte';
 
 export let selectedTemplate;
 
-let selectedTemplateTask = 'classification';
+let selectedTemplateTask = 'Classification';
 let templateList = [];
 
 function onTemplateSelected(ev) {
@@ -52,8 +52,8 @@ $: options = _.map(templateList, (t) => ({
   on:change={onTemplateSelected}
   value={selectedTemplateTask}
   {options}
-  title='Select project Task'
-  placeholder='Select task'
+  title='Select project template'
+  placeholder='Select template'
   />
 <Spacer size={6} />
 <Input
