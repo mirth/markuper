@@ -13,36 +13,25 @@ import DataSourcePicker from './DataSourcePicker.svelte';
 
 
 let projectName = '';
-const selectedTemplate = {
+let selectedTemplate = {
   template: {
     xml: '',
   },
   error: null,
 };
-const dataSources = {
-  dataSources: [],
-};
 
-function isProjectValid() {
-  if (projectNameError) {
-    return false;
-  }
-
-  if (selectedTemplate.error) {
-    return false;
-  }
-
-  if (dataSources.dataSources.length === 0) {
-    return false;
-  }
-
-  return true;
-}
-
+let dataSources = [];
 let createProjectError;
 
+$: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
+$: isProjectValid = !(
+  projectNameError
+  || selectedTemplate.error
+  || dataSources.length === 0
+);
+
 async function createNewProject() {
-  if (!isProjectValid()) {
+  if (!isProjectValid) {
     return;
   }
 
@@ -51,7 +40,7 @@ async function createNewProject() {
       name: projectName,
     },
     template: selectedTemplate.template,
-    data_sources: dataSources.dataSources,
+    data_sources: dataSources,
   });
 
   if (res.status === 400) {
@@ -63,8 +52,6 @@ async function createNewProject() {
     await goToProject(res.project_id)();
   }
 }
-
-$: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
 
 </script>
 
@@ -86,15 +73,20 @@ $: projectNameError = (projectName.trim().length === 0) && 'Project name should 
       {/if}
 
       <Spacer size={16} />
-      <TemplatePicker {selectedTemplate} />
+      <TemplatePicker bind:selectedTemplate />
       <Spacer size={24} />
-      <DataSourcePicker {dataSources} />
+      <DataSourcePicker bind:dataSources />
       <Spacer size={36} />
       <div style='display: inline;'>
         {#if createProjectError}
           <span id='create_project_error'>{createProjectError}</span>
         {/if}
-        <Button on:click={createNewProject} style='float: right; margin-bottom: 20px; margin-right: 20px;'>Create</Button>
+        <Button
+          on:click={createNewProject} style='float: right;'
+          type={isProjectValid ? 'filled' : 'flat'}
+        >
+          Create
+        </Button>
       </div>
     </Cell>
   </Row>

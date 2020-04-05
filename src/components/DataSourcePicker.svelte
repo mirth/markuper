@@ -21,7 +21,7 @@ function newEmptySource() {
 let newSource = newEmptySource();
 
 let isNewSourceValid = false;
-$: isNewSourceValid = newSource.isValid()
+$: isNewSourceValid = newSource.isValid();
 
 // fixme e2e
 function addDataSource() {
@@ -30,7 +30,7 @@ function addDataSource() {
   }
 
   newSource.source_uri = newSource.source_uri.trim();
-  dataSources.dataSources = dataSources.dataSources.concat([newSource]);
+  dataSources = dataSources.concat([newSource]);
   newSource = newEmptySource();
 }
 
@@ -67,7 +67,7 @@ function getDirectory(e) {
 <Row>
 <Cell>
   <ul>
-    {#each dataSources.dataSources as dataSource}
+    {#each dataSources as dataSource}
     <li>
       <DataSource {dataSource} disabled={true} />
     </li>
@@ -77,7 +77,7 @@ function getDirectory(e) {
 </Row>
 <Row>
 <Cell>
-{#if dataSources.dataSources.length === 0}
+{#if dataSources.length === 0}
 <span>There should be at least one data source</span>
 {/if}
 </Cell>
