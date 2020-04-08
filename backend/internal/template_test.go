@@ -16,6 +16,7 @@ func TestListTemplates(t *testing.T) {
 		assert.ElementsMatch(t, []TemplateXML{
 			DEFAULT_CLASSIFICATION_TEMPLATE,
 			DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE,
+			DEFAULT_OBJECT_DETECTION_TEMPLATE,
 		}, l.Templates)
 	}
 }

@@ -6,6 +6,7 @@ import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
+import SampleView from './SampleView.svelte';
 import { activeMarkup } from '../store';
 import { goToProject } from '../project';
 
@@ -46,9 +47,7 @@ async function submitMarkupAndFetchNext() {
     {#if sample.sample === null}
       <Typography type="title" block>No samples left</Typography>
     {:else}
-      <div class='image-container'>
-        <img src='file://{sample.sample.image_uri}' alt='KEK'/>
-      </div>
+      <SampleView {sample} />
     {/if}
   </Cell>
   <Cell xs={4}>
@@ -72,19 +71,6 @@ async function submitMarkupAndFetchNext() {
 
 <style>
 
-.image-container {
-  padding: 0 45px 45px 0;
-  width: 100%;
-}
-
-img {
-  max-width: 100%;
-  border: 1px solid black;
-
-  display:block;
-  margin-left:auto;
-  margin-right:auto;
-}
 
 hr {
   border: none;

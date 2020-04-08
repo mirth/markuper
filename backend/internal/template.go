@@ -25,6 +25,12 @@ type ClassificationField struct {
 type RadioField = ClassificationField
 type CheckboxField = ClassificationField
 
+type BoundingBoxField struct {
+	Type   string            `json:"type"`
+	Group  string            `json:"group"`
+	Labels []ValueWithVizual `json:"labels"`
+}
+
 func NewRadioField(group string) *RadioField {
 	return &RadioField{
 		Group:  group,
@@ -41,9 +47,18 @@ func NewCheckboxField(group string) *CheckboxField {
 	}
 }
 
+func NewBoundingBoxField(group string) *BoundingBoxField {
+	return &BoundingBoxField{
+		Type:   "bounding_box",
+		Group:  group,
+		Labels: make([]ValueWithVizual, 0),
+	}
+}
+
 type Template struct {
-	Radios     []RadioField    `json:"radios"`
-	Checkboxes []CheckboxField `json:"checkboxes"`
+	Radios        []RadioField       `json:"radios"`
+	Checkboxes    []CheckboxField    `json:"checkboxes"`
+	BoundingBoxes []BoundingBoxField `json:"bounding_boxes"`
 
 	FieldsOrder []string `json:"fields_order"`
 }
@@ -96,11 +111,21 @@ var DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE = TemplateXML{
 `,
 }
 
+var DEFAULT_OBJECT_DETECTION_TEMPLATE = TemplateXML{
+	Task: "Object detection",
+	XML: `<content>
+	<bounding_box group="animal" value="cat" vizual="Cat"/>
+	<bounding_box group="animal" value="dog" vizual="Dog"/>
+</content>
+`,
+}
+
 func (_ *TemplateServiceImpl) ListTemplates() (TemplateList, error) {
 	return TemplateList{
 		Templates: []TemplateXML{
 			DEFAULT_CLASSIFICATION_TEMPLATE,
 			DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE,
+			DEFAULT_OBJECT_DETECTION_TEMPLATE,
 		},
 	}, nil
 }

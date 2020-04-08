@@ -100,7 +100,7 @@ func TestUnsupportedElement(t *testing.T) {
 	assert.Equal(t, "Unsupported element [kek]", err.Error())
 }
 
-func TestXMLToTemplateRadios(t *testing.T) {
+func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
@@ -110,12 +110,15 @@ func TestXMLToTemplateRadios(t *testing.T) {
 			<checkbox group="color" value="black" vizual="Black" />
 			<checkbox group="color" value="white" vizual="White" />
 			<checkbox group="color" value="pink" vizual="Pink" />
+
+			<bounding_box group="box" value="cat" vizual="Cat" />
+			<bounding_box group="box" value="dog" vizual="Dog" />
 		</content>
 		`
 		tt, err := XMLToTemplate(data)
 		assert.Nil(t, err)
 
-		assert.Equal(t, []string{"animal", "color"}, tt.FieldsOrder)
+		assert.Equal(t, []string{"animal", "color", "box"}, tt.FieldsOrder)
 		assert.ElementsMatch(t, []RadioField{{
 			Type:  "radio",
 			Group: "animal",
@@ -124,6 +127,7 @@ func TestXMLToTemplateRadios(t *testing.T) {
 				{Vizual: "Dog", Value: "dog"},
 			},
 		}}, tt.Radios)
+
 		assert.ElementsMatch(t, []CheckboxField{{
 			Type:  "checkbox",
 			Group: "color",
@@ -133,6 +137,15 @@ func TestXMLToTemplateRadios(t *testing.T) {
 				{Vizual: "Pink", Value: "pink"},
 			},
 		}}, tt.Checkboxes)
+
+		assert.ElementsMatch(t, []BoundingBoxField{{
+			Type:  "bounding_box",
+			Group: "box",
+			Labels: []ValueWithVizual{
+				{Vizual: "Cat", Value: "cat"},
+				{Vizual: "Dog", Value: "dog"},
+			},
+		}}, tt.BoundingBoxes)
 	}
 
 	{

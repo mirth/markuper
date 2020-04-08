@@ -79,6 +79,61 @@ func emptyAttribute(nodes []Node) (Node, string) {
 	return Node{}, ""
 }
 
+func nodesToFields(
+	nodes []Node,
+	radiosByGroup *map[string]*RadioField,
+	checkboxesByGroup *map[string]*CheckboxField,
+	bboxesByGroup *map[string]*BoundingBoxField,
+) ([]string, error) {
+	groupsByOrder := []string{}
+	for _, n := range nodes {
+		g := getGroup(n)
+		groupsByOrder = append(groupsByOrder, g)
+
+		appendLabels := func(labels []ValueWithVizual) []ValueWithVizual {
+			return append(labels, ValueWithVizual{
+				Vizual: getVizual(n),
+				Value:  getValue(n),
+			})
+		}
+
+		switch n.XMLName.Local {
+		case "radio":
+			f, ok := (*radiosByGroup)[g]
+			if !ok {
+				f = NewRadioField(g)
+				(*radiosByGroup)[g] = f
+			}
+
+			f.Labels = appendLabels(f.Labels)
+		case "checkbox":
+			f, ok := (*checkboxesByGroup)[g]
+			if !ok {
+				f = NewCheckboxField(g)
+				(*checkboxesByGroup)[g] = f
+			}
+
+			f.Labels = appendLabels(f.Labels)
+		case "bounding_box":
+			f, ok := (*bboxesByGroup)[g]
+			if !ok {
+				f = NewBoundingBoxField(g)
+				(*bboxesByGroup)[g] = f
+			}
+
+			f.Labels = appendLabels(f.Labels)
+		default:
+			return nil, NewBusinessError(
+				fmt.Sprintf("Unsupported element [%s]", n.XMLName.Local),
+			)
+		}
+	}
+
+	groupsByOrder = utils.Unique(groupsByOrder)
+
+	return groupsByOrder, nil
+}
+
 func XMLToTemplate(s string) (Template, error) {
 	buf := bytes.NewBuffer([]byte(s))
 	dec := xml.NewDecoder(buf)
@@ -121,57 +176,35 @@ func XMLToTemplate(s string) (Template, error) {
 
 	radiosByGroup := map[string]*RadioField{}
 	checkboxesByGroup := map[string]*CheckboxField{}
-	groupsByOrder := []string{}
-	for _, n := range nodes {
-		g := getGroup(n)
-		groupsByOrder = append(groupsByOrder, g)
-
-		appendLabels := func(labels []ValueWithVizual) []ValueWithVizual {
-			return append(labels, ValueWithVizual{
-				Vizual: getVizual(n),
-				Value:  getValue(n),
-			})
-		}
-
-		switch n.XMLName.Local {
-		case "radio":
-			f, ok := radiosByGroup[g]
-			if !ok {
-				f = NewRadioField(g)
-				radiosByGroup[g] = f
-			}
-
-			f.Labels = appendLabels(f.Labels)
-		case "checkbox":
-			f, ok := checkboxesByGroup[g]
-			if !ok {
-				f = NewCheckboxField(g)
-				checkboxesByGroup[g] = f
-			}
-
-			f.Labels = appendLabels(f.Labels)
-		default:
-			return Template{}, NewBusinessError(
-				fmt.Sprintf("Unsupported element [%s]", n.XMLName.Local),
-			)
-		}
+	bboxesByGroup := map[string]*BoundingBoxField{}
+	groupsByOrder, err := nodesToFields(
+		nodes,
+		&radiosByGroup,
+		&checkboxesByGroup,
+		&bboxesByGroup,
+	)
+	if err != nil {
+		return Template{}, err
 	}
-
-	groupsByOrder = utils.Unique(groupsByOrder)
 
 	radios := make([]RadioField, 0)
 	checkboxes := make([]CheckboxField, 0)
+	bboxes := make([]BoundingBoxField, 0)
 	for _, v := range radiosByGroup {
 		radios = append(radios, *v)
 	}
 	for _, v := range checkboxesByGroup {
 		checkboxes = append(checkboxes, *v)
 	}
+	for _, v := range bboxesByGroup {
+		bboxes = append(bboxes, *v)
+	}
 
 	t := Template{
-		Radios:      radios,
-		Checkboxes:  checkboxes,
-		FieldsOrder: groupsByOrder,
+		Radios:        radios,
+		Checkboxes:    checkboxes,
+		FieldsOrder:   groupsByOrder,
+		BoundingBoxes: bboxes,
 	}
 
 	{
@@ -235,6 +268,7 @@ func duplicatedLabels(t Template) map[string][]string {
 		}
 
 		d := findCountsGt1(labelCount)
+		sort.Strings(d)
 		if len(d) > 0 {
 			dups[f.Group] = d
 		}

@@ -17,8 +17,11 @@ export const activeProject = writable({
   data_sources: [],
 });
 export const activeMarkup = writable({});
+export const sampleView = writable({});
 export const assessState = writable({
   focusedGroup: null,
+  activeBBox: null,
+  imageElement: null,
 });
 
 export async function fetchProjectList() {

@@ -16,8 +16,8 @@ import { getFieldsInOrderFor } from '../project';
 
 export let params;
 
-function labelsStr(radio) {
-  return _.map(radio.labels, 'value').join(', ');
+function labelsStr(field) {
+  return _.map(field.labels, 'value').join(', ');
 }
 
 function exportProject(p) {

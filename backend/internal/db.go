@@ -36,6 +36,9 @@ func fixGob(p Project) Project {
 	if p.Template.Checkboxes == nil {
 		p.Template.Checkboxes = make([]CheckboxField, 0)
 	}
+	if p.Template.BoundingBoxes == nil {
+		p.Template.BoundingBoxes = make([]BoundingBoxField, 0)
+	}
 
 	return p
 }

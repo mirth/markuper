@@ -4,13 +4,13 @@ import Block from 'svelte-atoms/Block.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
 import ControlSubmit from './ControlSubmit.svelte';
+import ControlBoundingBox from './ControlBoundingBox.svelte';
 import { assessState, activeMarkup } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 import { submitGroup } from '../../control';
 
 export let submitMarkupAndFetchNext;
-export let sample;
-
+export let sample;;
 
 $: $activeMarkup = (sample.markup && sample.markup.markup) || {};
 
@@ -62,6 +62,7 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
 
 {#each fields as field, i }
+  {console.log("field: ", field)}
   <div id={`device${i}`}>
     <Block type={$assessState.focusedGroup === field.group ? 'selected' : 'block1'}>
       <label>
@@ -71,6 +72,9 @@ $: $assessState.focusedGroup = groupsOrder[fieldIter];
         {/if}
         {#if field.type === 'checkbox'}
           <ControlCheckbox {field} />
+        {/if}
+        {#if field.type === 'bounding_box'}
+          <ControlBoundingBox {field} />
         {/if}
       </label>
     </Block>
