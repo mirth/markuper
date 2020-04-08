@@ -42,38 +42,38 @@ $: boxes = $activeMarkup[field.group] || []
 </div>
 
 <style>
-canvas {
+/* canvas {
   position:absolute;
   width: 100%;
   height: 100%;
 
   z-index:20;
-}
+} */
 
 img {
-  /* position:absolute; */
   z-index:1;
 
   max-width: 100%;
-  border: 1px solid black;
 
   display:block;
   margin-left:auto;
   margin-right:auto;
+
+  box-sizing: content-box;
 }
 
 .box {
   position: absolute;
   border: 1px solid green;
+
+  box-sizing: border-box;
 }
 
-/* .image-container {
-  position:absolute;
-  display:inline-block;
-  /* padding: 0 45px 45px 0; */
-  /* margin: 0 auto; */
-  /* width: 100%; */
-/* } */
+.image-container {
+  position:relative;
+  border: 1px solid black;
+}
+
 
 
 </style>

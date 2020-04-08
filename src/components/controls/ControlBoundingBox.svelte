@@ -12,7 +12,7 @@ onMount(() => {
 });
 let boxes = [];
 $: $activeMarkup[field.group] = boxes
-
+$: img = $assessState.imageElement;
 
 function cornersToBox(upperLeft, downRight) {
     const width = downRight.x - upperLeft.x;
@@ -27,15 +27,29 @@ function cornersToBox(upperLeft, downRight) {
 }
 
 function computePos(ev) {
-  const rect = $assessState.imageElement.getBoundingClientRect()
+  const rect = img.getBoundingClientRect()
 
   return {
-    x: ev.pageX - rect.left + $assessState.imageElement.offsetLeft,
-    y: ev.pageY - rect.top + $assessState.imageElement.offsetTop,
+    x: ev.pageX - rect.left + img.offsetLeft,
+    y: ev.pageY - rect.top + img.offsetTop,
   }
 }
 
 function handleMousedown(ev) {
+  if(ev.pageX) {
+
+  }
+
+  const img = $assessState.imageElement;
+
+  if(ev.x < img.x || ev.x > img.x + img.width) {
+    return
+  }
+
+  if(ev.y < img.y || ev.y > img.y + img.height) {
+    return
+  }
+
   upperLeft = computePos(ev)
 }
 
@@ -56,29 +70,23 @@ function handleMouseup(ev) {
 
 
 function handleMousemove(ev) {
-  // if(!(upperLeft && downRight)) {
-  //   return;
-  // }
-  // console.log('ev: ', ev)
   if(upperLeft) {
     downRight = computePos(ev);
-  }
-  // console.log('ev: ', ev)
 
-  // const ctx = $sampleView.getContext('2d');
-  // ctx.clearRect(0, 0, 320, 320)
-  // console.log('upperLeft: ', upperLeft)
-  // console.log('downRight: ', downRight)
+    const rect = img.getBoundingClientRect()
+
+    if(ev.x > img.x + img.width) {
+      downRight.x = img.width;
+    }
+    if(ev.y > img.y + img.height) {
+      downRight.y = img.height;
+    }
+  }
+
   if(upperLeft && downRight) {
     const box = cornersToBox(upperLeft, downRight)
     $assessState.activeBBox = box;
-  //   drawBox(ctx, box);
   }
-
-  // for(let box of boxes) {
-  //   drawBox(ctx, box);
-  // }
-  // ctx.clear();
 }
 
 function handleKeydown(ev) {
