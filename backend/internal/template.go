@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"backend/pkg/utils"
 	"context"
+	"fmt"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -26,9 +28,22 @@ type RadioField = ClassificationField
 type CheckboxField = ClassificationField
 
 type BoundingBoxField struct {
-	Type   string            `json:"type"`
-	Group  string            `json:"group"`
-	Labels []ValueWithVizual `json:"labels"`
+	*ClassificationComponents
+
+	Type  string `json:"type"`
+	Group string `json:"group"`
+}
+
+type Field interface {
+	GetType() string
+}
+
+func (f ClassificationField) GetType() string {
+	return f.Type
+}
+
+func (f BoundingBoxField) GetType() string {
+	return f.Type
 }
 
 func NewRadioField(group string) *RadioField {
@@ -49,22 +64,114 @@ func NewCheckboxField(group string) *CheckboxField {
 
 func NewBoundingBoxField(group string) *BoundingBoxField {
 	return &BoundingBoxField{
-		Type:   "bounding_box",
-		Group:  group,
-		Labels: make([]ValueWithVizual, 0),
+		Type:  "bounding_box",
+		Group: group,
+		ClassificationComponents: &ClassificationComponents{
+			Radios:     make([]*RadioField, 0),
+			Checkboxes: make([]*CheckboxField, 0),
+		},
 	}
 }
 
-type Template struct {
-	Radios        []RadioField       `json:"radios"`
-	Checkboxes    []CheckboxField    `json:"checkboxes"`
-	BoundingBoxes []BoundingBoxField `json:"bounding_boxes"`
-
-	FieldsOrder []string `json:"fields_order"`
+type ClassificationComponents struct {
+	Radios      []*RadioField    `json:"radios"`
+	Checkboxes  []*CheckboxField `json:"checkboxes"`
+	FieldsOrder []string         `json:"fields_order"`
 }
 
-func (t *Template) getClassificationFields() []ClassificationField {
-	fields := []ClassificationField{}
+type Template struct {
+	*ClassificationComponents
+	BoundingBoxes []*BoundingBoxField `json:"bounding_boxes"`
+}
+
+func findClField(fields []*ClassificationField, group string) *ClassificationField {
+	for _, iterField := range fields {
+		if iterField.Group == group {
+			return iterField
+		}
+	}
+
+	return nil
+}
+
+func findBBoxField(fields []*BoundingBoxField, group string) *BoundingBoxField {
+	for _, iterField := range fields {
+		if iterField.Group == group {
+			return iterField
+		}
+	}
+
+	return nil
+}
+
+func appendIfNotExists(s *[]string, g string) {
+	if len(*s) == 0 || !utils.Contains(*s, g) {
+		*s = append(*s, g)
+	}
+}
+
+func isClField(fieldName string) bool {
+	if fieldName == "radio" {
+		return true
+	}
+
+	if fieldName == "checkbox" {
+		return true
+	}
+
+	return false
+}
+
+func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) {
+	g := getGroup(n)
+	var f *ClassificationField
+
+	switch n.XMLName.Local {
+	case "radio":
+		f = findClField(t.Radios, g)
+		if f == nil {
+			f = NewRadioField(g)
+			t.Radios = append(t.Radios, f)
+		}
+	case "checkbox":
+		f = findClField(t.Checkboxes, g)
+		if f == nil {
+			f = NewCheckboxField(g)
+			t.Checkboxes = append(t.Checkboxes, f)
+		}
+	}
+
+	f.Labels = append(f.Labels, ValueWithVizual{
+		Vizual: getVizual(n),
+		Value:  getValue(n),
+	})
+
+	appendIfNotExists(&t.FieldsOrder, g)
+}
+
+func (t *Template) CreateOrUpdateBBoxFieldFor(n Node) error {
+	g := getGroup(n)
+	box := findBBoxField(t.BoundingBoxes, g)
+	if box == nil {
+		box = NewBoundingBoxField(g)
+	}
+
+	for _, iterNode := range n.Nodes {
+		if !isClField(iterNode.XMLName.Local) {
+			return NewBusinessError(
+				fmt.Sprintf("Unsupported element [%s] in bounding_box field", n.XMLName.Local),
+			)
+		}
+		box.CreateOrUpdateClFieldFor(iterNode)
+	}
+
+	appendIfNotExists(&t.FieldsOrder, g)
+
+	return nil
+}
+
+func (t *Template) getClassificationFields() []*ClassificationField {
+	fields := []*ClassificationField{}
 
 	for _, f := range t.Radios {
 		fields = append(fields, f)
