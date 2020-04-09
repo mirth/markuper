@@ -1,15 +1,16 @@
 <script>
-import { onMount } from 'svelte';
 import {sampleView, activeMarkup, assessState} from '../../store';
+import ControlList from './ControlList.svelte';
+import { getFieldsInOrderFor } from '../../project';
 
 export let field;
+export let prefix;
+
+// const [fields, groupsOrder] = getFieldsInOrderFor(field);
 
 let upperLeft;
 let downRight;
 
-onMount(() => {
-
-});
 let boxes = [];
 $: $activeMarkup[field.group] = boxes
 $: img = $assessState.imageElement;
@@ -103,11 +104,9 @@ function handleKeyup(ev) {
   on:mousedown={handleMousedown}
   on:mouseup={handleMouseup}
   on:mousemove={handleMousemove}
-  on:keydown={handleKeydown}
-  on:keyup={handleKeyup}
   />
 
-KEK
-<!-- <canvas
-  bind:this={canvas}
-></canvas> -->
+  <!-- on:keydown={handleKeydown}
+  on:keyup={handleKeyup} -->
+
+<ControlList templateLike={field} {prefix} />

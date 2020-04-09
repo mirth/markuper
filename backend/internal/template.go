@@ -154,6 +154,7 @@ func (t *Template) CreateOrUpdateBBoxFieldFor(n Node) error {
 	box := findBBoxField(t.BoundingBoxes, g)
 	if box == nil {
 		box = NewBoundingBoxField(g)
+		t.BoundingBoxes = append(t.BoundingBoxes, box)
 	}
 
 	for _, iterNode := range n.Nodes {
@@ -221,8 +222,10 @@ var DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE = TemplateXML{
 var DEFAULT_OBJECT_DETECTION_TEMPLATE = TemplateXML{
 	Task: "Object detection",
 	XML: `<content>
-	<bounding_box group="animal" value="cat" vizual="Cat"/>
-	<bounding_box group="animal" value="dog" vizual="Dog"/>
+	<bounding_box>
+		<radio group="animal" value="cat" vizual="Cat"/>
+		<radio group="animal" value="dog" vizual="Dog"/>
+	</bounding_box>
 </content>
 `,
 }

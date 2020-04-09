@@ -89,7 +89,10 @@ func nodeToUpdatedField(t *Template, n Node) error {
 	case "checkbox":
 		t.CreateOrUpdateClFieldFor(n)
 	case "bounding_box":
-		t.CreateOrUpdateBBoxFieldFor(n)
+		err := t.CreateOrUpdateBBoxFieldFor(n)
+		if err != nil {
+			return err
+		}
 	default:
 		return NewBusinessError(
 			fmt.Sprintf("Unsupported element [%s]", n.XMLName.Local),

@@ -100,6 +100,7 @@ func TestUnsupportedElement(t *testing.T) {
 	assert.Equal(t, "Unsupported element [kek]", err.Error())
 }
 
+// fixme duplicatedGroups for bbox
 func TestXMLToFields(t *testing.T) {
 	{
 		data := `
@@ -112,8 +113,8 @@ func TestXMLToFields(t *testing.T) {
 			<checkbox group="color" value="pink" vizual="Pink" />
 
 			<bounding_box group="box">
-				<radio group="animal" value="cat" vizual="Cat" />
-				<radio group="animal" value="dog" vizual="Dog" />
+				<radio group="animal" value="kitty" vizual="Kitty" />
+				<radio group="animal" value="doge" vizual="Doge" />
 			</bounding_box>
 		</content>
 		`
@@ -140,14 +141,22 @@ func TestXMLToFields(t *testing.T) {
 			},
 		}}, tt.Checkboxes)
 
-		// assert.ElementsMatch(t, []BoundingBoxField{{
-		// 	Type:  "bounding_box",
-		// 	Group: "box",
-		// 	Labels: []ValueWithVizual{
-		// 		{Vizual: "Cat", Value: "cat"},
-		// 		{Vizual: "Dog", Value: "dog"},
-		// 	},
-		// }}, tt.BoundingBoxes)
+		assert.ElementsMatch(t, []*BoundingBoxField{{
+			Type:  "bounding_box",
+			Group: "box",
+			ClassificationComponents: &ClassificationComponents{
+				Radios: []*RadioField{{
+					Type:  "radio",
+					Group: "animal",
+					Labels: []ValueWithVizual{
+						{Vizual: "Kitty", Value: "kitty"},
+						{Vizual: "Doge", Value: "doge"},
+					},
+				}},
+				Checkboxes:  make([]*CheckboxField, 0),
+				FieldsOrder: []string{"animal"},
+			},
+		}}, tt.BoundingBoxes)
 	}
 
 	{

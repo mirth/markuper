@@ -11,10 +11,11 @@ export function goToProject(projectId) {
 
 export function getFieldsInOrderFor(template) {
   const groupsOrder = template.fields_order;
+
   const byGroup = _.groupBy([
-    ...template.radios,
-    ...template.checkboxes,
-    ...template.bounding_boxes,
+    ...(template.radios || []),
+    ...(template.checkboxes || []),
+    ...(template.bounding_boxes || []),
   ], 'group');
   const fields = groupsOrder.flatMap(((group) => byGroup[group]));
 

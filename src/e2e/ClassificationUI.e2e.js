@@ -106,9 +106,9 @@ describe('Device state keep for assessed samples', function () {
   });
 
   it('displays radio 2 selected', async () => {
-    await getRadio(app, 'device0', 2).click();
+    await getRadio(app, 'device/root/0', 2).click();
 
-    const selected = await getRadioState(app, 'device0');
+    const selected = await getRadioState(app, 'device/root/0');
     expect(selected).to.be.deep.eq([false, true]);
     await app.client.keys('Enter');
   });
@@ -116,7 +116,7 @@ describe('Device state keep for assessed samples', function () {
   it('displays checkbox 1 as checked', async () => {
     await app.client.keys('1');
 
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([true, false]);
     await app.client.keys('Enter');
   });
@@ -127,9 +127,9 @@ describe('Device state keep for assessed samples', function () {
     await app.client.waitUntilTextExists('span', 'Begin assess');
     await clickButton(app, 'span', 'Begin assess');
 
-    const selected = await getRadioState(app, 'device0');
+    const selected = await getRadioState(app, 'device/root/0');
     expect(selected).to.be.deep.eq([false, false]);
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([false, false]);
   });
 
@@ -139,9 +139,9 @@ describe('Device state keep for assessed samples', function () {
     await getSamplePath(app, 'kek0.jpg').element('..').click();
     await app.client.waitForVisible("button/*[@innertext='Cat']");
 
-    const selected = await getRadioState(app, 'device0');
+    const selected = await getRadioState(app, 'device/root/0');
     expect(selected).to.be.deep.eq([false, true]);
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([true, false]);
   });
 });
@@ -179,16 +179,16 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
   });
 
   const focusIsOn = (device) => {
-    expectFocusIsOn(['device0', 'device1', 'device2'], device);
+    expectFocusIsOn(['device/root/0', 'device/root/1', 'device/root/2'], device);
   };
 
   it('displays correct devices labels', async () => {
-    await assertCheckboxLabels('device0');
-    await assertRadioLabels(app, 'device1', ['Cat', 'Dog', 'Chuk', 'Gek']);
-    await assertRadioLabels(app, 'device2', ['Smoll', 'Big']);
+    await assertCheckboxLabels('device/root/0');
+    await assertRadioLabels(app, 'device/root/1', ['Cat', 'Dog', 'Chuk', 'Gek']);
+    await assertRadioLabels(app, 'device/root/2', ['Smoll', 'Big']);
   });
 
-  focusIsOn('device0');
+  focusIsOn('device/root/0');
 
   it('displays checkbox 1 as checked', async () => {
     await app.client.keys('1');
@@ -197,28 +197,28 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
     await app.client.keys('1');
     await app.client.keys('2');
 
-    const checked = await getChecked(app, 'device0');
+    const checked = await getChecked(app, 'device/root/0');
     expect(checked).to.be.deep.eq([true, false, false]);
     await app.client.keys('Enter');
   });
 
-  focusIsOn('device1');
+  focusIsOn('device/root/1');
 
   it('displays radio 4 selected', async () => {
-    await getRadio(app, 'device1', 1).click();
-    await getRadio(app, 'device1', 1).click();
-    await getRadio(app, 'device1', 4).click();
+    await getRadio(app, 'device/root/1', 1).click();
+    await getRadio(app, 'device/root/1', 1).click();
+    await getRadio(app, 'device/root/1', 4).click();
 
-    const selected = await getRadioState(app, 'device1');
+    const selected = await getRadioState(app, 'device/root/1');
     expect(selected).to.be.deep.eq([false, false, false, true]);
     await app.client.keys('Enter');
   });
 
-  focusIsOn('device2');
+  focusIsOn('device/root/2');
 
   it('displays radio 2 selected', async () => {
-    await getRadio(app, 'device2', 2).click();
-    const selected = await getRadioState(app, 'device2');
+    await getRadio(app, 'device/root/2', 2).click();
+    const selected = await getRadioState(app, 'device/root/2');
     expect(selected).to.be.deep.eq([false, true]);
     await app.client.keys('Enter');
   });
@@ -252,7 +252,7 @@ describe('Focus and state [Radio, Checkbox]', function () {
   `;
 
   const focusIsOn = (device) => {
-    expectFocusIsOn(['device0', 'device1'], device);
+    expectFocusIsOn(['device/root/0', 'device/root/1'], device);
   };
   itNavigatesToProject(app, appPath, xml);
 
@@ -264,72 +264,72 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   it('displays correct devices labels', async () => {
     await sleep(2000);
-    await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
-    await assertCheckboxLabels('device1');
+    await assertRadioLabels(app, 'device/root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
+    await assertCheckboxLabels('device/root/1');
   });
 
-  focusIsOn('device0');
+  focusIsOn('device/root/0');
 
   it('tries to submit empty radio field', async () => {
     await app.client.keys('Enter');
     await sleep(1500);
   });
 
-  focusIsOn('device0');
+  focusIsOn('device/root/0');
 
   it('displays radio 3 selected', async () => {
     await app.client.keys('3');
-    const selected = await getRadioState(app, 'device0');
+    const selected = await getRadioState(app, 'device/root/0');
     expect(selected).to.be.deep.eq([false, false, true, false]);
   });
 
-  focusIsOn('device0');
+  focusIsOn('device/root/0');
 
   it('submits radio field', async () => {
     await app.client.keys('Enter');
   });
 
-  focusIsOn('device1');
+  focusIsOn('device/root/1');
 
   it('displays radio 1 selected', async () => {
-    await getRadio(app, 'device0', 1).click();
-    const selected = await getRadioState(app, 'device0');
+    await getRadio(app, 'device/root/0', 1).click();
+    const selected = await getRadioState(app, 'device/root/0');
     expect(selected).to.be.deep.eq([true, false, false, false]);
   });
 
-  focusIsOn('device1');
+  focusIsOn('device/root/1');
 
   it('displays checkbox 2 as checked', async () => {
     await app.client.keys('2');
 
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([false, true, false]);
   });
 
-  focusIsOn('device1');
+  focusIsOn('device/root/1');
 
   it('displays checkboxes 1,2 as checked', async () => {
     await app.client.keys('1');
 
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([true, true, false]);
   });
 
-  focusIsOn('device1');
+  focusIsOn('device/root/1');
 
   it('displays all checkboxes as checked', async () => {
     await app.client.keys('3');
 
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([true, true, true]);
   });
 
-  focusIsOn('device1');
+  focusIsOn('device/root/1');
 
   it('displays checkbox 2 as unchecked', async () => {
     await app.client.keys('2');
 
-    const checked = await getChecked(app, 'device1');
+    const checked = await getChecked(app, 'device/root/1');
     expect(checked).to.be.deep.eq([true, false, true]);
     await app.client.keys('Enter');
   });

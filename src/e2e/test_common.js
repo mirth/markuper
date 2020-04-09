@@ -33,7 +33,7 @@ export const createProject = async (appPath, xml) => {
   const glob0 = path.join(imgDir, '*.jpg');
   const glob1 = path.join(imgDir, '*.png');
 
-  await api.post('/project', {
+  const res = await api.post('/project', {
     description: {
       name: 'testproj0',
     },
@@ -46,6 +46,8 @@ export const createProject = async (appPath, xml) => {
       { type: 'local_directory', source_uri: glob1 },
     ],
   });
+
+  expect(res).not.to.have.property('status');
 };
 
 export const clickButton = async (app, tag, text) => {

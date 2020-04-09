@@ -19,6 +19,7 @@ export const activeProject = writable({
 export const activeMarkup = writable({});
 export const sampleView = writable({});
 export const assessState = writable({
+  controlPrefix: null,
   focusedGroup: null,
   activeBBox: null,
   imageElement: null,
