@@ -19,5 +19,5 @@ export function getFieldsInOrderFor(template) {
   ], 'group');
   const fields = groupsOrder.flatMap(((group) => byGroup[group]));
 
-  return [fields, groupsOrder];
+  return fields;
 }

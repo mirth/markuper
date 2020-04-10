@@ -11,20 +11,21 @@ import ControlSubmit from './ControlSubmit.svelte';
 import { submitGroup } from '../../control';
 
 
-export let templateLike;
+export let owner;
 export let submitMarkupAndFetchNext;
-export let prefix;
+
+const ownerGroup = (owner && owner.group) || 'root';
 
 let fieldIter = 0;
 let keyDown = null;
 
-// console.log('templateLike: ', templateLike)
-const [fields, groupsOrder] = getFieldsInOrderFor(templateLike);
-if(prefix === 'root') {
-  groupsOrder.push(submitGroup);
+const fields = getFieldsInOrderFor(owner)
+
+let groupsOrder = owner.fields_order;
+if(ownerGroup === 'root') {
+  groupsOrder = [...groupsOrder, submitGroup];
 }
 
-// console.log('fields: ', fields)
 function isDeviceFilled() {
   const curField = fields[fieldIter];
   if (curField.type === 'radio' && !Object.hasOwnProperty.call($activeMarkup, curField.group)) {
@@ -40,14 +41,10 @@ function focusOnNextField() {
   }
 
   fieldIter += 1;
+  $assessState.focusedGroup = groupsOrder[fieldIter];
 }
 
 function handleKeydown(event) {
-  console.log('$assessState.controlPrefix prefix: ', $assessState.controlPrefix, prefix)
-  if($assessState.controlPrefix !== prefix) {
-    return;
-  }
-
   keyDown = event.key;
 }
 
@@ -56,30 +53,49 @@ function handleKeyup(event) {
     return;
   }
 
+  if($assessState.curFocusedOwner !== ownerGroup) {
+    return
+  }
+
+  if($assessState.curFocusedOwner !== $assessState.lastFocusedOwner) {
+    $assessState.focusedGroup = groupsOrder[fieldIter];
+    $assessState.lastFocusedOwner = $assessState.curFocusedOwner
+    return
+  }
+
+  const focusIsOnThisList = $assessState.curFocusedOwner === ownerGroup;
+  if(!focusIsOnThisList) {
+    return;
+  }
+
+  if($assessState.focusedGroup === submitGroup) {
+    return;
+  }
+
   if (event.key === 'Enter') {
     if (fieldIter < groupsOrder.length - 1) {
       focusOnNextField();
+      $assessState.curFocusedOwner = ownerGroup;
+    } else {
+      if($assessState.curFocusedOwner !== 'root') {
+        $assessState.lastFocusedOwner = $assessState.curFocusedOwner;
+        $assessState.curFocusedOwner = ownerGroup;
+      }
     }
   }
 
   keyDown = null;
 }
 
-$: if($assessState.controlPrefix === prefix) {
-  $assessState.focusedGroup = groupsOrder[fieldIter];
-}
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
 
 {#each fields as field, i }
-  <div id={`device/${prefix}/${i}`}>
-    <!-- {console.log('field: ', prefix, i, field)}
-    {console.log('fieldsfields: ', prefix, fields)} -->
+  <div id={`${ownerGroup}/${i}`}>
     <Block type={$assessState.focusedGroup === field.group ? 'selected' : 'block1'}>
       <label>
         <span>{field.group}</span>
-        <!-- <ControlClassification {field} /> -->
         {#if field.type === 'radio'}
           <ControlRadio {field} />
         {/if}
@@ -88,21 +104,21 @@ $: if($assessState.controlPrefix === prefix) {
         {/if}
 
         {#if field.type === 'bounding_box'}
-          <ControlBoundingBox {field} prefix={`${prefix}/${i}`}/>
+          <ControlBoundingBox {field} />
         {/if}
       </label>
     </Block>
   </div>
 {/each}
 
-{#if prefix === 'root'}
-<Spacer size={16} />
-<div id='device_submit'>
-  <ControlSubmit
-    {submitMarkupAndFetchNext}
-    isSelected={$assessState.focusedGroup === submitGroup}
-    />
-</div>
+{#if submitMarkupAndFetchNext}
+  <Spacer size={16} />
+  <div id='device_submit'>
+    <ControlSubmit
+      {submitMarkupAndFetchNext}
+      isSelected={$assessState.focusedGroup === submitGroup}
+      />
+  </div>
 {/if}
 
 <style>

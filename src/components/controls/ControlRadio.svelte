@@ -12,8 +12,9 @@ const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
 let keyDown;
 let isSelected = false;
-$: isSelected = isFieldSelected(field, $assessState);
 let radio = $activeMarkup[field.group];
+
+$: isSelected = isFieldSelected(field, $assessState);
 $: if (radio) {
   $activeMarkup[field.group] = radio;
 }

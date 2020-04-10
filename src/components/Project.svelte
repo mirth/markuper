@@ -60,9 +60,9 @@ $: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
     {#each $activeProject.data_sources as src}
       <p>Data source: <span>{src.source_uri}</span></p>
     {/each}
-    {#each fields as field}
+    <!-- {#each fields as field}
       <p>Labels: <span>{labelsStr(field)}</span></p>
-    {/each}
+    {/each} -->
   </Cell>
 </Row>
 <Spacer size={24} />

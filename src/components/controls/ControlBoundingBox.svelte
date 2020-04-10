@@ -4,9 +4,6 @@ import ControlList from './ControlList.svelte';
 import { getFieldsInOrderFor } from '../../project';
 
 export let field;
-export let prefix;
-
-// const [fields, groupsOrder] = getFieldsInOrderFor(field);
 
 let upperLeft;
 let downRight;
@@ -37,8 +34,8 @@ function computePos(ev) {
 }
 
 function handleMousedown(ev) {
-  if(ev.pageX) {
-
+  if($assessState.focusedGroup !== field.group) {
+    return;
   }
 
   const img = $assessState.imageElement;
@@ -67,6 +64,8 @@ function handleMouseup(ev) {
   upperLeft = null;
   downRight = null;
   $assessState.activeBBox = null;
+  $assessState.focusedGroup = field.fields_order[0];
+  $assessState.lastFocusedOwner = field.group;
 }
 
 
@@ -90,14 +89,6 @@ function handleMousemove(ev) {
   }
 }
 
-function handleKeydown(ev) {
-
-}
-
-function handleKeyup(ev) {
-
-}
-
 </script>
 
 <svelte:window
@@ -106,7 +97,5 @@ function handleKeyup(ev) {
   on:mousemove={handleMousemove}
   />
 
-  <!-- on:keydown={handleKeydown}
-  on:keyup={handleKeyup} -->
 
-<ControlList templateLike={field} {prefix} />
+<ControlList owner={field} />
