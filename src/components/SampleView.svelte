@@ -13,7 +13,7 @@ $: if(field) {
 </script>
 
 
-<div class='image-container'>
+<div id='image-container'>
   <img
     src='file://{sample.sample.image_uri}'
     alt='KEK'
@@ -38,29 +38,16 @@ $: if(field) {
       top: ${$assessState.activeBBox.y}px;
     `} class='box' />
   {/if}
-  <!-- <canvas bind:this={$sampleView} >
 
-  </canvas> -->
 </div>
 
 <style>
-/* canvas {
-  position:absolute;
-  width: 100%;
-  height: 100%;
-
-  z-index:20;
-} */
 
 img {
   z-index:1;
 
-  max-width: 100%;
-
+  width: 100%;
   display:block;
-  margin-left:auto;
-  margin-right:auto;
-
   box-sizing: content-box;
 }
 
@@ -71,7 +58,7 @@ img {
   box-sizing: border-box;
 }
 
-.image-container {
+#image-container {
   position:relative;
   border: 1px solid black;
 }

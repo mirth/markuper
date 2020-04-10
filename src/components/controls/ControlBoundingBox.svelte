@@ -34,6 +34,7 @@ function computePos(ev) {
 }
 
 function handleMousedown(ev) {
+  console.log('buttonDown')
   if($assessState.focusedGroup !== field.group) {
     return;
   }
@@ -55,19 +56,19 @@ function handleMouseup(ev) {
   if(!(upperLeft && downRight)) {
     return;
   }
-  const box = cornersToBox(upperLeft, downRight);
-  if((box.width === 0) || (box.height === 0)) {
+  if(($assessState.activeBBox .width === 0) || ($assessState.activeBBox .height === 0)) {
     return;
   }
-  boxes = [...boxes, box];
+
+  $assessState.focusedGroup = field.fields_order[0];
 
   upperLeft = null;
   downRight = null;
-  $assessState.activeBBox = null;
-  $assessState.focusedGroup = field.fields_order[0];
-  $assessState.lastFocusedOwner = field.group;
 }
 
+$: if(upperLeft && downRight) {
+  $assessState.activeBBox = cornersToBox(upperLeft, downRight);
+}
 
 function handleMousemove(ev) {
   if(upperLeft) {
@@ -99,3 +100,10 @@ function handleMousemove(ev) {
 
 
 <ControlList owner={field} />
+<ul id='boxes'>
+  {#each boxes as box, i}
+  <li>
+    left: {box.x}, top: {box.y}, width: {box.width}, height: {box.height}
+  </li>
+  {/each}
+</ul>

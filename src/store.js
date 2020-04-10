@@ -20,8 +20,6 @@ export const activeMarkup = writable({});
 export const sampleView = writable({});
 export const assessState = writable({
   focusedGroup: null,
-  curFocusedOwner: null,
-  lastFocusedOwner: null,
 
   activeBBox: null,
   imageElement: null,
