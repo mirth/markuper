@@ -6,7 +6,7 @@ import { Application } from 'spectron';
 import electronPath from 'electron';
 import _ from 'lodash';
 import path from 'path';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import {
   getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, getSampleClass, sleep,
   clickButton, getRadioState, getChecked, clickLink,
@@ -23,6 +23,29 @@ async function selectRect(upperLeft, downRight) {
   await app.client.moveToObject('#image-container', upperLeft[0], upperLeft[1]);
   await app.client.buttonDown(0);
   await app.client.moveToObject('#image-container', downRight[0], downRight[1]);
+  await app.client.buttonUp(0);
+}
+
+async function getBoxesMarkup() {
+  const boxes = '//*[@id="boxes"]/li';
+  await app.client.waitForExist(boxes);
+  const elements = await app.client.elements(boxes);
+  const markup = await Promise.all(elements.value.map(async (el) => {
+    const txt = await app.client.elementIdText(el.ELEMENT);
+    return txt.value;
+  }));
+
+  return markup;
+}
+
+function almostEqual(rawActual, etalon) {
+  // eslint-disable-next-line no-eval
+  const actual = eval('({' + rawActual + '})');
+  const thresh = 2;
+  assert.approximately(actual.left, etalon.left, thresh, 'numbers are close');
+  assert.approximately(actual.top, etalon.top, thresh, 'numbers are close');
+  assert.approximately(actual.width, etalon.width, thresh, 'numbers are close');
+  assert.approximately(actual.height, etalon.height, thresh, 'numbers are close');
 }
 
 describe('Kek', function () {
@@ -34,14 +57,16 @@ describe('Kek', function () {
     }
   });
 
+  // <checkbox group="color" value="black" vizual="Black" />
+  // <checkbox group="color" value="white" vizual="White" />
+
   const xml = `
   <content>
     <bounding_box group="bbox">
       <radio group="animal" value="cat" vizual="Cat" />
       <radio group="animal" value="dog" vizual="Dog" />
 
-      <checkbox group="color" value="black" vizual="Black" />
-      <checkbox group="color" value="white" vizual="White" />
+
     </bounding_box>
   </content>
   `;
@@ -54,11 +79,17 @@ describe('Kek', function () {
   });
 
   it('lulz', async () => {
-    // await app.client.leftClick('#image-container', 0, 0);
-
     selectRect([10, 10], [100, 100]);
-    // await app.client.buttonUp(0);
-    await sleep(10000)
-  })
 
-})
+    await getRadio(app, 'bbox/0', 2).click();
+
+    const selected = await getRadioState(app, 'bbox/0');
+    expect(selected).to.be.deep.eq([false, true]);
+    await sleep(500);
+    await app.client.keys('Enter');
+
+    const mark = await getBoxesMarkup();
+
+    almostEqual(mark, {left: 10, top: 10, width: 90, height: 90});
+  });
+});
