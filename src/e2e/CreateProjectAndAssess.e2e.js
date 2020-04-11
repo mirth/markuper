@@ -112,34 +112,34 @@ describe('Application launch', function () {
         const pathText = await getSamplePath(app, 'kek0.jpg').getText();
         const cl = await getSampleClass(app, 'kek0.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
-        expect(cl).to.be.eq('animal: chuk');
+        expect(cl).to.be.eq('{"animal":"chuk"}');
       }
 
       {
         const pathText = await getSamplePath(app, 'kek1.jpg').getText();
         const cl = await getSampleClass(app, 'kek1.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek1.jpg') + ':');
-        expect(cl).to.be.eq('animal: dog');
+        expect(cl).to.be.eq('{"animal":"dog"}');
       }
 
       {
         const pathText = await getSamplePath(app, 'kek2.jpg').getText();
         const cl = await getSampleClass(app, 'kek2.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek2.jpg') + ':');
-        expect(cl).to.be.eq('animal: dog');
+        expect(cl).to.be.eq('{"animal":"dog"}');
       }
 
       {
         const pathText = await getSamplePath(app, 'kek3.png').getText();
         const cl = await getSampleClass(app, 'kek3.png').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
-        expect(cl).to.be.eq('animal: cat');
+        expect(cl).to.be.eq('{"animal":"cat"}');
       }
       {
         const pathText = await getSamplePath(app, 'kek4.png').getText();
         const cl = await getSampleClass(app, 'kek4.png').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek4.png') + ':');
-        expect(cl).to.be.eq('animal: cat');
+        expect(cl).to.be.eq('{"animal":"cat"}');
       }
     });
 
@@ -162,7 +162,7 @@ describe('Application launch', function () {
       await sleep(1500);
       {
         const cl = await getSampleClass(app, 'kek1.jpg').getText();
-        expect(cl).to.be.eq('animal: gek');
+        expect(cl).to.be.eq('{"animal":"gek"}');
       }
     });
   });

@@ -48,7 +48,10 @@ function almostEqual(rawActual, etalon) {
   assert.approximately(actual.height, etalon.height, thresh, 'numbers are close');
 }
 
-describe('Kek', function () {
+// <checkbox group="color" value="black" vizual="Black" />
+// <checkbox group="color" value="white" vizual="White" />
+
+describe('Simple bounding box test', function () {
   this.timeout(20000);
   before(() => app.start());
   after(() => {
@@ -57,16 +60,12 @@ describe('Kek', function () {
     }
   });
 
-  // <checkbox group="color" value="black" vizual="Black" />
-  // <checkbox group="color" value="white" vizual="White" />
 
   const xml = `
   <content>
     <bounding_box group="bbox">
       <radio group="animal" value="cat" vizual="Cat" />
       <radio group="animal" value="dog" vizual="Dog" />
-
-
     </bounding_box>
   </content>
   `;

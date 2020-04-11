@@ -9,8 +9,9 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, getSampleClass, sleep,
-  clickButton, getRadioState, getChecked, clickLink,
+  clickButton, getRadioState, getChecked, clickLink, deterministicStrigify,
 } from './test_common';
+
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -66,7 +67,7 @@ function expectSampleMarkupToBeEq(markup) {
     const pathText = await getSamplePath(app, 'kek0.jpg').getText();
     const cl = await getSampleClass(app, 'kek0.jpg').getText();
     expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
-    expect(cl).to.be.eq(markup);
+    expect(cl).to.be.eq(deterministicStrigify(markup));
   });
 }
 
@@ -226,7 +227,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
   focusIsOn('device_submit');
 
   itSubmitsSample();
-  expectSampleMarkupToBeEq('animal: gek, color: black, size: big');
+  expectSampleMarkupToBeEq({animal: 'gek', color: ['black'], size: 'big'});
 });
 
 describe('Focus and state [Radio, Checkbox]', function () {
@@ -337,5 +338,5 @@ describe('Focus and state [Radio, Checkbox]', function () {
   focusIsOn('device_submit');
 
   itSubmitsSample();
-  expectSampleMarkupToBeEq('animal: cat, color: black,pink');
+  expectSampleMarkupToBeEq({animal: 'cat', color: ['black', 'pink']});
 });

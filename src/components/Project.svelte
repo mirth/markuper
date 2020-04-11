@@ -12,13 +12,20 @@ import Block from 'svelte-atoms/Block.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
-import { getFieldsInOrderFor } from '../project';
+import { getFieldsInOrderFor, deterministicStrigify } from '../project';
 
 export let params;
 
-function labelsStr(field) {
-  return _.map(field.labels, 'value').join(', ');
-}
+// function labelsStr(field) {
+//   return field.labels.map(value => {
+//     console.log(value)
+//     if(typeof value === 'object') {
+//       return JSON.stringify(value)
+//     }
+
+//     return value;
+//   }).join(', ');
+// }
 
 function exportProject(p) {
   return async () => {
@@ -29,11 +36,7 @@ function exportProject(p) {
 }
 
 function formatMarkup(markup) {
-  return Object.keys(markup)
-    .sort()
-    .map((labelName) => [labelName, markup[labelName]])
-    .map(([labelName, labelValue]) => `${labelName}: ${labelValue}`)
-    .join(', ');
+  return deterministicStrigify(markup)
 }
 
 let assessedList = [];
