@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+
 import _ from 'lodash';
 import { push } from 'svelte-spa-router';
 import { fetchProject } from './store';
@@ -18,6 +20,11 @@ export function getFieldsInOrderFor(template) {
     ...(template.bounding_boxes || []),
   ], 'group');
   const fields = groupsOrder.flatMap(((group) => byGroup[group]));
+
+  const owner = template.group;
+  for (const field of fields) {
+    field.owner = owner;
+  }
 
   return fields;
 }

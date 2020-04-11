@@ -1,17 +1,17 @@
 <script>
 
 import ControlList from './ControlList.svelte';
-import { assessState, activeMarkup } from '../../store';
+import { assessState, sampleMarkup, activeMarkup } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 import { submitGroup } from '../../control';
 
 export let submitMarkupAndFetchNext;
 export let sample;
 
+let keyDown;
 let fieldIter = 0;
-$: $activeMarkup = (sample.markup && sample.markup.markup) || {};
+$: $sampleMarkup = (sample.markup && sample.markup.markup) || {};
 
-let keyDown = null;
 
 function handleKeydown(event) {
   keyDown = event.key;
@@ -38,24 +38,37 @@ function ownerByChild(childGroup) {
 }
 
 function isFieldFilled(field) {
-  if (field.type === 'radio' && !Object.hasOwnProperty.call($activeMarkup, field.group)) {
+  if (field.type === 'radio' && !Object.hasOwnProperty.call($assessState.markup, field.group)) {
     return false;
   }
 
   return true;
 }
 
+function pushActiveMarkup() {
+  const [owner, field] = ownerByChild($assessState.focusedGroup)
+  if(owner.group) {
+    $sampleMarkup[owner.group] = [
+      ...$sampleMarkup[owner.group],
+      Object.assign({}, $assessState.markup),
+    ]
+  } else {
+    $sampleMarkup = $assessState.markup
+  }
+}
 
 function tryIncrementIter() {
   const [owner, field] = ownerByChild($assessState.focusedGroup)
   const idx = owner.fields_order.indexOf($assessState.focusedGroup)
 
   if(idx === (owner.fields_order.length - 1)) {
-    if(!owner.group) {
-      $assessState.focusedGroup = submitGroup;
-    } else {
-      if(isFieldFilled(field)) {
-        $assessState.focusedGroup = owner.group
+    if(isFieldFilled(field)) {
+      pushActiveMarkup()
+      if(!owner.group) {
+        $assessState.focusedGroup = submitGroup;
+      } else {
+        $assessState.focusedGroup = owner.group;
+        $assessState.markup = {}
       }
     }
   } else {
@@ -72,6 +85,10 @@ function handleKeyup(event) {
   }
 
   if(event.key !== 'Enter') {
+    return
+  }
+
+  if($assessState.focusedGroup === submitGroup) {
     return
   }
 

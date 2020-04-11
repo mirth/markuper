@@ -16,12 +16,12 @@ export const activeProject = writable({
   },
   data_sources: [],
 });
-export const activeMarkup = writable({});
+export const sampleMarkup = writable({});
 export const sampleView = writable({});
 export const assessState = writable({
   focusedGroup: null,
 
-  activeBBox: null,
+  markup: {},
   imageElement: null,
 });
 

@@ -7,7 +7,7 @@ import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
 import SampleView from './SampleView.svelte';
-import { activeMarkup } from '../store';
+import { sampleMarkup, assessState } from '../store';
 import { goToProject } from '../project';
 
 export let params = {};
@@ -32,10 +32,11 @@ async function submitMarkupAndFetchNext() {
   await api.post(`/project/${sampleId.project_id}/assess`, {
     sample_id: sampleId,
     sample_markup: {
-      markup: $activeMarkup,
+      markup: $sampleMarkup,
     },
   });
   sample = fetchNext(sampleId.project_id);
+  $assessState.markup = {}
 }
 
 </script>

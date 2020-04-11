@@ -1,5 +1,5 @@
 <script>
-import {sampleView, activeMarkup, assessState} from '../../store';
+import {sampleView, sampleMarkup, assessState} from '../../store';
 import ControlList from './ControlList.svelte';
 import { getFieldsInOrderFor } from '../../project';
 
@@ -7,9 +7,10 @@ export let field;
 
 let upperLeft;
 let downRight;
+if(!$sampleMarkup[field.group]) {
+  $sampleMarkup[field.group] = [];
+}
 
-let boxes = [];
-$: $activeMarkup[field.group] = boxes
 $: img = $assessState.imageElement;
 
 function cornersToBox(upperLeft, downRight) {
@@ -34,7 +35,6 @@ function computePos(ev) {
 }
 
 function handleMousedown(ev) {
-  console.log('buttonDown')
   if($assessState.focusedGroup !== field.group) {
     return;
   }
@@ -56,7 +56,7 @@ function handleMouseup(ev) {
   if(!(upperLeft && downRight)) {
     return;
   }
-  if(($assessState.activeBBox .width === 0) || ($assessState.activeBBox .height === 0)) {
+  if(($assessState.markup.box.width === 0) || ($assessState.markup.box.height === 0)) {
     return;
   }
 
@@ -67,7 +67,7 @@ function handleMouseup(ev) {
 }
 
 $: if(upperLeft && downRight) {
-  $assessState.activeBBox = cornersToBox(upperLeft, downRight);
+  $assessState.markup.box = cornersToBox(upperLeft, downRight);
 }
 
 function handleMousemove(ev) {
@@ -101,9 +101,9 @@ function handleMousemove(ev) {
 
 <ControlList owner={field} />
 <ul id='boxes'>
-  {#each boxes as box, i}
+  {#each $sampleMarkup[field.group] as mark, i}
   <li>
-    left: {box.x}, top: {box.y}, width: {box.width}, height: {box.height}
+    left: {mark.box.x}, top: {mark.box.y}, width: {mark.box.width}, height: {mark.box.height}
   </li>
   {/each}
 </ul>

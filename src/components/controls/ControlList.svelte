@@ -5,7 +5,7 @@ import Block from 'svelte-atoms/Block.svelte';
 import ControlBoundingBox from './ControlBoundingBox.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
-import { assessState, activeMarkup } from '../../store';
+import { assessState, sampleMarkup } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 import ControlSubmit from './ControlSubmit.svelte';
 import { submitGroup } from '../../control';

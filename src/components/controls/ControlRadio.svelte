@@ -3,7 +3,7 @@ import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import Radio from 'svelte-atoms/Radio.svelte';
 import { makeLabelsWithKeys } from '../../control';
-import { activeMarkup, assessState, isFieldSelected } from '../../store';
+import { sampleMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
 export let field;
@@ -12,11 +12,16 @@ const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
 let keyDown;
 let isSelected = false;
-let radio = $activeMarkup[field.group];
+
+if(!field.owner && $sampleMarkup[field.group]) {
+  $assessState.markup[field.group] = $sampleMarkup[field.group];
+}
+
+let radio = $assessState.markup[field.group];
 
 $: isSelected = isFieldSelected(field, $assessState);
 $: if (radio) {
-  $activeMarkup[field.group] = radio;
+  $assessState.markup[field.group] = radio;
 }
 
 

@@ -1,15 +1,13 @@
 <script>
-import {sampleView, activeMarkup, assessState} from '../store'
+import {sampleView, sampleMarkup, assessState} from '../store'
 export let sample;
 
 const field = sample.project.template.bounding_boxes[0];
 let boxes = []
 $: if(field) {
-  boxes = $activeMarkup[field.group] || []
+  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group]) || []
 }
 
-// $: console.log('boxes: ', boxes)
-// console.log('boxes: ', boxes)
 </script>
 
 
@@ -30,12 +28,12 @@ $: if(field) {
     `} class='box' />
   {/each}
 
-  {#if $assessState.activeBBox}
+  {#if $assessState.markup.box}
     <div style={`
-      width: ${$assessState.activeBBox.width}px;
-      height: ${$assessState.activeBBox.height}px;
-      left: ${$assessState.activeBBox.x}px;
-      top: ${$assessState.activeBBox.y}px;
+      width: ${$assessState.markup.box.width}px;
+      height: ${$assessState.markup.box.height}px;
+      left: ${$assessState.markup.box.x}px;
+      top: ${$assessState.markup.box.y}px;
     `} class='box' />
   {/if}
 
