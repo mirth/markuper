@@ -5,7 +5,7 @@ export let sample;
 const field = sample.project.template.bounding_boxes[0];
 let boxes = []
 $: if(field) {
-  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group]) || []
+  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group].map(m => m.box)) || []
 }
 
 </script>

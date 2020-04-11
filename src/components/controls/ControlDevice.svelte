@@ -10,8 +10,9 @@ export let sample;
 
 let keyDown;
 let fieldIter = 0;
-$: $sampleMarkup = (sample.markup && sample.markup.markup) || {};
 
+$sampleMarkup = (sample.markup && sample.markup.markup) || {};
+$assessState.markup = {}
 
 function handleKeydown(event) {
   keyDown = event.key;
@@ -47,21 +48,26 @@ function isFieldFilled(field) {
 
 function pushActiveMarkup() {
   const [owner, field] = ownerByChild($assessState.focusedGroup)
+
+  const $assessStateMarkup = JSON.parse(JSON.stringify($assessState.markup));
   if(owner.group) {
     $sampleMarkup[owner.group] = [
       ...$sampleMarkup[owner.group],
-      Object.assign({}, $assessState.markup),
+      $assessStateMarkup,
     ]
   } else {
-    $sampleMarkup = $assessState.markup
+    if(field.type !== 'bounding_box') {
+      $sampleMarkup = $assessStateMarkup
+    }
   }
 }
 
 function tryIncrementIter() {
   const [owner, field] = ownerByChild($assessState.focusedGroup)
-  const idx = owner.fields_order.indexOf($assessState.focusedGroup)
+  let ownerFieldsOrder = owner.fields_order;
+  const idx = ownerFieldsOrder.indexOf($assessState.focusedGroup)
 
-  if(idx === (owner.fields_order.length - 1)) {
+  if(idx === (ownerFieldsOrder.length - 1)) {
     if(isFieldFilled(field)) {
       pushActiveMarkup()
       if(!owner.group) {
@@ -73,7 +79,7 @@ function tryIncrementIter() {
     }
   } else {
     if(isFieldFilled(field)) {
-      $assessState.focusedGroup = owner.fields_order[idx + 1];
+      $assessState.focusedGroup = ownerFieldsOrder[idx + 1];
     }
   }
 }

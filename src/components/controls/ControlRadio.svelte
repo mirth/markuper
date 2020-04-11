@@ -17,12 +17,10 @@ if(!field.owner && $sampleMarkup[field.group]) {
   $assessState.markup[field.group] = $sampleMarkup[field.group];
 }
 
-let radio = $assessState.markup[field.group];
+$: radio = $assessState.markup[field.group];
 
 $: isSelected = isFieldSelected(field, $assessState);
-$: if (radio) {
-  $assessState.markup[field.group] = radio;
-}
+
 
 
 function handleKeydown(event) {
@@ -33,6 +31,10 @@ function handleKeydown(event) {
   keyDown = event.key;
 }
 
+function updateRadio(labelValue) {
+  radio = labelValue;
+  $assessState.markup[field.group] = radio;
+}
 async function handleKeyup(event) {
   if (!isSelected) {
     return;
@@ -48,8 +50,16 @@ async function handleKeyup(event) {
 
   const labelIndex = parseInt(event.key, 10) - 1;
   const label = field.labels[labelIndex];
-  radio = label.value;
+
+  updateRadio(label.value);
+
   keyDown = null;
+}
+
+function onChange(labelValue) {
+  return function(_ev) {
+    updateRadio(labelValue);
+  }
 }
 
 </script>
@@ -63,6 +73,7 @@ async function handleKeyup(event) {
       <Radio
         bind:group={radio}
         value={label.value}
+        on:change={onChange(label.value)}
       >
         {label.vizual}
       </Radio>

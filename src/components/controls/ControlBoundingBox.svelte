@@ -7,7 +7,7 @@ export let field;
 
 let upperLeft;
 let downRight;
-if(!$sampleMarkup[field.group]) {
+$: if(!$sampleMarkup[field.group]) {
   $sampleMarkup[field.group] = [];
 }
 
