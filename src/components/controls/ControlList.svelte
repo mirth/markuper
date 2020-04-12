@@ -5,7 +5,7 @@ import Block from 'svelte-atoms/Block.svelte';
 import ControlBoundingBox from './ControlBoundingBox.svelte';
 import ControlRadio from './ControlRadio.svelte';
 import ControlCheckbox from './ControlCheckbox.svelte';
-import { assessState, sampleMarkup } from '../../store';
+import { assessState } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 import ControlSubmit from './ControlSubmit.svelte';
 import { submitGroup } from '../../control';
@@ -15,11 +15,7 @@ export let owner;
 export let submitMarkupAndFetchNext;
 
 const ownerGroup = (owner && owner.group) || 'root';
-
-let fieldIter = 0;
-let keyDown = null;
-
-const fields = getFieldsInOrderFor(owner)
+const fields = getFieldsInOrderFor(owner);
 
 </script>
 

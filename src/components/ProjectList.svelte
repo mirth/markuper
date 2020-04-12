@@ -1,7 +1,7 @@
 <script>
 import _ from 'lodash';
 import { onMount } from 'svelte';
-import Block from "svelte-atoms/Block.svelte";
+import Block from 'svelte-atoms/Block.svelte';
 import Button from 'svelte-atoms/Button.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';

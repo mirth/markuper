@@ -1,17 +1,18 @@
 <script>
-import {sampleView, sampleMarkup, assessState} from '../store'
+import { sampleView, sampleMarkup, assessState } from '../store';
+
 export let sample;
 
 const field = sample.project.template.bounding_boxes[0];
-let boxes = []
-$: if(field) {
-  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group]) || []
+let boxes = [];
+$: if (field) {
+  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group]) || [];
 }
 
 function formatMarkup(markup) {
-  const keys = Object.keys(markup).filter(k => k !== 'box')
+  const keys = Object.keys(markup).filter((k) => k !== 'box');
 
-  return keys.map(k => `${k}: ${markup[k]}`).join('\n')
+  return keys.map((k) => `${k}: ${markup[k]}`).join('\n');
 }
 
 </script>

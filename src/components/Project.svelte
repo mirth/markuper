@@ -12,7 +12,7 @@ import Block from 'svelte-atoms/Block.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
-import { getFieldsInOrderFor, deterministicStrigify } from '../project';
+import { deterministicStrigify } from '../project'; // getFieldsInOrderFor
 
 export let params;
 
@@ -36,7 +36,7 @@ function exportProject(p) {
 }
 
 function formatMarkup(markup) {
-  return deterministicStrigify(markup)
+  return deterministicStrigify(markup);
 }
 
 let assessedList = [];
@@ -46,8 +46,8 @@ onMount(async () => {
   await fetchProject(params.project_id);
 });
 
-let fields = [];
-$: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
+// let fields = [];
+// $: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
 </script>
 
 

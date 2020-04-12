@@ -4,12 +4,10 @@
 /* eslint-disable func-names */
 import { Application } from 'spectron';
 import electronPath from 'electron';
-import _ from 'lodash';
 import path from 'path';
 import { expect, assert } from 'chai';
 import {
-  getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, getSampleClass, sleep,
-  clickButton, getRadioState, getChecked, clickLink, expectSampleMarkupToBeEq,
+  itNavigatesToProject, sleep, clickButton, getRadioState,
 } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
@@ -91,7 +89,9 @@ describe('Simple bounding box test', function () {
 
     const mark = await getBoxesMarkup();
 
-    almostEqual(mark, {left: 10, top: 10, width: 90, height: 90});
+    almostEqual(mark, {
+      left: 10, top: 10, width: 90, height: 90,
+    });
     await sleep(1500);
     await app.client.keys('Enter');
     await sleep(1500);

@@ -13,14 +13,13 @@ const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 let keyDown;
 let isSelected = false;
 
-if(!field.owner && $sampleMarkup[field.group]) {
+if (!field.owner && $sampleMarkup[field.group]) {
   $assessState.markup[field.group] = $sampleMarkup[field.group];
 }
 
 $: radio = $assessState.markup[field.group];
 
 $: isSelected = isFieldSelected(field, $assessState);
-
 
 
 function handleKeydown(event) {
@@ -57,9 +56,9 @@ async function handleKeyup(event) {
 }
 
 function onChange(labelValue) {
-  return function(_ev) {
+  return () => {
     updateRadio(labelValue);
-  }
+  };
 }
 
 </script>

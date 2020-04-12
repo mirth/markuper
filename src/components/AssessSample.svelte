@@ -36,7 +36,7 @@ async function submitMarkupAndFetchNext() {
     },
   });
   sample = fetchNext(sampleId.project_id);
-  $assessState.markup = {}
+  $assessState.markup = {};
   $assessState.focusedGroup = null;
 }
 

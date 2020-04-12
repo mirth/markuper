@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-restricted-syntax */
 
 import _ from 'lodash';
@@ -30,18 +31,14 @@ export function getFieldsInOrderFor(template) {
 }
 
 // FIXME test_common.js
-const sortObj = (obj) => {
-  // eslint-disable-next-line no-nested-ternary
-  return obj === null || typeof obj !== 'object'
-    ? obj
-    : Array.isArray(obj)
-      ? obj.map(sortObj)
-      : Object.assign({},
-        ...Object.entries(obj)
-          .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-          .map(([k, v]) => ({ [k]: sortObj(v) })));
-}
+const sortObj = (obj) => (obj === null || typeof obj !== 'object'
+  ? obj
+  : Array.isArray(obj)
+    ? obj.map(sortObj)
+    : Object.assign({},
+      ...Object.entries(obj)
+        .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+        .map(([k, v]) => ({ [k]: sortObj(v) }))));
 
-export const deterministicStrigify = (obj) => {
-  return JSON.stringify(sortObj(obj));
-};
+
+export const deterministicStrigify = (obj) => JSON.stringify(sortObj(obj));

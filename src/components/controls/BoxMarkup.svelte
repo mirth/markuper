@@ -2,14 +2,12 @@
 import IconButton from 'svelte-atoms/IconButton.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
-import Block from "svelte-atoms/Block.svelte";
+import Block from 'svelte-atoms/Block.svelte';
 import Container from 'svelte-atoms/Grids/Container.svelte';
-import { sampleMarkup } from '../../store';
 
 export let markup;
 export let isSelected;
 export let onCrossPressed;
-
 
 </script>
 

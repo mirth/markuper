@@ -12,7 +12,7 @@ const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 let keyDown;
 let checked = new Set([]);
 let isSelected = false;
-if(!field.owner && $sampleMarkup[field.group]) {
+if (!field.owner && $sampleMarkup[field.group]) {
   $assessState.markup[field.group] = $sampleMarkup[field.group];
 }
 
