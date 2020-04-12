@@ -17,7 +17,9 @@ export const activeProject = writable({
   data_sources: [],
 });
 export const sampleMarkup = writable({});
-export const sampleView = writable({});
+export const sampleView = writable({
+  selectedBox: null,
+});
 export const assessState = writable({
   focusedGroup: null,
 

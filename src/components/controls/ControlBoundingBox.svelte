@@ -2,11 +2,16 @@
 import {sampleView, sampleMarkup, assessState} from '../../store';
 import ControlList from './ControlList.svelte';
 import { getFieldsInOrderFor } from '../../project';
+import Table from "svelte-atoms/Table/Table.svelte";
+import Tbody from "svelte-atoms/Table/Tbody.svelte";
+import Thead from "svelte-atoms/Table/Thead.svelte";
+import BoxMarkup from './BoxMarkup.svelte'
 
 export let field;
 
 let upperLeft;
 let downRight;
+
 $: if(!$sampleMarkup[field.group]) {
   $sampleMarkup[field.group] = [];
 }
@@ -90,6 +95,15 @@ function handleMousemove(ev) {
   }
 }
 
+function removeBox(boxIdx) {
+  return function() {
+    $sampleMarkup[field.group] = $sampleMarkup[field.group].filter((_el, i) => {
+      return i !== boxIdx;
+    })
+  }
+}
+
+
 </script>
 
 <svelte:window
@@ -100,10 +114,26 @@ function handleMousemove(ev) {
 
 
 <ControlList owner={field} />
-<ul id='boxes'>
-  {#each $sampleMarkup[field.group] as mark, i}
-  <li>
-    left: {mark.box.x}, top: {mark.box.y}, width: {mark.box.width}, height: {mark.box.height}
-  </li>
-  {/each}
-</ul>
+
+<div id='boxes'>
+  <Table>
+    <Tbody>
+      {#each $sampleMarkup[field.group] as markup, i}
+        <tr>
+          <td>
+            <BoxMarkup
+              {markup}
+              isSelected={$sampleView.selectedBox === i}
+              on:mouseover={() => $sampleView.selectedBox = i}
+              onCrossPressed={removeBox(i)}
+              />
+          </td>
+        </tr>
+      {/each}
+    </Tbody>
+  </Table>
+</div>
+
+<style>
+
+</style>

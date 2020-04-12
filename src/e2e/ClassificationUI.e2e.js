@@ -8,8 +8,8 @@ import _ from 'lodash';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, getSampleClass, sleep,
-  clickButton, getRadioState, getChecked, clickLink, deterministicStrigify,
+  getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, sleep,
+  clickButton, getRadioState, getChecked, clickLink, expectSampleMarkupToBeEq,
 } from './test_common';
 
 
@@ -55,20 +55,6 @@ async function assertCheckboxLabels(device) {
     return txt.value;
   }));
   expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
-}
-
-function expectSampleMarkupToBeEq(markup) {
-  it('displays sample markup on project page', async () => {
-    await clickLink(app, 'span', 'testproj0');
-    await app.client.waitForExist('ul');
-
-    const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
-
-    const pathText = await getSamplePath(app, 'kek0.jpg').getText();
-    const cl = await getSampleClass(app, 'kek0.jpg').getText();
-    expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
-    expect(cl).to.be.eq(deterministicStrigify(markup));
-  });
 }
 
 function itSubmitsSample() {
@@ -227,7 +213,7 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
   focusIsOn('device_submit');
 
   itSubmitsSample();
-  expectSampleMarkupToBeEq({animal: 'gek', color: ['black'], size: 'big'});
+  expectSampleMarkupToBeEq(app, appPath, {animal: 'gek', color: ['black'], size: 'big'});
 });
 
 describe('Focus and state [Radio, Checkbox]', function () {
@@ -338,5 +324,5 @@ describe('Focus and state [Radio, Checkbox]', function () {
   focusIsOn('device_submit');
 
   itSubmitsSample();
-  expectSampleMarkupToBeEq({animal: 'cat', color: ['black', 'pink']});
+  expectSampleMarkupToBeEq(app, appPath, {animal: 'cat', color: ['black', 'pink']});
 });

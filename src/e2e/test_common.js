@@ -1,8 +1,8 @@
+/* eslint-disable prefer-template */
 /* eslint-disable no-unused-expressions */
 import path from 'path';
 import { expect } from 'chai';
 import api from '../api';
-
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
 export const getRadio = (app, device, i) => app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/div/label`);
@@ -158,7 +158,6 @@ export const getChecked = async (app, device) => {
   return checked;
 };
 
-
 const sortObj = (obj) => {
   // eslint-disable-next-line no-nested-ternary
   return obj === null || typeof obj !== 'object'
@@ -174,3 +173,17 @@ const sortObj = (obj) => {
 export const deterministicStrigify = (obj) => {
   return JSON.stringify(sortObj(obj));
 };
+
+export function expectSampleMarkupToBeEq(app, appPath, markup) {
+  it('displays sample markup on project page', async () => {
+    await clickLink(app, 'span', 'testproj0');
+    await app.client.waitForExist('ul');
+
+    const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
+
+    const pathText = await getSamplePath(app, 'kek0.jpg').getText();
+    const cl = await getSampleClass(app, 'kek0.jpg').getText();
+    expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
+    expect(cl).to.be.eq(deterministicStrigify(markup));
+  });
+}

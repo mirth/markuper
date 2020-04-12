@@ -5,7 +5,13 @@ export let sample;
 const field = sample.project.template.bounding_boxes[0];
 let boxes = []
 $: if(field) {
-  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group].map(m => m.box)) || []
+  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group]) || []
+}
+
+function formatMarkup(markup) {
+  const keys = Object.keys(markup).filter(k => k !== 'box')
+
+  return keys.map(k => `${k}: ${markup[k]}`).join('\n')
 }
 
 </script>
@@ -19,13 +25,17 @@ $: if(field) {
     bind:this={$assessState.imageElement}
     />
 
-  {#each boxes as box}
+  {#each boxes as box, i}
     <div style={`
-      width: ${box.width}px;
-      height: ${box.height}px;
-      left: ${box.x}px;
-      top: ${box.y}px;
-    `} class='box' />
+      width: ${box.box.width}px;
+      height: ${box.box.height}px;
+      left: ${box.box.x}px;
+      top: ${box.box.y}px;
+    `} class='box' class:box-selected={$sampleView.selectedBox === i}>
+      {#if $sampleView.selectedBox === i}
+        <span><small>{formatMarkup(box)}</small></span>
+      {/if}
+    </div>
   {/each}
 
   {#if $assessState.markup.box}
@@ -34,7 +44,7 @@ $: if(field) {
       height: ${$assessState.markup.box.height}px;
       left: ${$assessState.markup.box.x}px;
       top: ${$assessState.markup.box.y}px;
-    `} class='box' />
+    `} class='box'/>
   {/if}
 
 </div>
@@ -56,11 +66,18 @@ img {
   box-sizing: border-box;
 }
 
+.box-selected {
+  border: 3px solid green;
+}
+
 #image-container {
   position:relative;
   border: 1px solid black;
 }
 
+span {
+  background-color: green;
+}
 
 
 </style>
