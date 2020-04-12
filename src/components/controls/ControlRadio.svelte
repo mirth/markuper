@@ -56,6 +56,12 @@ async function handleKeyup(event) {
   keyDown = null;
 }
 
+function onChange(labelValue) {
+  return function(_ev) {
+    updateRadio(labelValue);
+  }
+}
+
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
@@ -67,6 +73,7 @@ async function handleKeyup(event) {
       <Radio
         bind:group={radio}
         value={label.value}
+        on:click={onChange(label.value)}
       >
         {label.vizual}
       </Radio>
