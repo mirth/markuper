@@ -204,8 +204,8 @@ type TemplateServiceImpl struct {
 var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 	Task: "Classification",
 	XML: `<content>
-    <radio group="animal" value="cat" vizual="Cat" />
-    <radio group="animal" value="dog" vizual="Dog" />
+  <radio group="animal" value="cat" vizual="Cat" />
+  <radio group="animal" value="dog" vizual="Dog" />
 </content>
 `,
 }
@@ -213,8 +213,8 @@ var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 var DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE = TemplateXML{
 	Task: "Multi-label classification",
 	XML: `<content>
-    <checkbox group="color" value="black" vizual="Black" />
-    <checkbox group="color" value="white" vizual="White" />
+  <checkbox group="color" value="black" vizual="Black" />
+  <checkbox group="color" value="white" vizual="White" />
 </content>
 `,
 }
@@ -222,10 +222,10 @@ var DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE = TemplateXML{
 var DEFAULT_OBJECT_DETECTION_TEMPLATE = TemplateXML{
 	Task: "Object detection",
 	XML: `<content>
-	<bounding_box>
-		<radio group="animal" value="cat" vizual="Cat"/>
-		<radio group="animal" value="dog" vizual="Dog"/>
-	</bounding_box>
+  <bounding_box group="box">
+    <radio group="animal" value="cat" vizual="Cat"/>
+    <radio group="animal" value="dog" vizual="Dog"/>
+  </bounding_box>
 </content>
 `,
 }
