@@ -93,10 +93,6 @@ export function assertBoxAlmostEqual(a, b) {
   assert.approximately(a.height, b.height, thresh, 'numbers are close');
 }
 
-export function expectBoxEqual(a, b) {
-  expect(a).to.be.deep.eq(b);
-}
-
 export function createProjectWithTemplate(app, appPath, xml) {
   it('opens Create New Project popup', async () => {
     await app.client.waitForVisible('button');
