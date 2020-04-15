@@ -14,6 +14,9 @@ const appPath = path.join(__dirname, '../..');
 const app = new Application({
   path: electronPath,
   args: [appPath],
+  webdriverOptions: {
+    deprecationWarnings: false,
+  },
 });
 
 
@@ -88,9 +91,8 @@ describe('Simple bounding box test', function () {
     await app.client.keys('Enter');
 
     const mark = await getBoxesMarkup();
-
     almostEqual(mark, {
-      left: 10, top: 10, width: 90, height: 90,
+      left: 0, top: 0, width: 4, height: 4,
     });
     await sleep(1500);
     await app.client.keys('Enter');

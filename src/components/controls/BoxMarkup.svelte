@@ -19,7 +19,14 @@ export let onCrossPressed;
           type={isSelected ? 'selected' : 'block1'}
           style='padding: 3px;'
         >
-          <span><small>left: {Math.round(markup.box.x)}, top: {Math.round(markup.box.y)}, width: {markup.box.width}, height: {markup.box.height}</small></span>
+          <span>
+            <small>
+              left: {Math.round(markup.box.x)},
+              top: {Math.round(markup.box.y)},
+              width: {Math.round(markup.box.width)},
+              height: {Math.round(markup.box.height)}
+            </small>
+          </span>
         </Block>
       </div>
     </Cell>

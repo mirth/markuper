@@ -3,10 +3,48 @@ import { sampleView, sampleMarkup, assessState } from '../store';
 
 export let sample;
 
+function scaleBox(raw) {
+  const scale = $assessState.imageElement.naturalWidth / $assessState.imageElement.clientWidth;
+  return {
+    x: raw.x / scale,
+    y: raw.y / scale,
+    width: raw.width / scale,
+    height: raw.height / scale,
+  }
+}
+
+function scaleBoxes(markupForGroup, assessStateBox) {
+  if(!$assessState.imageElement) {
+    return;
+  }
+
+  activeBox = assessStateBox ? scaleBox(assessStateBox) : null;
+  boxes = (markupForGroup || []).map((mark) =>{
+    return {
+      ...mark,
+      box: scaleBox(mark.box)
+    }
+  })
+}
+
 const field = sample.project.template.bounding_boxes[0];
 let boxes = [];
+let activeBox;
+let resizeObserver;
+
 $: if (field) {
-  boxes = ($sampleMarkup[field.group] && $sampleMarkup[field.group]) || [];
+  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box)
+}
+
+$: if($assessState.markup.box) {
+  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box)
+}
+
+$: if(!resizeObserver && $assessState.imageElement) {
+  resizeObserver = new ResizeObserver(() => {
+    scaleBoxes($sampleMarkup[field.group], $assessState.markup.box)
+  })
+  resizeObserver.observe($assessState.imageElement)
 }
 
 function formatMarkup(markup) {
@@ -16,7 +54,6 @@ function formatMarkup(markup) {
 }
 
 </script>
-
 
 <div id='image-container'>
   <img
@@ -39,15 +76,14 @@ function formatMarkup(markup) {
     </div>
   {/each}
 
-  {#if $assessState.markup.box}
+  {#if activeBox}
     <div style={`
-      width: ${$assessState.markup.box.width}px;
-      height: ${$assessState.markup.box.height}px;
-      left: ${$assessState.markup.box.x}px;
-      top: ${$assessState.markup.box.y}px;
+      width: ${activeBox.width}px;
+      height: ${activeBox.height}px;
+      left: ${activeBox.x}px;
+      top: ${activeBox.y}px;
     `} class='box'/>
   {/if}
-
 </div>
 
 <style>
@@ -57,23 +93,23 @@ img {
 
   width: 100%;
   display:block;
-  box-sizing: content-box;
+  box-sizing: border-box;
 }
 
 .box {
   position: absolute;
-  border: 1px solid green;
+  border: 2px solid green;
 
   box-sizing: border-box;
 }
 
 .box-selected {
-  border: 3px solid green;
+  border: 4px solid green;
 }
 
 #image-container {
   position:relative;
-  border: 1px solid black;
+  border: 2px solid black;
 }
 
 span {

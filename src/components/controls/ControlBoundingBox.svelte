@@ -17,12 +17,21 @@ $: if (!$sampleMarkup[field.group]) {
 $: img = $assessState.imageElement;
 
 function cornersToBox() {
-  const width = downRight.x - upperLeft.x;
-  const height = downRight.y - upperLeft.y;
+  let width = downRight.x - upperLeft.x;
+  let height = downRight.y - upperLeft.y;
+
+  let x = Math.min(Math.max(0, upperLeft.x), img.width);
+  let y = Math.min(Math.max(0, upperLeft.y), img.height);
+
+  const scale = img.naturalWidth / img.clientWidth;
+  x *= scale;
+  y *= scale;
+  width *= scale;
+  height *= scale;
 
   return {
-    x: upperLeft.x,
-    y: upperLeft.y,
+    x: x,
+    y: y,
     width,
     height,
   };
