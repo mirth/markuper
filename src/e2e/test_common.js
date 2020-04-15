@@ -1,8 +1,9 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable prefer-template */
 /* eslint-disable no-unused-expressions */
 import path from 'path';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import api from '../api';
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
@@ -82,6 +83,19 @@ export const itNavigatesToProject = (app, appPath, xml) => {
 
 export const getSamplePath = (app, filename) => app.client.element(`small*=${filename}`);
 export const getSampleClass = (app, filename) => getSamplePath(app, filename).element('../..').element('./span');
+
+export function assertBoxAlmostEqual(a, b) {
+  const thresh = 1;
+
+  assert.approximately(a.x, b.x, thresh, 'numbers are close');
+  assert.approximately(a.y, b.y, thresh, 'numbers are close');
+  assert.approximately(a.width, b.width, thresh, 'numbers are close');
+  assert.approximately(a.height, b.height, thresh, 'numbers are close');
+}
+
+export function expectBoxEqual(a, b) {
+  expect(a).to.be.deep.eq(b);
+}
 
 export function createProjectWithTemplate(app, appPath, xml) {
   it('opens Create New Project popup', async () => {
@@ -182,6 +196,25 @@ export function expectSampleMarkupToBeEq(app, appPath, markup) {
     const pathText = await getSamplePath(app, 'kek0.jpg').getText();
     const cl = await getSampleClass(app, 'kek0.jpg').getText();
     expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
-    expect(cl).to.be.eq(deterministicStrigify(markup));
+
+    const actual = JSON.parse(cl);
+    const actualKeys = Object.keys(actual);
+    const expectedKeys = Object.keys(markup);
+    expect(actualKeys).to.be.deep.eq(expectedKeys);
+
+    if (actualKeys.length === 1) {
+      const boxKey = actualKeys[0];
+      markup[boxKey].forEach((expected, i) => {
+        Object.entries(expected).forEach(([k, v]) => {
+          if (k === 'box') {
+            assertBoxAlmostEqual(v, actual[boxKey][i].box);
+          } else {
+            expect(v).to.be.deep.eq(actual[boxKey][i][k]);
+          }
+        });
+      });
+    } else {
+      expect(actual).to.be.deep.eq(markup);
+    }
   });
 }

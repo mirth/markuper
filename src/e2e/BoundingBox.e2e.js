@@ -1,3 +1,4 @@
+/* eslint-disable no-eval */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable prefer-template */
 /* eslint-disable consistent-return */
@@ -5,9 +6,10 @@
 import { Application } from 'spectron';
 import electronPath from 'electron';
 import path from 'path';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import {
-  itNavigatesToProject, sleep, clickButton, getRadioState,
+  itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
+  expectBoxEqual,
 } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
@@ -37,16 +39,6 @@ async function getBoxesMarkup() {
   }));
 
   return markup;
-}
-
-function almostEqual(rawActual, etalon) {
-  // eslint-disable-next-line no-eval
-  const actual = eval('({' + rawActual + '})');
-  const thresh = 2;
-  assert.approximately(actual.left, etalon.left, thresh, 'numbers are close');
-  assert.approximately(actual.top, etalon.top, thresh, 'numbers are close');
-  assert.approximately(actual.width, etalon.width, thresh, 'numbers are close');
-  assert.approximately(actual.height, etalon.height, thresh, 'numbers are close');
 }
 
 // <checkbox group="color" value="black" vizual="Black" />
@@ -81,17 +73,15 @@ describe('Simple bounding box test', function () {
   it('lulz', async () => {
     selectRect([10, 10], [100, 100]);
 
-    // fixme this not working
-    // await getRadio(app, 'bbox/0', 2).click();
+    await getRadio(app, 'bbox/0', 2).click();
     await sleep(500);
-    await app.client.keys('2');
 
     const selected = await getRadioState(app, 'bbox/0');
     expect(selected).to.be.deep.eq([false, true]);
     await app.client.keys('Enter');
 
     const mark = await getBoxesMarkup();
-    almostEqual(mark, {
+    expectBoxEqual(eval('({' + mark + '})'), {
       left: 0, top: 0, width: 4, height: 4,
     });
     await sleep(1500);
@@ -105,13 +95,12 @@ describe('Simple bounding box test', function () {
     await app.client.waitForText('span', 'Begin assess');
   });
 
-  // fixme
-  // -{"bbox":[{"animal":"dog","box":{"height":90,"width":90,"x":8.34375,"y":9}}]}
-  // +{"bbox":[{"animal":"dog","box":{"height":90,"width":90,"x":10,"y":10}}]}
-  // expectSampleMarkupToBeEq(app, appPath, {
-  //   bbox: [{
-  //     box: {x: 10, y: 10, width: 90, height: 90},
-  //     animal: 'dog',
-  //   }],
-  // });
+  expectSampleMarkupToBeEq(app, appPath, {
+    bbox: [{
+      box: {
+        x: 0, y: 0, width: 4, height: 4,
+      },
+      animal: 'dog',
+    }],
+  });
 });

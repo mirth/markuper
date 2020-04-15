@@ -3,6 +3,11 @@ import { sampleView, sampleMarkup, assessState } from '../store';
 
 export let sample;
 
+const field = sample.project.template.bounding_boxes[0];
+let boxes = [];
+let activeBox;
+let resizeObserver;
+
 function scaleBox(raw) {
   const scale = $assessState.imageElement.naturalWidth / $assessState.imageElement.clientWidth;
   return {
@@ -10,41 +15,34 @@ function scaleBox(raw) {
     y: raw.y / scale,
     width: raw.width / scale,
     height: raw.height / scale,
-  }
+  };
 }
 
 function scaleBoxes(markupForGroup, assessStateBox) {
-  if(!$assessState.imageElement) {
+  if (!$assessState.imageElement) {
     return;
   }
 
   activeBox = assessStateBox ? scaleBox(assessStateBox) : null;
-  boxes = (markupForGroup || []).map((mark) =>{
-    return {
-      ...mark,
-      box: scaleBox(mark.box)
-    }
-  })
+  boxes = (markupForGroup || []).map((mark) => ({
+    ...mark,
+    box: scaleBox(mark.box),
+  }));
 }
-
-const field = sample.project.template.bounding_boxes[0];
-let boxes = [];
-let activeBox;
-let resizeObserver;
 
 $: if (field) {
-  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box)
+  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box);
 }
 
-$: if($assessState.markup.box) {
-  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box)
+$: if ($assessState.markup.box) {
+  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box);
 }
 
-$: if(!resizeObserver && $assessState.imageElement) {
+$: if (!resizeObserver && $assessState.imageElement) {
   resizeObserver = new ResizeObserver(() => {
-    scaleBoxes($sampleMarkup[field.group], $assessState.markup.box)
-  })
-  resizeObserver.observe($assessState.imageElement)
+    scaleBoxes($sampleMarkup[field.group], $assessState.markup.box);
+  });
+  resizeObserver.observe($assessState.imageElement);
 }
 
 function formatMarkup(markup) {

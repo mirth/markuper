@@ -30,8 +30,8 @@ function cornersToBox() {
   height *= scale;
 
   return {
-    x: x,
-    y: y,
+    x,
+    y,
     width,
     height,
   };
