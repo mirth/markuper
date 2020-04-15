@@ -10,6 +10,7 @@ import { expect } from 'chai';
 import {
   itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
 } from './test_common';
+import { TestCheckboxRadioRadio, TestRadioCheckbox } from './classification_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -47,6 +48,8 @@ const assertBoxMarkup = (expected, actual) => {
     expect(act).to.be.deep.eq(expected[i]);
   });
 };
+
+// fixme test for checking markup for sample stays
 
 describe('Simple bounding box test', function () {
   this.timeout(20000);
@@ -250,5 +253,128 @@ describe('Bounding boxes manipulation', function () {
         animal: 'dog',
       },
     ],
+  });
+});
+
+
+describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function () {
+  this.timeout(20000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  const xml = `
+  <content>
+    <bounding_box group="bbox">
+      <checkbox group="color" value="black" vizual="Black" />
+      <checkbox group="color" value="white" vizual="White" />
+      <checkbox group="color" value="pink" vizual="Pink" />
+
+      <radio group="animal" value="cat" vizual="Cat" />
+      <radio group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="chuk" vizual="Chuk" />
+      <radio group="animal" value="gek" vizual="Gek" />
+
+      <radio group="size" value="smoll" vizual="Smoll" />
+      <radio group="size" value="big" vizual="Big" />
+    </bounding_box>
+  </content>
+  `;
+
+  itNavigatesToProject(app, appPath, xml);
+
+  it('begins assess', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
+  });
+
+  it('draw bounding box', async () => {
+    selectRect([100, 100], [375, 375]);
+  });
+
+  TestCheckboxRadioRadio(app, 'bbox');
+
+  it('submits the sample', async () => {
+    await app.client.keys('Enter');
+    await app.client.keys('Enter');
+    await sleep(1500);
+  });
+
+  it('goes on project page', async () => {
+    await clickButton(app, 'span', 'testproj0');
+    await app.client.waitForText('span', 'Begin assess');
+  });
+
+  expectSampleMarkupToBeEq(app, appPath, {
+    bbox: [{
+      box: {
+        x: 4, y: 4, width: 12, height: 12,
+      },
+      animal: 'gek',
+      color: ['black'],
+      size: 'big',
+    }],
+  });
+});
+
+describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function () {
+  this.timeout(20000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  const xml = `
+  <content>
+    <bounding_box group="bbox">
+      <radio group="animal" value="cat" vizual="Cat" />
+      <radio group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="chuk" vizual="Chuk" />
+      <radio group="animal" value="gek" vizual="Gek" />
+
+      <checkbox group="color" value="black" vizual="Black" />
+      <checkbox group="color" value="white" vizual="White" />
+      <checkbox group="color" value="pink" vizual="Pink" />
+    </bounding_box>
+  </content>
+  `;
+
+  itNavigatesToProject(app, appPath, xml);
+
+  it('begins assess', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
+  });
+
+  it('draw bounding box', async () => {
+    selectRect([100, 100], [375, 375]);
+  });
+
+  TestRadioCheckbox(app, 'bbox');
+
+  it('submits the sample', async () => {
+    await app.client.keys('Enter');
+    await app.client.keys('Enter');
+    await sleep(1500);
+  });
+
+  it('goes on project page', async () => {
+    await clickButton(app, 'span', 'testproj0');
+    await app.client.waitForText('span', 'Begin assess');
+  });
+
+  expectSampleMarkupToBeEq(app, appPath, {
+    bbox: [{
+      box: {
+        x: 4, y: 4, width: 12, height: 12,
+      },
+      animal: 'cat',
+      color: ['black', 'pink'],
+    }],
   });
 });

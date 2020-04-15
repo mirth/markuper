@@ -4,67 +4,19 @@
 /* eslint-disable func-names */
 import { Application } from 'spectron';
 import electronPath from 'electron';
-import _ from 'lodash';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  getPath, getRadio, assertRadioLabels, itNavigatesToProject, getSamplePath, sleep,
+  getRadio, itNavigatesToProject, getSamplePath,
   clickButton, getRadioState, getChecked, expectSampleMarkupToBeEq,
 } from './test_common';
-
+import { TestCheckboxRadioRadio, TestRadioCheckbox, itSubmitsSample } from './classification_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
   path: electronPath,
   args: [appPath],
 });
-
-
-function expectFocusIsOn(devices, device) {
-  it(`focused on device ${device}`, async () => {
-    const cls = await Promise.all(devices.map(async (dev) => {
-      const cl = await app.client.element(`//*[@id="${dev}"]/div`).getAttribute('class');
-      return cl;
-    }));
-
-    const pairs = _.zip(devices, cls);
-
-    for (const [iterName, iterCl] of pairs) {
-      if (iterName === device) {
-        expect(iterCl).to.have.string('selected');
-      } else {
-        expect(iterCl).to.not.have.string('selected');
-      }
-    }
-
-    const devSubmitCl = await app.client.element('//*[@id="device_submit"]/div/button').getAttribute('class');
-
-    if (device === 'devSubmit') {
-      expect(devSubmitCl).to.have.string('filled');
-    }
-  });
-}
-
-async function assertCheckboxLabels(device) {
-  const inputs = `//*[@id="${device}"]/div/label/ul/li/label/input`;
-  await app.client.waitForExist(inputs);
-  const elements = await app.client.elements(inputs);
-  const labels = await Promise.all(elements.value.map(async (el) => {
-    const pth = await getPath(app, el, '..');
-    const txt = await app.client.elementIdText(pth.value.ELEMENT);
-    return txt.value;
-  }));
-  expect(labels).to.be.deep.eq(['Black', 'White', 'Pink']);
-}
-
-function itSubmitsSample() {
-  it('submits the sample', async () => {
-    await app.client.keys('Enter');
-    await sleep(1500);
-    await clickButton(app, 'span', 'testproj0');
-    await sleep(1500);
-  });
-}
 
 describe('Device state keep for assessed samples', function () {
   this.timeout(20000);
@@ -108,7 +60,7 @@ describe('Device state keep for assessed samples', function () {
     await app.client.keys('Enter');
   });
 
-  itSubmitsSample();
+  itSubmitsSample(app);
 
   it('goes to next new sample', async () => {
     await app.client.waitUntilTextExists('span', 'Begin assess');
@@ -165,54 +117,9 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
     await clickButton(app, 'span', 'Begin assess');
   });
 
-  const focusIsOn = (device) => {
-    expectFocusIsOn(['root/0', 'root/1', 'root/2'], device);
-  };
+  TestCheckboxRadioRadio(app, 'root');
 
-  it('displays correct devices labels', async () => {
-    await assertCheckboxLabels('root/0');
-    await assertRadioLabels(app, 'root/1', ['Cat', 'Dog', 'Chuk', 'Gek']);
-    await assertRadioLabels(app, 'root/2', ['Smoll', 'Big']);
-  });
-
-  focusIsOn('root/0');
-
-  it('displays checkbox 1 as checked', async () => {
-    await app.client.keys('1');
-    await app.client.keys('2');
-    await app.client.keys('1');
-    await app.client.keys('1');
-    await app.client.keys('2');
-
-    const checked = await getChecked(app, 'root/0');
-    expect(checked).to.be.deep.eq([true, false, false]);
-    await app.client.keys('Enter');
-  });
-
-  focusIsOn('root/1');
-
-  it('displays radio 4 selected', async () => {
-    await getRadio(app, 'root/1', 1).click();
-    await getRadio(app, 'root/1', 1).click();
-    await getRadio(app, 'root/1', 4).click();
-
-    const selected = await getRadioState(app, 'root/1');
-    expect(selected).to.be.deep.eq([false, false, false, true]);
-    await app.client.keys('Enter');
-  });
-
-  focusIsOn('root/2');
-
-  it('displays radio 2 selected', async () => {
-    await getRadio(app, 'root/2', 2).click();
-    const selected = await getRadioState(app, 'root/2');
-    expect(selected).to.be.deep.eq([false, true]);
-    await app.client.keys('Enter');
-  });
-
-  focusIsOn('device_submit');
-
-  itSubmitsSample();
+  itSubmitsSample(app);
   expectSampleMarkupToBeEq(app, appPath, { animal: 'gek', color: ['black'], size: 'big' });
 });
 
@@ -238,9 +145,6 @@ describe('Focus and state [Radio, Checkbox]', function () {
   </content>
   `;
 
-  const focusIsOn = (device) => {
-    expectFocusIsOn(['root/0', 'root/1'], device);
-  };
   itNavigatesToProject(app, appPath, xml);
 
   it('begins assess', async () => {
@@ -249,80 +153,8 @@ describe('Focus and state [Radio, Checkbox]', function () {
   });
 
 
-  it('displays correct devices labels', async () => {
-    await sleep(2000);
-    await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
-    await assertCheckboxLabels('root/1');
-  });
+  TestRadioCheckbox(app, 'root');
 
-  focusIsOn('root/0');
-
-  it('tries to submit empty radio field', async () => {
-    await app.client.keys('Enter');
-    await sleep(1500);
-  });
-
-  focusIsOn('root/0');
-
-  it('displays radio 3 selected', async () => {
-    await app.client.keys('3');
-    const selected = await getRadioState(app, 'root/0');
-    expect(selected).to.be.deep.eq([false, false, true, false]);
-  });
-
-  focusIsOn('root/0');
-
-  it('submits radio field', async () => {
-    await app.client.keys('Enter');
-  });
-
-  focusIsOn('root/1');
-
-  it('displays radio 1 selected', async () => {
-    await getRadio(app, 'root/0', 1).click();
-    const selected = await getRadioState(app, 'root/0');
-    expect(selected).to.be.deep.eq([true, false, false, false]);
-  });
-
-  focusIsOn('root/1');
-
-  it('displays checkbox 2 as checked', async () => {
-    await app.client.keys('2');
-
-    const checked = await getChecked(app, 'root/1');
-    expect(checked).to.be.deep.eq([false, true, false]);
-  });
-
-  focusIsOn('root/1');
-
-  it('displays checkboxes 1,2 as checked', async () => {
-    await app.client.keys('1');
-
-    const checked = await getChecked(app, 'root/1');
-    expect(checked).to.be.deep.eq([true, true, false]);
-  });
-
-  focusIsOn('root/1');
-
-  it('displays all checkboxes as checked', async () => {
-    await app.client.keys('3');
-
-    const checked = await getChecked(app, 'root/1');
-    expect(checked).to.be.deep.eq([true, true, true]);
-  });
-
-  focusIsOn('root/1');
-
-  it('displays checkbox 2 as unchecked', async () => {
-    await app.client.keys('2');
-
-    const checked = await getChecked(app, 'root/1');
-    expect(checked).to.be.deep.eq([true, false, true]);
-    await app.client.keys('Enter');
-  });
-
-  focusIsOn('device_submit');
-
-  itSubmitsSample();
+  itSubmitsSample(app);
   expectSampleMarkupToBeEq(app, appPath, { animal: 'cat', color: ['black', 'pink'] });
 });
