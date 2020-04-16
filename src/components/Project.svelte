@@ -12,13 +12,20 @@ import Block from 'svelte-atoms/Block.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
-import { getFieldsInOrderFor } from '../project';
+import { deterministicStrigify } from '../project'; // getFieldsInOrderFor
 
 export let params;
 
-function labelsStr(radio) {
-  return _.map(radio.labels, 'value').join(', ');
-}
+// function labelsStr(field) {
+//   return field.labels.map(value => {
+//     console.log(value)
+//     if(typeof value === 'object') {
+//       return JSON.stringify(value)
+//     }
+
+//     return value;
+//   }).join(', ');
+// }
 
 function exportProject(p) {
   return async () => {
@@ -29,11 +36,7 @@ function exportProject(p) {
 }
 
 function formatMarkup(markup) {
-  return Object.keys(markup)
-    .sort()
-    .map((labelName) => [labelName, markup[labelName]])
-    .map(([labelName, labelValue]) => `${labelName}: ${labelValue}`)
-    .join(', ');
+  return deterministicStrigify(markup);
 }
 
 let assessedList = [];
@@ -43,8 +46,8 @@ onMount(async () => {
   await fetchProject(params.project_id);
 });
 
-let fields = [];
-$: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
+// let fields = [];
+// $: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
 </script>
 
 
@@ -60,9 +63,9 @@ $: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
     {#each $activeProject.data_sources as src}
       <p>Data source: <span>{src.source_uri}</span></p>
     {/each}
-    {#each fields as field}
+    <!-- {#each fields as field}
       <p>Labels: <span>{labelsStr(field)}</span></p>
-    {/each}
+    {/each} -->
   </Cell>
 </Row>
 <Spacer size={24} />

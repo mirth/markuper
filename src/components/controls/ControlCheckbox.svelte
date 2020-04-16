@@ -2,7 +2,7 @@
 import Checkbox from 'svelte-atoms/Checkbox.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import { makeLabelsWithKeys } from '../../control';
-import { activeMarkup, assessState, isFieldSelected } from '../../store';
+import { sampleMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
 export let field;
@@ -12,7 +12,11 @@ const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 let keyDown;
 let checked = new Set([]);
 let isSelected = false;
-$: checked = new Set($activeMarkup[field.group] || []);
+if (!field.owner && $sampleMarkup[field.group]) {
+  $assessState.markup[field.group] = $sampleMarkup[field.group];
+}
+
+$: checked = new Set($assessState.markup[field.group] || []);
 $: isSelected = isFieldSelected(field, $assessState);
 
 function handleKeydown(event) {
@@ -30,7 +34,7 @@ function updateMarkupWith(labelValue) {
     checked.add(labelValue);
   }
 
-  $activeMarkup[field.group] = Array.from(checked);
+  $assessState.markup[field.group] = Array.from(checked);
 }
 
 async function handleKeyup(event) {

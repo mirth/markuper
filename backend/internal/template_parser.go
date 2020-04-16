@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"backend/pkg/utils"
 	"bytes"
 	"encoding/xml"
 	"fmt"
@@ -34,17 +33,19 @@ func missingAttribute(nodes []Node) (Node, string) {
 			}
 		}
 
-		{
-			_, ok := getAttrByName(n, "value")
-			if !ok {
-				return n, "value"
+		if isClField(n.XMLName.Local) {
+			{
+				_, ok := getAttrByName(n, "value")
+				if !ok {
+					return n, "value"
+				}
 			}
-		}
 
-		{
-			_, ok := getAttrByName(n, "vizual")
-			if !ok {
-				return n, "vizual"
+			{
+				_, ok := getAttrByName(n, "vizual")
+				if !ok {
+					return n, "vizual"
+				}
 			}
 		}
 	}
@@ -61,22 +62,68 @@ func emptyAttribute(nodes []Node) (Node, string) {
 			}
 		}
 
-		{
-			a, _ := getAttrByName(n, "value")
-			if len(a.Value) == 0 {
-				return n, "value"
+		if isClField(n.XMLName.Local) {
+			{
+				a, _ := getAttrByName(n, "value")
+				if len(a.Value) == 0 {
+					return n, "value"
+				}
 			}
-		}
 
-		{
-			a, _ := getAttrByName(n, "vizual")
-			if len(a.Value) == 0 {
-				return n, "vizual"
+			{
+				a, _ := getAttrByName(n, "vizual")
+				if len(a.Value) == 0 {
+					return n, "vizual"
+				}
 			}
 		}
 	}
 
 	return Node{}, ""
+}
+
+func nodeToUpdatedField(t *Template, n Node) error {
+	switch n.XMLName.Local {
+	case "radio":
+		t.CreateOrUpdateClFieldFor(n)
+	case "checkbox":
+		t.CreateOrUpdateClFieldFor(n)
+	case "bounding_box":
+		err := t.CreateOrUpdateBBoxFieldFor(n)
+		if err != nil {
+			return err
+		}
+	default:
+		return NewBusinessError(
+			fmt.Sprintf("Unsupported element [%s]", n.XMLName.Local),
+		)
+	}
+
+	return nil
+}
+
+func NewTemplate() Template {
+	return Template{
+		ClassificationComponents: &ClassificationComponents{
+			Radios:      make([]*RadioField, 0),
+			Checkboxes:  make([]*CheckboxField, 0),
+			FieldsOrder: make([]string, 0),
+		},
+		BoundingBoxes: make([]*BoundingBoxField, 0),
+	}
+}
+
+func nodesToTemplate(nodes []Node) (Template, error) {
+	t := NewTemplate()
+
+	for _, n := range nodes {
+		err := nodeToUpdatedField(&t, n)
+		if err != nil {
+			return Template{}, err
+		}
+	}
+
+	return t, nil
 }
 
 func XMLToTemplate(s string) (Template, error) {
@@ -119,59 +166,10 @@ func XMLToTemplate(s string) (Template, error) {
 		}
 	}
 
-	radiosByGroup := map[string]*RadioField{}
-	checkboxesByGroup := map[string]*CheckboxField{}
-	groupsByOrder := []string{}
-	for _, n := range nodes {
-		g := getGroup(n)
-		groupsByOrder = append(groupsByOrder, g)
+	t, err := nodesToTemplate(nodes)
 
-		appendLabels := func(labels []ValueWithVizual) []ValueWithVizual {
-			return append(labels, ValueWithVizual{
-				Vizual: getVizual(n),
-				Value:  getValue(n),
-			})
-		}
-
-		switch n.XMLName.Local {
-		case "radio":
-			f, ok := radiosByGroup[g]
-			if !ok {
-				f = NewRadioField(g)
-				radiosByGroup[g] = f
-			}
-
-			f.Labels = appendLabels(f.Labels)
-		case "checkbox":
-			f, ok := checkboxesByGroup[g]
-			if !ok {
-				f = NewCheckboxField(g)
-				checkboxesByGroup[g] = f
-			}
-
-			f.Labels = appendLabels(f.Labels)
-		default:
-			return Template{}, NewBusinessError(
-				fmt.Sprintf("Unsupported element [%s]", n.XMLName.Local),
-			)
-		}
-	}
-
-	groupsByOrder = utils.Unique(groupsByOrder)
-
-	radios := make([]RadioField, 0)
-	checkboxes := make([]CheckboxField, 0)
-	for _, v := range radiosByGroup {
-		radios = append(radios, *v)
-	}
-	for _, v := range checkboxesByGroup {
-		checkboxes = append(checkboxes, *v)
-	}
-
-	t := Template{
-		Radios:      radios,
-		Checkboxes:  checkboxes,
-		FieldsOrder: groupsByOrder,
+	if err != nil {
+		return Template{}, err
 	}
 
 	{
@@ -235,6 +233,7 @@ func duplicatedLabels(t Template) map[string][]string {
 		}
 
 		d := findCountsGt1(labelCount)
+		sort.Strings(d)
 		if len(d) > 0 {
 			dups[f.Group] = d
 		}

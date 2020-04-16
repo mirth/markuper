@@ -1,10 +1,10 @@
 <script>
 import { onMount } from 'svelte';
 import _ from 'lodash';
-import api from '../api';
 import Select from 'svelte-atoms/Select.svelte';
 import Input from 'svelte-atoms/Input.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
+import api from '../api';
 
 export let selectedTemplate;
 

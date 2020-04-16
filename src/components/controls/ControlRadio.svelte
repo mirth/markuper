@@ -3,7 +3,7 @@ import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import Radio from 'svelte-atoms/Radio.svelte';
 import { makeLabelsWithKeys } from '../../control';
-import { activeMarkup, assessState, isFieldSelected } from '../../store';
+import { sampleMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
 
 export let field;
@@ -12,11 +12,14 @@ const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
 let keyDown;
 let isSelected = false;
-$: isSelected = isFieldSelected(field, $assessState);
-let radio = $activeMarkup[field.group];
-$: if (radio) {
-  $activeMarkup[field.group] = radio;
+
+if (!field.owner && $sampleMarkup[field.group]) {
+  $assessState.markup[field.group] = $sampleMarkup[field.group];
 }
+
+$: radio = $assessState.markup[field.group];
+
+$: isSelected = isFieldSelected(field, $assessState);
 
 
 function handleKeydown(event) {
@@ -27,6 +30,10 @@ function handleKeydown(event) {
   keyDown = event.key;
 }
 
+function updateRadio(labelValue) {
+  radio = labelValue;
+  $assessState.markup[field.group] = radio;
+}
 async function handleKeyup(event) {
   if (!isSelected) {
     return;
@@ -42,8 +49,16 @@ async function handleKeyup(event) {
 
   const labelIndex = parseInt(event.key, 10) - 1;
   const label = field.labels[labelIndex];
-  radio = label.value;
+
+  updateRadio(label.value);
+
   keyDown = null;
+}
+
+function onChange(labelValue) {
+  return () => {
+    updateRadio(labelValue);
+  };
 }
 
 </script>
@@ -57,6 +72,7 @@ async function handleKeyup(event) {
       <Radio
         bind:group={radio}
         value={label.value}
+        on:click={onChange(label.value)}
       >
         {label.vizual}
       </Radio>

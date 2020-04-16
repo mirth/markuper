@@ -52,7 +52,7 @@ describe('Application launch', function () {
 
     it('assesses 1st jpg sample', async () => {
       await app.client.waitForExist('img');
-      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
+      await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek0.jpg'));
       await app.client.keys('3');
@@ -62,17 +62,17 @@ describe('Application launch', function () {
 
     it('assesses 2nd jpg sample', async () => {
       await app.client.waitForExist('img');
-      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
+      await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek1.jpg'));
-      await getRadio(app, 'device0', 2).click();
+      await getRadio(app, 'root/0', 2).click();
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
 
     it('assesses 3rd jpg sample', async () => {
       await app.client.waitForExist('img');
-      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
+      await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek2.jpg'));
       await app.client.keys('2');
@@ -82,20 +82,20 @@ describe('Application launch', function () {
 
     it('assesses 1st png sample', async () => {
       await app.client.waitForExist('img');
-      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
+      await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek3.png'));
-      await getRadio(app, 'device0', 1).click();
+      await getRadio(app, 'root/0', 1).click();
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
 
     it('assesses 2nd png sample', async () => {
       await app.client.waitForExist('img');
-      await assertRadioLabels(app, 'device0', ['Cat', 'Dog', 'Chuk', 'Gek']);
+      await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek4.png'));
-      await getRadio(app, 'device0', 1).click();
+      await getRadio(app, 'root/0', 1).click();
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -112,34 +112,34 @@ describe('Application launch', function () {
         const pathText = await getSamplePath(app, 'kek0.jpg').getText();
         const cl = await getSampleClass(app, 'kek0.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
-        expect(cl).to.be.eq('animal: chuk');
+        expect(cl).to.be.eq('{"animal":"chuk"}');
       }
 
       {
         const pathText = await getSamplePath(app, 'kek1.jpg').getText();
         const cl = await getSampleClass(app, 'kek1.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek1.jpg') + ':');
-        expect(cl).to.be.eq('animal: dog');
+        expect(cl).to.be.eq('{"animal":"dog"}');
       }
 
       {
         const pathText = await getSamplePath(app, 'kek2.jpg').getText();
         const cl = await getSampleClass(app, 'kek2.jpg').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek2.jpg') + ':');
-        expect(cl).to.be.eq('animal: dog');
+        expect(cl).to.be.eq('{"animal":"dog"}');
       }
 
       {
         const pathText = await getSamplePath(app, 'kek3.png').getText();
         const cl = await getSampleClass(app, 'kek3.png').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek3.png') + ':');
-        expect(cl).to.be.eq('animal: cat');
+        expect(cl).to.be.eq('{"animal":"cat"}');
       }
       {
         const pathText = await getSamplePath(app, 'kek4.png').getText();
         const cl = await getSampleClass(app, 'kek4.png').getText();
         expect(pathText).to.be.eq(path.join(imgDir, 'kek4.png') + ':');
-        expect(cl).to.be.eq('animal: cat');
+        expect(cl).to.be.eq('{"animal":"cat"}');
       }
     });
 
@@ -147,12 +147,12 @@ describe('Application launch', function () {
       await getSamplePath(app, 'kek1.jpg').element('..').click();
       await app.client.waitForVisible("button/*[@innertext='Cat']");
 
-      const selected = await getRadioState(app, 'device0');
+      const selected = await getRadioState(app, 'root/0');
       expect(selected).to.be.deep.eq([false, true, false, false]);
     });
 
     it("changes class to 'gek'", async () => {
-      await getRadio(app, 'device0', 4).click();
+      await getRadio(app, 'root/0', 4).click();
       await sleep(1500);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
@@ -162,7 +162,7 @@ describe('Application launch', function () {
       await sleep(1500);
       {
         const cl = await getSampleClass(app, 'kek1.jpg').getText();
-        expect(cl).to.be.eq('animal: gek');
+        expect(cl).to.be.eq('{"animal":"gek"}');
       }
     });
   });

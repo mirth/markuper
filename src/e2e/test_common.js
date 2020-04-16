@@ -1,8 +1,10 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable prefer-template */
 /* eslint-disable no-unused-expressions */
 import path from 'path';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import api from '../api';
-
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
 export const getRadio = (app, device, i) => app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/div/label`);
@@ -33,7 +35,7 @@ export const createProject = async (appPath, xml) => {
   const glob0 = path.join(imgDir, '*.jpg');
   const glob1 = path.join(imgDir, '*.png');
 
-  await api.post('/project', {
+  const res = await api.post('/project', {
     description: {
       name: 'testproj0',
     },
@@ -46,6 +48,8 @@ export const createProject = async (appPath, xml) => {
       { type: 'local_directory', source_uri: glob1 },
     ],
   });
+
+  expect(res).not.to.have.property('status');
 };
 
 export const clickButton = async (app, tag, text) => {
@@ -79,6 +83,15 @@ export const itNavigatesToProject = (app, appPath, xml) => {
 
 export const getSamplePath = (app, filename) => app.client.element(`small*=${filename}`);
 export const getSampleClass = (app, filename) => getSamplePath(app, filename).element('../..').element('./span');
+
+export function assertBoxAlmostEqual(a, b) {
+  const thresh = 1;
+
+  assert.approximately(a.x, b.x, thresh, 'numbers are close');
+  assert.approximately(a.y, b.y, thresh, 'numbers are close');
+  assert.approximately(a.width, b.width, thresh, 'numbers are close');
+  assert.approximately(a.height, b.height, thresh, 'numbers are close');
+}
 
 export function createProjectWithTemplate(app, appPath, xml) {
   it('opens Create New Project popup', async () => {
@@ -155,3 +168,49 @@ export const getChecked = async (app, device) => {
 
   return checked;
 };
+
+// fixme project.js
+const sortObj = (obj) => (obj === null || typeof obj !== 'object'
+  ? obj
+  : Array.isArray(obj)
+    ? obj.map(sortObj)
+    : Object.assign({},
+      ...Object.entries(obj)
+        .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+        .map(([k, v]) => ({ [k]: sortObj(v) }))));
+
+
+export const deterministicStrigify = (obj) => JSON.stringify(sortObj(obj));
+
+export function expectSampleMarkupToBeEq(app, appPath, markup) {
+  it('displays sample markup on project page', async () => {
+    await clickLink(app, 'span', 'testproj0');
+    await app.client.waitForExist('ul');
+
+    const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
+
+    const pathText = await getSamplePath(app, 'kek0.jpg').getText();
+    const cl = await getSampleClass(app, 'kek0.jpg').getText();
+    expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
+
+    const actual = JSON.parse(cl);
+    const actualKeys = Object.keys(actual);
+    const expectedKeys = Object.keys(markup);
+    expect(actualKeys).to.be.deep.eq(expectedKeys);
+
+    if (actualKeys.length === 1) {
+      const boxKey = actualKeys[0];
+      markup[boxKey].forEach((expected, i) => {
+        Object.entries(expected).forEach(([k, v]) => {
+          if (k === 'box') {
+            assertBoxAlmostEqual(v, actual[boxKey][i].box);
+          } else {
+            expect(v).to.be.deep.eq(actual[boxKey][i][k]);
+          }
+        });
+      });
+    } else {
+      expect(actual).to.be.deep.eq(markup);
+    }
+  });
+}
