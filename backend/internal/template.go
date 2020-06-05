@@ -171,7 +171,7 @@ func (t *Template) CreateOrUpdateBBoxFieldFor(n Node) error {
 	return nil
 }
 
-func (t *Template) getClassificationFields() []*ClassificationField {
+func (t *ClassificationComponents) getClassificationFields() []*ClassificationField {
 	fields := []*ClassificationField{}
 
 	for _, f := range t.Radios {

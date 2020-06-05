@@ -113,8 +113,8 @@ func TestXMLToFields(t *testing.T) {
 			<checkbox group="color" value="pink" vizual="Pink" />
 
 			<bounding_box group="box">
-				<radio group="animal" value="kitty" vizual="Kitty" />
-				<radio group="animal" value="doge" vizual="Doge" />
+				<radio group="box_kind" value="kitty" vizual="Kitty" />
+				<radio group="box_kind" value="doge" vizual="Doge" />
 			</bounding_box>
 		</content>
 		`
@@ -147,16 +147,55 @@ func TestXMLToFields(t *testing.T) {
 			ClassificationComponents: &ClassificationComponents{
 				Radios: []*RadioField{{
 					Type:  "radio",
-					Group: "animal",
+					Group: "box_kind",
 					Labels: []ValueWithVizual{
 						{Vizual: "Kitty", Value: "kitty"},
 						{Vizual: "Doge", Value: "doge"},
 					},
 				}},
 				Checkboxes:  make([]*CheckboxField, 0),
-				FieldsOrder: []string{"animal"},
+				FieldsOrder: []string{"box_kind"},
 			},
 		}}, tt.BoundingBoxes)
+	}
+
+	{
+		data := `
+		<content>
+			<radio group="animal" value="cat" vizual="Cat" />
+			<radio group="animal" value="dog" vizual="Dog" />
+
+			<checkbox group="color" value="black" vizual="Black" />
+			<checkbox group="color" value="white" vizual="White" />
+			<checkbox group="color" value="pink" vizual="Pink" />
+
+			<bounding_box group="box">
+				<radio group="animal" value="kitty" vizual="Kitty" />
+				<radio group="animal" value="doge" vizual="Doge" />
+			</bounding_box>
+		</content>
+		`
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Template has duplicate groups: animal", err.Error())
+	}
+
+	{
+		data := `
+    <content>
+      <bounding_box group="box">
+        <checkbox group="color" value="black" vizual="Black" />
+        <checkbox group="color" value="white" vizual="White" />
+        <checkbox group="color" value="pink" vizual="Pink" />
+
+        <checkbox group="box" value="cat" vizual="Cat" />
+        <checkbox group="box" value="dog" vizual="Dog" />
+      </bounding_box>
+    </content>
+		`
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Template has duplicate groups: box", err.Error())
 	}
 
 	{

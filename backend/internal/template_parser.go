@@ -208,6 +208,13 @@ func duplicatedGroups(t Template) []string {
 		groupCount[f.Group] += 1
 	}
 
+	for _, b := range t.BoundingBoxes {
+		for _, f := range b.getClassificationFields() {
+			groupCount[f.Group] += 1
+		}
+		groupCount[b.Group] += 1
+	}
+
 	return findCountsGt1(groupCount)
 }
 

@@ -22,6 +22,39 @@ describe('Application launch', function () {
     }
   });
 
+  describe('Unable to create project because of duplicated groups', () => {
+    const xml = `
+    <content>
+      <bounding_box group="box">
+        <checkbox group="color" value="black" vizual="Black" />
+        <checkbox group="color" value="white" vizual="White" />
+        <checkbox group="color" value="pink" vizual="Pink" />
+
+        <checkbox group="box" value="cat" vizual="Cat" />
+        <checkbox group="box" value="dog" vizual="Dog" />
+      </bounding_box>
+    </content>
+    `;
+    createProjectWithTemplate(app, appPath, xml);
+
+    it('display duplicate group error', async () => {
+      await app.client.waitForVisible('//*[@id="create_project_error"]');
+      const el = app.client.element('//*[@id="create_project_error"]');
+      const err = await el.getText();
+      expect(err).to.be.eq('Template has duplicate groups: box');
+    });
+  });
+});
+
+describe('Application launch', function () {
+  this.timeout(30000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
   describe('Unable to create project because of some attribute is empty', () => {
     const xml = `
     <content>
