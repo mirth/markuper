@@ -58,11 +58,14 @@ onMount(async () => {
 <Cell>
 <Row>
   <Cell>
-    <Typography type='title' block>{$activeProject.description.name}</Typography>
+    <Typography type='title' block><b>{$activeProject.description.name}</b></Typography>
 
+    <Typography type='subheader' block>Data sources:</Typography>
+    <ul>
     {#each $activeProject.data_sources as src}
-      <p>Data source: <span>{src.source_uri}</span></p>
+      <li><span>{src.source_uri}</span></li>
     {/each}
+    </ul>
     <!-- {#each fields as field}
       <p>Labels: <span>{labelsStr(field)}</span></p>
     {/each} -->
@@ -110,7 +113,8 @@ onMount(async () => {
 
 <style>
 li {
-  list-style-type: none;
+  /* list-style-type: none; */
+  list-style: circle inside none;
 }
 ul {
   padding: 0;
