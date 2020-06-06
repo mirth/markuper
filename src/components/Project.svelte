@@ -12,20 +12,10 @@ import Block from 'svelte-atoms/Block.svelte';
 import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import { activeProject, fetchProject } from '../store';
-import { deterministicStrigify } from '../project'; // getFieldsInOrderFor
+import { deterministicStrigify } from '../project';
+import ControlList from './controls/ControlList.svelte';
 
 export let params;
-
-// function labelsStr(field) {
-//   return field.labels.map(value => {
-//     console.log(value)
-//     if(typeof value === 'object') {
-//       return JSON.stringify(value)
-//     }
-
-//     return value;
-//   }).join(', ');
-// }
 
 function exportProject(p) {
   return async () => {
@@ -46,8 +36,6 @@ onMount(async () => {
   await fetchProject(params.project_id);
 });
 
-// let fields = [];
-// $: [fields, groupsOrder] = getFieldsInOrderFor($activeProject.template);
 </script>
 
 
@@ -55,36 +43,41 @@ onMount(async () => {
 <PageBlank>
 <Block>
 <Row>
-<Cell>
-<Row>
-  <Cell>
-    <Typography type='title' block><b>{$activeProject.description.name}</b></Typography>
-
-    <Typography type='subheader' block>Data sources:</Typography>
-    <ul>
-    {#each $activeProject.data_sources as src}
-      <li><span>{src.source_uri}</span></li>
-    {/each}
-    </ul>
-    <!-- {#each fields as field}
-      <p>Labels: <span>{labelsStr(field)}</span></p>
-    {/each} -->
+  <Cell xs={8}>
+    <Row>
+      <Cell>
+        <Typography type='title' block><b>{$activeProject.description.name}</b></Typography>
+        <Typography type='subheader' block>Data sources:</Typography>
+        <ul>
+        {#each $activeProject.data_sources as src}
+          <li><span>{src.source_uri}</span></li>
+        {/each}
+        </ul>
+      </Cell>
+    </Row>
+    <Spacer size={24} />
+    <Row>
+      <Cell>
+        <div style='display: flex; justify-content: space-between; flex-direction: row;'>
+          <Button on:click={() => push(`/project/${$activeProject.project_id}/assess_sample`)} iconRight='chevron-right'>
+            Begin assess
+          </Button>
+          <Button on:click={exportProject($activeProject)} iconLeft='download'>
+            Export CSV
+          </Button>
+        </div>
+      </Cell>
+    </Row>
   </Cell>
-</Row>
-<Spacer size={24} />
-<Row>
-  <Cell>
-    <div style='display: flex; justify-content: space-between; flex-direction: row;'>
-      <Button on:click={() => push(`/project/${$activeProject.project_id}/assess_sample`)} iconRight='chevron-right'>
-        Begin assess
-      </Button>
-      <Button on:click={exportProject($activeProject)} iconLeft='download'>
-        Export CSV
-      </Button>
-    </div>
+  <Cell xs={4}>
+    <Typography type='subheader' block>Sample UI</Typography>
+    <Block type="block3">
+      <ControlList
+        submitMarkupAndFetchNext={() => {}}
+        owner={$activeProject.template}
+        />
+    </Block>
   </Cell>
-</Row>
-</Cell>
 </Row>
 <Spacer size={32} />
 <Row>

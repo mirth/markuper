@@ -14,8 +14,8 @@ import { submitGroup } from '../../control';
 export let owner;
 export let submitMarkupAndFetchNext;
 
-const ownerGroup = (owner && owner.group) || 'root';
-const fields = getFieldsInOrderFor(owner);
+$: ownerGroup = (owner && owner.group) || 'root';
+$: fields = getFieldsInOrderFor(owner);
 
 </script>
 

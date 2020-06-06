@@ -38,11 +38,14 @@ describe('Application launch', function () {
     `;
     const [imgDir, glob0, glob1] = createProjectWithTemplate(app, appPath, xml);
 
-    it('displays project description', async () => {
+    it('displays project data sources', async () => {
       await app.client.waitUntilTextExists('span', 'testproj0');
       await app.client.waitUntilTextExists('span', glob0);
       await app.client.waitUntilTextExists('span', glob1);
-      await app.client.waitUntilTextExists('span', 'cat, dog, chuk, gek');
+    });
+
+    it('displays project sample ui', async () => {
+      await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
     });
 
     it('begins assess', async () => {
