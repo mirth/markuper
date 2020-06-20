@@ -14,8 +14,9 @@ type TaskAnswer struct {
 }
 
 type ValueWithVizual struct {
-	Value  string `json:"value"`
-	Vizual string `json:"vizual"`
+	Value        string `json:"value"`
+	DisplayName  string `json:"display_name"`
+	DisplayColor string `json:"display_color"`
 }
 
 type ClassificationField struct {
@@ -70,6 +71,14 @@ func NewBoundingBoxField(group string) *BoundingBoxField {
 			Radios:     make([]*RadioField, 0),
 			Checkboxes: make([]*CheckboxField, 0),
 		},
+	}
+}
+
+func NewValueWithVizualWithColor(value, displayName, displayColor string) ValueWithVizual {
+	return ValueWithVizual{
+		Value:        value,
+		DisplayName:  displayName,
+		DisplayColor: displayColor,
 	}
 }
 
@@ -141,12 +150,20 @@ func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) {
 		}
 	}
 
-	f.Labels = append(f.Labels, ValueWithVizual{
-		Vizual: getVizual(n),
-		Value:  getValue(n),
-	})
+	f.Labels = append(f.Labels, NewValueWithVizualFromNode(n))
 
 	appendIfNotExists(&t.FieldsOrder, g)
+}
+
+func NewValueWithVizualFromNode(n Node) ValueWithVizual {
+	color := getColor(n)
+
+	// fixme check if color is valid
+	return NewValueWithVizualWithColor(
+		getValue(n),
+		getVizual(n),
+		color,
+	)
 }
 
 func (t *Template) CreateOrUpdateBBoxFieldFor(n Node) error {

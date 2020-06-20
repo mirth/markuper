@@ -8,7 +8,7 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
+  getPath, itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
 } from './test_common';
 import { TestCheckboxRadioRadio, TestRadioCheckbox } from './classification_common';
 
@@ -320,7 +320,7 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
   });
 });
 
-describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function () {
+describe('Bounding box with Focus and state [Checkbox, Radio]', function () {
   this.timeout(20000);
   before(() => app.start());
   after(() => {
@@ -376,5 +376,57 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
       animal: 'cat',
       color: ['black', 'pink'],
     }],
+  });
+});
+
+describe('Display correct box labels', function () {
+  this.timeout(20000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  const xml = `
+  <content>
+    <bounding_box group="bbox">
+      <radio group="animal" value="cat" vizual="Cat" color="#100000" />
+      <radio group="animal" value="dog" vizual="Dog" color="#200000" />
+      <radio group="animal" value="chuk" vizual="Chuk" color="#300000" />
+      <radio group="animal" value="gek" vizual="Gek" color="#400000" />
+
+      <checkbox group="color" value="black" vizual="Black" color="#500000" />
+      <checkbox group="color" value="white" vizual="White" color="#600000" />
+      <checkbox group="color" value="pink" vizual="Pink" color="#700000" />
+    </bounding_box>
+  </content>
+  `;
+
+  itNavigatesToProject(app, appPath, xml);
+
+  it('begins assess', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
+  });
+
+  it('draw bounding box', async () => {
+    selectRect([100, 100], [375, 375]);
+  });
+
+  TestRadioCheckbox(app, 'bbox');
+
+  it('displays box labels correctly', async () => {
+    const elements = await app.client.elements('//*[@id="image-container"]/div/ul/li/span');
+    const labels = await Promise.all(elements.value.map(async (el) => {
+      const txt = await app.client.elementIdText(el.ELEMENT);
+      const color = await app.client.elementIdCssProperty(el.ELEMENT, 'background-color');
+      return [txt.value, color.value];
+    }));
+    expect(labels).to.be.deep.eq([
+      ['Cat', 'rgba(16, 0, 0, 1)'],
+      ['Black', 'rgba(80, 0, 0, 1)'],
+      ['Pink', 'rgba(112, 0, 0, 1)'],
+    ]);
   });
 });

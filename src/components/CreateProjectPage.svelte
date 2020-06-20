@@ -6,7 +6,7 @@ import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
 import api from '../api';
-import { goToProject } from '../project';
+import { goToProject, enrichWithColor } from '../project';
 import PageBlank from './PageBlank.svelte';
 import TemplatePicker from './TemplatePicker.svelte';
 import DataSourcePicker from './DataSourcePicker.svelte';
@@ -34,6 +34,8 @@ async function createNewProject() {
   if (!isProjectValid) {
     return;
   }
+
+  selectedTemplate.template.xml = enrichWithColor(selectedTemplate.template.xml);
 
   const res = await api.post('/project', {
     description: {

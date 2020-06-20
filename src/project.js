@@ -42,3 +42,39 @@ const sortObj = (obj) => (obj === null || typeof obj !== 'object'
 
 
 export const deterministicStrigify = (obj) => JSON.stringify(sortObj(obj));
+
+function iterateXMLNodes(root, fn) {
+  for (const node of root.childNodes) {
+    fn(node);
+    iterateXMLNodes(node, fn);
+  }
+}
+
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i += 1) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+
+export function enrichWithColor(templateXML) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(templateXML, 'text/xml');
+  const root = xmlDoc.getElementsByTagName('content')[0];
+
+  iterateXMLNodes(root, (node) => {
+    if (node.nodeName === '#text') {
+      return;
+    }
+
+    const color = getRandomColor();
+    node.setAttribute('color', color);
+  });
+
+  const newXml = `<content>${xmlDoc.documentElement.innerHTML}</content>`;
+
+  return newXml;
+}

@@ -100,6 +100,11 @@ func TestUnsupportedElement(t *testing.T) {
 	assert.Equal(t, "Unsupported element [kek]", err.Error())
 }
 
+func newValue(value, name string) ValueWithVizual {
+	color := ""
+	return NewValueWithVizualWithColor(value, name, color)
+}
+
 // fixme duplicatedGroups for bbox
 func TestXMLToFields(t *testing.T) {
 	{
@@ -126,8 +131,8 @@ func TestXMLToFields(t *testing.T) {
 			Type:  "radio",
 			Group: "animal",
 			Labels: []ValueWithVizual{
-				{Vizual: "Cat", Value: "cat"},
-				{Vizual: "Dog", Value: "dog"},
+				newValue("cat", "Cat"),
+				newValue("dog", "Dog"),
 			},
 		}}, tt.Radios)
 
@@ -135,9 +140,9 @@ func TestXMLToFields(t *testing.T) {
 			Type:  "checkbox",
 			Group: "color",
 			Labels: []ValueWithVizual{
-				{Vizual: "Black", Value: "black"},
-				{Vizual: "White", Value: "white"},
-				{Vizual: "Pink", Value: "pink"},
+				newValue("black", "Black"),
+				newValue("white", "White"),
+				newValue("pink", "Pink"),
 			},
 		}}, tt.Checkboxes)
 
@@ -149,8 +154,8 @@ func TestXMLToFields(t *testing.T) {
 					Type:  "radio",
 					Group: "box_kind",
 					Labels: []ValueWithVizual{
-						{Vizual: "Kitty", Value: "kitty"},
-						{Vizual: "Doge", Value: "doge"},
+						newValue("kitty", "Kitty"),
+						newValue("doge", "Doge"),
 					},
 				}},
 				Checkboxes:  make([]*CheckboxField, 0),
@@ -238,12 +243,12 @@ func TestDuplicatedLabels(t *testing.T) {
 				Radios: []*RadioField{{
 					Type:   "radio",
 					Group:  "animal",
-					Labels: []ValueWithVizual{{"dog", "Dog"}},
+					Labels: []ValueWithVizual{newValue("dog", "Dog")},
 				}},
 				Checkboxes: []*CheckboxField{{
 					Type:   "checkbox",
 					Group:  "color",
-					Labels: []ValueWithVizual{{"white", "White"}},
+					Labels: []ValueWithVizual{newValue("white", "White")},
 				}},
 			},
 		}
@@ -256,9 +261,12 @@ func TestDuplicatedLabels(t *testing.T) {
 		tmplt := Template{
 			ClassificationComponents: &ClassificationComponents{
 				Radios: []*RadioField{{
-					Type:   "radio",
-					Group:  "animal",
-					Labels: []ValueWithVizual{{"dog", "Dog"}, {"dog", "Dogh"}},
+					Type:  "radio",
+					Group: "animal",
+					Labels: []ValueWithVizual{
+						newValue("dog", "Dog"),
+						newValue("dog", "Dogh"),
+					},
 				}},
 			},
 		}
@@ -276,10 +284,10 @@ func TestDuplicatedLabels(t *testing.T) {
 					Type:  "checkbox",
 					Group: "color",
 					Labels: []ValueWithVizual{
-						{"white", "White"},
-						{"white", "White"},
-						{"black", "Black"},
-						{"black", "Black"},
+						newValue("white", "White"),
+						newValue("white", "White"),
+						newValue("black", "Black"),
+						newValue("black", "Black"),
 					},
 				}},
 			},
@@ -295,18 +303,21 @@ func TestDuplicatedLabels(t *testing.T) {
 		tmplt := Template{
 			ClassificationComponents: &ClassificationComponents{
 				Radios: []*RadioField{{
-					Type:   "radio",
-					Group:  "animal",
-					Labels: []ValueWithVizual{{"dog", "Dog"}, {"dog", "Dogh"}},
+					Type:  "radio",
+					Group: "animal",
+					Labels: []ValueWithVizual{
+						newValue("dog", "Dog"),
+						newValue("dog", "Dogh"),
+					},
 				}},
 				Checkboxes: []*CheckboxField{{
 					Type:  "checkbox",
 					Group: "color",
 					Labels: []ValueWithVizual{
-						{"white", "White"},
-						{"white", "White"},
-						{"black", "Black"},
-						{"black", "Black"},
+						newValue("white", "White"),
+						newValue("white", "White"),
+						newValue("black", "Black"),
+						newValue("black", "Black"),
 					},
 				}},
 			},

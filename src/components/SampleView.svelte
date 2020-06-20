@@ -1,5 +1,7 @@
 <script>
 import { sampleView, sampleMarkup, assessState } from '../store';
+import BoxLabels from './sample_view/BoxLabels.svelte';
+
 
 export let sample;
 
@@ -68,9 +70,7 @@ function formatMarkup(markup) {
       left: ${box.box.x}px;
       top: ${box.box.y}px;
     `} class='box' class:box-selected={$sampleView.selectedBox === i}>
-      {#if $sampleView.selectedBox === i}
-        <span><small>{formatMarkup(box)}</small></span>
-      {/if}
+      <BoxLabels markup={box} template={sample.project.template} />
     </div>
   {/each}
 

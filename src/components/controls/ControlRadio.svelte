@@ -74,7 +74,7 @@ function onChange(labelValue) {
         value={label.value}
         on:click={onChange(label.value)}
       >
-        {label.vizual}
+        <span style={`color: ${label.display_color}`}>{label.display_name}</span>
       </Radio>
       <Spacer size={8} />
       {#if isSelected}

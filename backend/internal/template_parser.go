@@ -274,6 +274,11 @@ func getValue(n Node) string {
 	return a.Value
 }
 
+func getColor(n Node) string {
+	a, _ := getAttrByName(n, "color")
+	return a.Value
+}
+
 func walkFirstLevel(nodes []Node, f func(Node) bool) {
 	if len(nodes) == 0 {
 		return

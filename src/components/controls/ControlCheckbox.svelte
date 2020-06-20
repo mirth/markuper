@@ -74,7 +74,7 @@ function onChangeFor(labelValue) {
       checked={checked.has(label.value)}
       on:change={onChangeFor(label.value)}
       >
-      {label.vizual}
+      <span style={`color: ${label.display_color}`}>{label.display_name}</span>
     </Checkbox>
     <Spacer size={8} />
     {#if isSelected}

@@ -83,7 +83,7 @@ onMount(async () => {
 <Row>
 <Cell>
 {#if assessedList.length === 0}
-<Typography type='title' block>No samples have assessed yet</Typography>
+<Typography type='title' block>No samples have been assessed yet</Typography>
 {:else}
 <Typography type='title' block>Assessed samples:</Typography>
 {/if}
