@@ -139,6 +139,14 @@ func main() {
 		encodeResponse,
 	)
 
+	getProjectMetaEndpoint := newServer(
+		internal.GetProjectMetaEndpoint(ps),
+		MakeHTTPRequestDecoder(func() interface{} {
+			return &internal.WithProjectIDRequest{}
+		}),
+		encodeResponse,
+	)
+
 	listTemplatesEndpoint := newServer(
 		internal.ListTemplatesEndpoint(pts),
 		MakeHTTPRequestDecoder(func() interface{} {
@@ -166,6 +174,7 @@ func main() {
 	r.Handle("/api/v1/projects", listProjectsHandler).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}/next", nextHandler)
 	r.Handle("/api/v1/project/{project_id}", getProjectEndpoint).Methods("GET")
+	r.Handle("/api/v1/project/{project_id}/stats", getProjectMetaEndpoint).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}/assess", assessHandler).Methods("POST")
 	r.Handle("/api/v1/project/{project_id}/assessed", listMarkupHandler).Methods("GET")
 	r.Handle("/api/v1/project/{project_id}/export", exportToCsvEnpoint)

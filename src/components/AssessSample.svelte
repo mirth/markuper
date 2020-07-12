@@ -17,6 +17,11 @@ async function fetchNext(projectID) {
   return res;
 }
 
+async function getProjStats(projectID) {
+  const res = await api.get(`/project/${projectID}/stats`)
+  return res;
+}
+
 let sample = (async () => {
   if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
     return api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
@@ -24,6 +29,7 @@ let sample = (async () => {
 
   return fetchNext(params.project_id);
 })();
+let projStats = getProjStats(params.project_id);
 
 async function submitMarkupAndFetchNext() {
   sample = await sample;
@@ -38,6 +44,8 @@ async function submitMarkupAndFetchNext() {
   sample = fetchNext(sampleId.project_id);
   $assessState.markup = {};
   $assessState.focusedGroup = null;
+
+  projStats = getProjStats(sampleId.project_id);
 }
 
 </script>
@@ -64,6 +72,9 @@ async function submitMarkupAndFetchNext() {
       >
         {sample.project.description.name}
       </Button>
+      {#await projStats then projStats}
+        ({projStats.assessed_number_of_samples} / {projStats.total_number_of_samples})
+      {/await}
     </span>
   </Cell>
 {/await}

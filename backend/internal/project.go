@@ -25,6 +25,8 @@ type Project struct {
 	Template    Template     `json:"template"`
 	DataSources []DataSource `json:"data_sources"`
 
+	ShuffleSamples bool `json:"shuffle_samples"`
+
 	Description ProjectDescription `json:"description"`
 }
 
@@ -32,12 +34,15 @@ type CreateProjectRequest struct {
 	Template    TemplateXML        `json:"template"`
 	DataSources []DataSource       `json:"data_sources"`
 	Description ProjectDescription `json:"description"`
+
+	ShuffleSamples bool `json:"shuffle_samples"`
 }
 
 func NewProject(
 	template TemplateXML,
 	dataSrc []DataSource,
 	desc ProjectDescription,
+	shuffleSamples bool,
 ) (Project, error) {
 	projectID := ProjectID(xid.New().String())
 	now := utils.NowUTC()
@@ -48,11 +53,12 @@ func NewProject(
 	}
 
 	return Project{
-		CreatedAt:   now,
-		ProjectID:   projectID,
-		Template:    t,
-		DataSources: dataSrc,
-		Description: desc,
+		CreatedAt:      now,
+		ProjectID:      projectID,
+		Template:       t,
+		DataSources:    dataSrc,
+		Description:    desc,
+		ShuffleSamples: shuffleSamples,
 	}, nil
 }
 
@@ -60,6 +66,7 @@ type ProjectService interface {
 	CreateProject(CreateProjectRequest) (Project, error)
 	ListProjects() (ProjectList, error)
 	GetProject(WithProjectIDRequest) (Project, error)
+	GetProjectMeta(WithProjectIDRequest) (ProjectMeta, error)
 }
 
 type ProjectServiceImpl struct {
@@ -114,7 +121,7 @@ func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
 }
 
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
-	project, err := NewProject(req.Template, req.DataSources, req.Description)
+	project, err := NewProject(req.Template, req.DataSources, req.Description, req.ShuffleSamples)
 	if err != nil {
 		return Project{}, err
 	}
@@ -198,5 +205,16 @@ func GetProjectEndpoint(s ProjectService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := *request.(*WithProjectIDRequest)
 		return s.GetProject(req)
+	}
+}
+
+func (s *ProjectServiceImpl) GetProjectMeta(req WithProjectIDRequest) (ProjectMeta, error) {
+	return inefficientProjectMeta(s.db, req.ProjectID)
+}
+
+func GetProjectMetaEndpoint(s ProjectService) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := *request.(*WithProjectIDRequest)
+		return s.GetProjectMeta(req)
 	}
 }

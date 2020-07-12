@@ -136,7 +136,14 @@ func TestFetchSampleList(t *testing.T) {
 		Type:      "local_directory",
 		SourceURI: joinTmp(fmt.Sprintf("*.jpg")),
 	}
-	proj, _ := NewProject(DEFAULT_CLASSIFICATION_TEMPLATE, []DataSource{src}, ProjectDescription{})
+
+	shuffleSamples := false
+	proj, _ := NewProject(
+		DEFAULT_CLASSIFICATION_TEMPLATE,
+		[]DataSource{src},
+		ProjectDescription{},
+		shuffleSamples,
+	)
 	list, err := fetchSampleList(db, proj, src)
 	assert.Nil(t, err)
 
@@ -199,7 +206,7 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 			var objmap map[string]json.RawMessage
 			json.Unmarshal(s, &objmap)
 			uri := ""
-			json.Unmarshal(objmap["image_uri"], &uri)			
+			json.Unmarshal(objmap["image_uri"], &uri)
 			uris = append(uris, uri)
 		}
 

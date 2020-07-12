@@ -243,3 +243,22 @@ func OpenDB(test bool) (*DB, error) {
 
 	return db, nil
 }
+
+func inefficientProjectMeta(db *DB, projID ProjectID) (ProjectMeta, error) {
+	doneIDs, err := getAllSampleIDsForProject(db, "markups", projID)
+	if err != nil {
+		return ProjectMeta{}, err
+	}
+
+	allIDs, err := getAllSampleIDsForProject(db, "samples", projID)
+	if err != nil {
+		return ProjectMeta{}, err
+	}
+
+	projMeta := ProjectMeta{
+		TotalNumberOfSamples:    len(allIDs),
+		AssessedNumberOfSamples: len(doneIDs),
+	}
+
+	return projMeta, nil
+}

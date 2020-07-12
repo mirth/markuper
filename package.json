@@ -1,6 +1,6 @@
 {
   "name": "markuper",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.5",
   "description": "Some cool app",
   "main": "main.js",
   "license": "Proprietary",
@@ -67,7 +67,7 @@
     "rollup-plugin-svelte": "^5.1.1",
     "sass": "^1.23.7",
     "spectron": "^9.0.0",
-    "svelte": "^3.15.0",
+    "svelte": "^3.24.0",
     "svelte-preprocess": "^3.3.0"
   },
   "dependencies": {

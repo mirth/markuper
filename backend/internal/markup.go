@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"math/rand"
 	"sort"
 	"time"
 
@@ -20,6 +21,11 @@ type SampleMarkup struct {
 	Markup json.RawMessage `json:"markup"`
 }
 
+type ProjectMeta struct {
+	TotalNumberOfSamples    int `json:"total_number_of_samples"`
+	AssessedNumberOfSamples int `json:"assessed_number_of_samples"`
+}
+
 type AssessRequest struct {
 	SampleID     SampleID     `json:"sample_id"`
 	SampleMarkup SampleMarkup `json:"sample_markup"`
@@ -29,6 +35,18 @@ type SampleResponse struct {
 	SampleID SampleID        `json:"sample_id"`
 	Sample   json.RawMessage `json:"sample"`
 	Project  Project         `json:"project"`
+}
+
+func NewSampleResponse(
+	sampleID SampleID,
+	sample json.RawMessage,
+	project Project,
+) SampleResponse {
+	return SampleResponse{
+		SampleID: sampleID,
+		Sample:   sample,
+		Project:  project,
+	}
 }
 
 type SampleWithMarkupResponse struct {
@@ -156,6 +174,22 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 	return samples, nil
 }
 
+func getRandomSample(toAssess []SampleID) SampleID {
+	rand.Seed(time.Now().Unix())
+	rnds := rand.NewSource(time.Now().Unix())
+	r := rand.New(rnds)
+
+	return toAssess[r.Intn(len(toAssess))]
+}
+
+func getSampleInOrder(toAssess []SampleID) SampleID {
+	sort.SliceStable(toAssess, func(i, j int) bool {
+		return toAssess[i].SampleID < toAssess[j].SampleID
+	})
+
+	return toAssess[0]
+}
+
 func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, error) {
 	tmp, err := getAllSampleIDsForProject(s.db, "markups", req.ProjectID)
 	if err != nil {
@@ -186,22 +220,21 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		}, nil
 	}
 
-	sort.SliceStable(toAssess, func(i, j int) bool {
-		return toAssess[i].SampleID < toAssess[j].SampleID
-	})
+	sID := SampleID{}
 
-	sID := toAssess[0]
+	if proj.ShuffleSamples {
+		sID = getRandomSample(toAssess)
+	} else {
+		sID = getSampleInOrder(toAssess)
+	}
+
 	sample, err := s.db.GetSample(sID)
 
 	if err != nil {
 		return SampleResponse{}, err
 	}
 
-	return SampleResponse{
-		SampleID: sID,
-		Sample:   sample,
-		Project:  proj,
-	}, err
+	return NewSampleResponse(sID, sample, proj), err
 }
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
@@ -285,12 +318,8 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 	}
 
 	return SampleWithMarkupResponse{
-		SampleResponse: SampleResponse{
-			SampleID: sID,
-			Sample:   sample,
-			Project:  proj,
-		},
-		SampleMarkup: markup,
+		SampleResponse: NewSampleResponse(sID, sample, proj),
+		SampleMarkup:   markup,
 	}, nil
 }
 

@@ -43,6 +43,7 @@ async function createNewProject() {
     },
     template: selectedTemplate.template,
     data_sources: dataSources,
+    shuffle_samples: false, // fixme
   });
 
   if (res.status === 400) {
