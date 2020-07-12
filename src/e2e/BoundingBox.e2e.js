@@ -174,7 +174,7 @@ describe('Bounding boxes manipulation', function () {
   });
 
   it('makes 3rd bounding box', async () => {
-    await drawAndCheckBBox([200, 200], [400, 400]);
+    await drawAndCheckBBox([200, 200], [399, 399]);
     const actual = await getBoxesMarkup();
     assertBoxMarkup([
       {
