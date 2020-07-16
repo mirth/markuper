@@ -42,7 +42,7 @@ function createWindow(backend) {
       nodeIntegration: false,
     },
   });
-  win.maximize();
+  // win.maximize();
   win.loadFile('public/index.html', { hash: '#' });
   win.on('closed', () => {
     // Dereference the window object, usually you would store windows

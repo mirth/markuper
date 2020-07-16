@@ -51,11 +51,12 @@ function handleMousedown(ev) {
     return;
   }
 
-  if (ev.x < img.x || ev.x > img.x + img.width) {
+  const imgRect = img.getBoundingClientRect();
+  if (ev.x < imgRect.x || ev.x > imgRect.x + imgRect.width) {
     return;
   }
 
-  if (ev.y < img.y || ev.y > img.y + img.height) {
+  if (ev.y < imgRect.y || ev.y > imgRect.y + imgRect.height) {
     return;
   }
 
