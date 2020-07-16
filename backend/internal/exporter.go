@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sort"
 	"strconv"
 
@@ -130,7 +131,8 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 	}
 
 	now := utils.NowUTC()
-	filename := fmt.Sprintf("%s_%s.csv", p.Description.Name, now.Format("2006-01-02T15:04:05"))
+	projName := url.QueryEscape(p.Description.Name)
+	filename := fmt.Sprintf("%s_%s.csv", projName, now.Format("2006-01-02T15:04:05"))
 
 	return ExportResponse{
 		CSV:      buf.Bytes(),
