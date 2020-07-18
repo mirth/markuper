@@ -21,9 +21,8 @@ const app = new Application({
   },
 });
 
-const TEST_IMAGE_SIZE = 32;
-
 async function makeToImageCoords() {
+  const TEST_IMAGE_SIZE = 32;
   const img = await getElement(app, '//*[@id="image-container"]/img');
   let width = await app.client.elementIdCssProperty(img, 'width');
   width = parseInt(width.value.slice(0, -2), 10);
@@ -36,11 +35,9 @@ async function makeToImageCoords() {
 
 async function selectRect(upperLeft, downRight) {
   const convPoint = await makeToImageCoords();
-  const img = '#image-container';//'//*[@id="image-container"]/img'
+  const img = '#image-container';
   const upperLeftConv = convPoint(upperLeft);
   const downRightConv = convPoint(downRight);
-  console.log(upperLeftConv)
-  console.log(downRightConv)
   await app.client.moveToObject(img, upperLeftConv[0], upperLeftConv[1]);
   await app.client.buttonDown(0);
   await app.client.moveToObject(img, downRightConv[0], downRightConv[1]);
