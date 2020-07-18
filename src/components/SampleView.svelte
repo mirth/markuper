@@ -47,12 +47,6 @@ $: if (field && !resizeObserver && $assessState.imageElement) {
   resizeObserver.observe($assessState.imageElement);
 }
 
-function formatMarkup(markup) {
-  const keys = Object.keys(markup).filter((k) => k !== 'box');
-
-  return keys.map((k) => `${k}: ${markup[k]}`).join('\n');
-}
-
 </script>
 
 <div id='image-container'>
@@ -109,10 +103,5 @@ img {
   position:relative;
   border: 2px solid black;
 }
-
-span {
-  background-color: green;
-}
-
 
 </style>

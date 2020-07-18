@@ -8,7 +8,8 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  getElement, itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
+  getElement, itNavigatesToProject, sleep, clickButton, getRadioState, getRadio,
+  expectSampleMarkupToBeEq,
 } from './test_common';
 import { TestCheckboxRadioRadio, TestRadioCheckbox } from './classification_common';
 
@@ -31,7 +32,7 @@ async function makeToImageCoords() {
     const [x, y] = point;
     return [Math.round((width / TEST_IMAGE_SIZE) * x), Math.round((width / TEST_IMAGE_SIZE) * y)];
   };
-};
+}
 
 async function selectRect(upperLeft, downRight) {
   const convPoint = await makeToImageCoords();

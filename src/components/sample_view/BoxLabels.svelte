@@ -1,27 +1,28 @@
 <script>
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-unused-vars */
 import _ from 'lodash';
-import { activeProject } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 
 export let markup;
 export let template;
 
-let fields = getFieldsInOrderFor(template.bounding_boxes[0]);
+const fields = getFieldsInOrderFor(template.bounding_boxes[0]);
 
 
-let byGroupByLabel = {}
-for(const field of fields) {
+const byGroupByLabel = {};
+for (const field of fields) {
   byGroupByLabel[field.group] = _.keyBy(field.labels, 'value');
 }
 
-const notBoxes = Object.entries(markup).filter(([k, v]) => k !== 'box');
+const notBoxes = Object.entries(markup).filter(([k, _v]) => k !== 'box');
 const labels = notBoxes.flatMap(([group, values]) => {
-  if(_.isArray(values)) {
-    return values.map(value => [group, byGroupByLabel[group][value]]);
+  if (_.isArray(values)) {
+    return values.map((value) => [group, byGroupByLabel[group][value]]);
   }
 
   return [[group, byGroupByLabel[group][values]]];
-})
+});
 
 </script>
 

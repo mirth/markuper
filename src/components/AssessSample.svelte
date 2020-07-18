@@ -18,7 +18,7 @@ async function fetchNext(projectID) {
 }
 
 async function getProjStats(projectID) {
-  const res = await api.get(`/project/${projectID}/stats`)
+  const res = await api.get(`/project/${projectID}/stats`);
   return res;
 }
 
