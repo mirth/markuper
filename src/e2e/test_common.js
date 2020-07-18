@@ -14,6 +14,12 @@ export const getChbox = (app, device, i) => {
 };
 
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
+export const getElement = async (app, pth) => {
+  await app.client.waitForExist(pth);
+  const el = await app.client.element(pth);
+
+  return el.value.ELEMENT;
+};
 
 export const assertRadioLabels = async (app, device, expectedLabels) => {
   const radios = `//*[@id="${device}"]/div/label/ul/li/div/label`;

@@ -8,7 +8,7 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  getPath, itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
+  getElement, itNavigatesToProject, sleep, clickButton, getRadioState, getRadio, expectSampleMarkupToBeEq,
 } from './test_common';
 import { TestCheckboxRadioRadio, TestRadioCheckbox } from './classification_common';
 
@@ -21,11 +21,29 @@ const app = new Application({
   },
 });
 
+const TEST_IMAGE_SIZE = 32;
+
+async function makeToImageCoords() {
+  const img = await getElement(app, '//*[@id="image-container"]/img');
+  let width = await app.client.elementIdCssProperty(img, 'width');
+  width = parseInt(width.value.slice(0, -2), 10);
+
+  return (point) => {
+    const [x, y] = point;
+    return [Math.round((width / TEST_IMAGE_SIZE) * x), Math.round((width / TEST_IMAGE_SIZE) * y)];
+  };
+};
 
 async function selectRect(upperLeft, downRight) {
-  await app.client.moveToObject('#image-container', upperLeft[0], upperLeft[1]);
+  const convPoint = await makeToImageCoords();
+  const img = '#image-container';//'//*[@id="image-container"]/img'
+  const upperLeftConv = convPoint(upperLeft);
+  const downRightConv = convPoint(downRight);
+  console.log(upperLeftConv)
+  console.log(downRightConv)
+  await app.client.moveToObject(img, upperLeftConv[0], upperLeftConv[1]);
   await app.client.buttonDown(0);
-  await app.client.moveToObject('#image-container', downRight[0], downRight[1]);
+  await app.client.moveToObject(img, downRightConv[0], downRightConv[1]);
   await app.client.buttonUp(0);
 }
 
@@ -78,7 +96,7 @@ describe('Simple bounding box test', function () {
   });
 
   it('makes correct bounding box', async () => {
-    selectRect([10, 10], [85, 85]);
+    selectRect([1, 1], [4, 4]);
 
     await getRadio(app, 'bbox/0', 2).click();
     await sleep(500);
@@ -90,7 +108,7 @@ describe('Simple bounding box test', function () {
     const actual = await getBoxesMarkup();
     assertBoxMarkup([
       {
-        left: 0, top: 0, width: 4, height: 4,
+        left: 1, top: 1, width: 3, height: 3,
       },
     ], actual);
 
@@ -108,7 +126,7 @@ describe('Simple bounding box test', function () {
   expectSampleMarkupToBeEq(app, appPath, {
     bbox: [{
       box: {
-        x: 0, y: 0, width: 4, height: 4,
+        x: 1, y: 1, width: 3, height: 3,
       },
       animal: 'dog',
     }],
@@ -155,33 +173,33 @@ describe('Bounding boxes manipulation', function () {
   };
 
   it('makes 1st bounding box', async () => {
-    await drawAndCheckBBox([10, 10], [85, 85], [{
-      left: 0, top: 0, width: 4, height: 4,
+    await drawAndCheckBBox([1, 1], [4, 4], [{
+      left: 1, top: 1, width: 3, height: 3,
     }]);
   });
 
   it('makes 2st bounding box', async () => {
-    await drawAndCheckBBox([85, 85], [300, 300]);
+    await drawAndCheckBBox([4, 4], [15, 15]);
     const actual = await getBoxesMarkup();
     assertBoxMarkup([
       {
-        left: 0, top: 0, width: 4, height: 4,
+        left: 1, top: 1, width: 3, height: 3,
       },
       {
-        left: 4, top: 4, width: 12, height: 12,
+        left: 4, top: 4, width: 11, height: 11,
       },
     ], actual);
   });
 
   it('makes 3rd bounding box', async () => {
-    await drawAndCheckBBox([150, 150], [300, 300]);
+    await drawAndCheckBBox([8, 8], [16, 16]);
     const actual = await getBoxesMarkup();
     assertBoxMarkup([
       {
-        left: 0, top: 0, width: 4, height: 4,
+        left: 1, top: 1, width: 3, height: 3,
       },
       {
-        left: 4, top: 4, width: 12, height: 12,
+        left: 4, top: 4, width: 11, height: 11,
       },
       {
         left: 8, top: 8, width: 8, height: 8,
@@ -195,7 +213,7 @@ describe('Bounding boxes manipulation', function () {
     const actual = await getBoxesMarkup();
     assertBoxMarkup([
       {
-        left: 0, top: 0, width: 4, height: 4,
+        left: 1, top: 1, width: 3, height: 3,
       },
       {
         left: 8, top: 8, width: 8, height: 8,
@@ -215,7 +233,7 @@ describe('Bounding boxes manipulation', function () {
   });
 
   it('makes 2d bounding box', async () => {
-    await drawAndCheckBBox([10, 10], [85, 85]);
+    await drawAndCheckBBox([1, 1], [4, 4]);
     await sleep(1000);
     const actual = await getBoxesMarkup();
     assertBoxMarkup([
@@ -223,7 +241,7 @@ describe('Bounding boxes manipulation', function () {
         left: 8, top: 8, width: 8, height: 8,
       },
       {
-        left: 0, top: 0, width: 4, height: 4,
+        left: 1, top: 1, width: 3, height: 3,
       },
     ], actual);
 
@@ -248,7 +266,7 @@ describe('Bounding boxes manipulation', function () {
       },
       {
         box: {
-          x: 0, y: 0, width: 4, height: 4,
+          x: 1, y: 1, width: 3, height: 3,
         },
         animal: 'dog',
       },
@@ -292,7 +310,7 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
   });
 
   it('draw bounding box', async () => {
-    selectRect([85, 85], [300, 300]);
+    selectRect([4, 4], [15, 15]);
   });
 
   TestCheckboxRadioRadio(app, 'bbox');
@@ -311,7 +329,7 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
   expectSampleMarkupToBeEq(app, appPath, {
     bbox: [{
       box: {
-        x: 4, y: 4, width: 12, height: 12,
+        x: 4, y: 4, width: 11, height: 11,
       },
       animal: 'gek',
       color: ['black'],
@@ -352,7 +370,7 @@ describe('Bounding box with Focus and state [Checkbox, Radio]', function () {
   });
 
   it('draw bounding box', async () => {
-    selectRect([85, 85], [300, 300]);
+    selectRect([4, 4], [15, 15]);
   });
 
   TestRadioCheckbox(app, 'bbox');
@@ -371,7 +389,7 @@ describe('Bounding box with Focus and state [Checkbox, Radio]', function () {
   expectSampleMarkupToBeEq(app, appPath, {
     bbox: [{
       box: {
-        x: 4, y: 4, width: 12, height: 12,
+        x: 4, y: 4, width: 11, height: 11,
       },
       animal: 'cat',
       color: ['black', 'pink'],
@@ -411,7 +429,7 @@ describe('Display correct box labels', function () {
   });
 
   it('draw bounding box', async () => {
-    selectRect([85, 85], [300, 300]);
+    selectRect([4, 4], [15, 15]);
   });
 
   TestRadioCheckbox(app, 'bbox');
