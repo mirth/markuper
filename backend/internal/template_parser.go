@@ -191,6 +191,7 @@ func XMLToTemplate(s string) (Template, error) {
 		}
 
 		if len(dups) > 0 {
+			sort.Strings(dups)
 			errMsg := fmt.Sprintf(
 				"Template has duplicate labels: %s",
 				strings.Join(dups, ", "),
