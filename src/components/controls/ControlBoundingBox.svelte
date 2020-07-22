@@ -1,20 +1,15 @@
 <script>
 import Table from 'svelte-atoms/Table/Table.svelte';
 import Tbody from 'svelte-atoms/Table/Tbody.svelte';
-import { sampleView, sampleMarkup, assessState } from '../../store';
+import { sampleView, sampleMarkup, assessState, isFieldSelected } from '../../store';
 import ControlList from './ControlList.svelte';
 import BoxMarkup from './BoxMarkup.svelte';
+import WithEnterForGroup from './WithEnterForGroup.svelte';
+
 
 export let field;
+export let onFieldCompleted;
 
-let upperLeft;
-let downRight;
-
-$: if (!$sampleMarkup[field.group]) {
-  $sampleMarkup[field.group] = [];
-}
-
-$: img = $assessState.imageElement;
 
 function cornersToBox() {
   let width = downRight.x - upperLeft.x;
@@ -67,7 +62,7 @@ function handleMouseup() {
   if (!(upperLeft && downRight)) {
     return;
   }
-  if (($assessState.markup.box.width === 0) || ($assessState.markup.box.height === 0)) {
+  if (($assessState.box.width === 0) || ($assessState.box.height === 0)) {
     return;
   }
 
@@ -75,10 +70,6 @@ function handleMouseup() {
 
   upperLeft = null;
   downRight = null;
-}
-
-$: if (upperLeft && downRight) {
-  $assessState.markup.box = cornersToBox();
 }
 
 function handleMousemove(ev) {
@@ -92,11 +83,6 @@ function handleMousemove(ev) {
       downRight.y = img.height;
     }
   }
-
-  if (upperLeft && downRight) {
-    const box = cornersToBox();
-    $assessState.activeBBox = box;
-  }
 }
 
 function removeBox(boxIdx) {
@@ -109,6 +95,39 @@ function selectBox(i) {
   $sampleView.selectedBox = i;
 }
 
+
+let upperLeft;
+let downRight;
+
+$: if (!$sampleMarkup[field.group]) {
+  $sampleMarkup[field.group] = [];
+}
+
+$: img = $assessState.imageElement;
+
+$: if (upperLeft && downRight) {
+  $assessState.box = cornersToBox();
+}
+
+function tryPushBox(callerGroup) {
+  const isLastControl = field.fields_order.indexOf(callerGroup) === (field.fields_order.length - 1);
+
+  if(isLastControl) {
+    const markupForBox = {
+      box: $assessState.box,
+    };
+    for(const group of field.fields_order) {
+      markupForBox[group] = $sampleMarkup[group];
+      delete $sampleMarkup[group];
+    }
+
+    $sampleMarkup[field.group] = $sampleMarkup[field.group].concat([markupForBox])
+    onFieldCompleted(field.group);
+  }
+
+  onFieldCompleted(callerGroup);
+}
+
 </script>
 
 <svelte:window
@@ -117,8 +136,7 @@ function selectBox(i) {
   on:mousemove={handleMousemove}
   />
 
-
-<ControlList owner={field} />
+<ControlList owner={field} onFieldCompleted={tryPushBox} />
 
 <div id='boxes'>
   <Table>

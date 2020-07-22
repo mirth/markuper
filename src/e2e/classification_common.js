@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import _ from 'lodash';
 import {
   getPath, getRadio, assertRadioLabels, sleep,
-  clickButton, getRadioState, getChecked,
+  clickButton, getRadioState, getChecked, getChbox,
 } from './test_common';
 
 function expectFocusIsOn(app, devices, device) {
@@ -67,11 +67,11 @@ export function TestCheckboxRadioRadio(app, prefix) {
 
   focusIsOn(CN('0'));
 
-  it('displays checkbox 1 as checked', async () => {
-    await app.client.keys('1');
+  it('displays checkbox 1, 3 as checked', async () => {
+    await getChbox(app, CN('0'), 1).click();
     await app.client.keys('2');
     await app.client.keys('1');
-    await app.client.keys('1');
+    await getChbox(app, CN('0'), 1).click();
     await app.client.keys('2');
 
     const checked = await getChecked(app, CN('0'));

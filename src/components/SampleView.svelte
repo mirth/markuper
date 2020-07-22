@@ -33,16 +33,16 @@ function scaleBoxes(markupForGroup, assessStateBox) {
 }
 
 $: if (field) {
-  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box);
+  scaleBoxes($sampleMarkup[field.group], $assessState.box);
 }
 
-$: if (field && $assessState.markup.box) {
-  scaleBoxes($sampleMarkup[field.group], $assessState.markup.box);
+$: if (field && $assessState.box) {
+  scaleBoxes($sampleMarkup[field.group], $assessState.box);
 }
 
 $: if (field && !resizeObserver && $assessState.imageElement) {
   resizeObserver = new ResizeObserver(() => {
-    scaleBoxes($sampleMarkup[field.group], $assessState.markup.box);
+    scaleBoxes($sampleMarkup[field.group], $assessState.box);
   });
   resizeObserver.observe($assessState.imageElement);
 }

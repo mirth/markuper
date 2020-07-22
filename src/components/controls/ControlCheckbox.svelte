@@ -1,23 +1,14 @@
 <script>
+import _ from 'lodash';
 import Checkbox from 'svelte-atoms/Checkbox.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import { makeLabelsWithKeys } from '../../control';
 import { sampleMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
+import WithEnterForGroup from './WithEnterForGroup.svelte';
 
+export let onFieldCompleted;
 export let field;
-
-const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
-
-let keyDown;
-let checked = new Set([]);
-let isSelected = false;
-if (!field.owner && $sampleMarkup[field.group]) {
-  $assessState.markup[field.group] = $sampleMarkup[field.group];
-}
-
-$: checked = new Set($assessState.markup[field.group] || []);
-$: isSelected = isFieldSelected(field, $assessState);
 
 function handleKeydown(event) {
   if (!isSelected) {
@@ -27,14 +18,17 @@ function handleKeydown(event) {
   keyDown = event.key;
 }
 
-function updateMarkupWith(labelValue) {
-  if (checked.has(labelValue)) {
-    checked.delete(labelValue);
-  } else {
-    checked.add(labelValue);
-  }
+function saveMarkup() {
+  const values = checked.map((checked, i) => {
+    return checked ? field.labels[i].value : null;
+  });
 
-  $assessState.markup[field.group] = Array.from(checked);
+  $sampleMarkup[field.group] = _.compact(values);
+}
+
+function updateCheckedWith(labelIndex) {
+  checked[labelIndex] = !checked[labelIndex];
+  saveMarkup();
 }
 
 async function handleKeyup(event) {
@@ -51,29 +45,47 @@ async function handleKeyup(event) {
   }
 
   const labelIndex = parseInt(event.key, 10) - 1;
-  const label = field.labels[labelIndex];
-
-  updateMarkupWith(label.value);
+  updateCheckedWith(labelIndex);
 
   keyDown = null;
 }
 
-function onChangeFor(labelValue) {
-  return () => {
-    updateMarkupWith(labelValue);
-  };
+function onEnterPressed() {
+  onFieldCompleted(field.group);
 }
+
+function tryInitWithSample() {
+  const checked = new Array(field.labels.length);
+
+  const markuped = $sampleMarkup[field.group] || [];
+  for(let i = 0; i < field.labels.length; i++) {
+    if(markuped.indexOf(field.labels[i].value) !== -1) {
+      checked[i] = true;
+    }
+  }
+
+  return checked;
+}
+
+const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
+let isSelected = false;
+let keyDown;
+
+const checked = tryInitWithSample();
+
+$: isSelected = isFieldSelected(field, $assessState);
 
 </script>
 
+<WithEnterForGroup {field} {onEnterPressed}/>
+
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
+
+
 <ul>
-{#each labelsWithKeys as [label, key]}
+{#each labelsWithKeys as [label, key], labelIndex}
   <li>
-    <Checkbox
-      checked={checked.has(label.value)}
-      on:change={onChangeFor(label.value)}
-      >
+    <Checkbox bind:checked={checked[labelIndex]}>
       <span style={`color: ${label.display_color}`}>{label.display_name}</span>
     </Checkbox>
     <Spacer size={8} />

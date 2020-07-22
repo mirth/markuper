@@ -13,6 +13,8 @@ import { submitGroup } from '../../control';
 
 export let owner;
 export let submitMarkupAndFetchNext;
+export let onFieldCompleted;
+
 
 $: ownerGroup = (owner && owner.group) || 'root';
 $: fields = getFieldsInOrderFor(owner);
@@ -25,14 +27,14 @@ $: fields = getFieldsInOrderFor(owner);
       <label>
         <span>{field.group}</span>
         {#if field.type === 'radio'}
-          <ControlRadio {field} />
+          <ControlRadio {field} {onFieldCompleted}/>
         {/if}
         {#if field.type === 'checkbox'}
-          <ControlCheckbox {field} />
+          <ControlCheckbox {field} {onFieldCompleted} />
         {/if}
 
         {#if field.type === 'bounding_box'}
-          <ControlBoundingBox {field} />
+          <ControlBoundingBox {field} {onFieldCompleted} />
         {/if}
       </label>
     </Block>
