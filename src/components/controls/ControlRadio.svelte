@@ -5,22 +5,11 @@ import Radio from 'svelte-atoms/Radio.svelte';
 import { makeLabelsWithKeys } from '../../control';
 import { sampleMarkup, assessState, isFieldSelected } from '../../store';
 import KeyboardButton from './KeyboardButton.svelte';
+import WithEnterForGroup from './WithEnterForGroup.svelte';
+
 
 export let field;
-
-const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
-
-let keyDown;
-let isSelected = false;
-
-if (!field.owner && $sampleMarkup[field.group]) {
-  $assessState.markup[field.group] = $sampleMarkup[field.group];
-}
-
-$: radio = $assessState.markup[field.group];
-
-$: isSelected = isFieldSelected(field, $assessState);
-
+export let onFieldCompleted;
 
 function handleKeydown(event) {
   if (!isSelected) {
@@ -31,9 +20,9 @@ function handleKeydown(event) {
 }
 
 function updateRadio(labelValue) {
-  radio = labelValue;
-  $assessState.markup[field.group] = radio;
+  $sampleMarkup[field.group] = labelValue
 }
+
 async function handleKeyup(event) {
   if (!isSelected) {
     return;
@@ -55,15 +44,27 @@ async function handleKeyup(event) {
   keyDown = null;
 }
 
-function onChange(labelValue) {
-  return () => {
-    updateRadio(labelValue);
-  };
+function onEnterPressed() {
+  if(!$sampleMarkup[field.group]) {
+    return;
+  }
+
+  onFieldCompleted(field.group);
 }
+
+const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
+
+let keyDown;
+let isSelected = false;
+
+$: radio = $sampleMarkup[field.group];
+$: isSelected = isFieldSelected(field, $assessState);
 
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
+
+<WithEnterForGroup {field} {onEnterPressed}/>
 
 <ul>
 {#each labelsWithKeys as [label, key]}
@@ -72,7 +73,7 @@ function onChange(labelValue) {
       <Radio
         bind:group={radio}
         value={label.value}
-        on:click={onChange(label.value)}
+        on:click={() => updateRadio(label.value)}
       >
         <span style={`color: ${label.display_color}`}>{label.display_name}</span>
       </Radio>

@@ -72,7 +72,7 @@ describe('Device state keep for assessed samples', function () {
     expect(checked).to.be.deep.eq([false, false]);
   });
 
-  it('goes back to first assessed sample', async () => {
+  it('goes back to first assessed sample and checks it has valid markup', async () => {
     await clickButton(app, 'span', 'testproj0');
     await app.client.waitForText('span', 'Begin assess');
     await getSamplePath(app, 'kek0.jpg').element('..').click();

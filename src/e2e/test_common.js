@@ -8,10 +8,7 @@ import api from '../api';
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
 export const getRadio = (app, device, i) => app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/div/label`);
-export const getChbox = (app, device, i) => {
-  const el = app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/label/input`);
-  return el;
-};
+export const getChbox = (app, device, i) => app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/label`);
 
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 export const getElement = async (app, pth) => {

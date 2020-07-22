@@ -65,6 +65,8 @@ const assertBoxMarkup = (expected, actual) => {
   });
 };
 
+const clickSubmit = async () => app.client.element('//*[@id="device_submit"]/div/button').click();
+
 // fixme test for checking markup for sample stays
 
 describe('Simple bounding box test', function () {
@@ -94,7 +96,7 @@ describe('Simple bounding box test', function () {
   });
 
   it('makes correct bounding box', async () => {
-    selectRect([1, 1], [4, 4]);
+    await selectRect([1, 1], [4, 4]);
 
     await getRadio(app, 'bbox/0', 2).click();
     await sleep(500);
@@ -112,8 +114,7 @@ describe('Simple bounding box test', function () {
 
     await sleep(1500);
     await app.client.keys('Enter');
-    await sleep(1500);
-    await app.client.keys('Enter');
+    await clickSubmit();
   });
 
   it('goes on project page', async () => {
@@ -159,7 +160,7 @@ describe('Bounding boxes manipulation', function () {
   });
 
   const drawAndCheckBBox = async (upperLeft, downRight) => {
-    selectRect(upperLeft, downRight);
+    await selectRect(upperLeft, downRight);
 
     await getRadio(app, 'bbox/0', 2).click();
     await sleep(500);
@@ -243,10 +244,9 @@ describe('Bounding boxes manipulation', function () {
       },
     ], actual);
 
-    await app.client.keys('Enter');
     await sleep(1500);
     await app.client.keys('Enter');
-    await sleep(1500);
+    await clickSubmit();
   });
 
   it('goes on project page', async () => {
@@ -308,14 +308,13 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
   });
 
   it('draw bounding box', async () => {
-    selectRect([4, 4], [15, 15]);
+    await selectRect([4, 4], [15, 15]);
   });
 
   TestCheckboxRadioRadio(app, 'bbox');
 
   it('submits the sample', async () => {
-    await app.client.keys('Enter');
-    await app.client.keys('Enter');
+    await clickSubmit();
     await sleep(1500);
   });
 
@@ -368,14 +367,13 @@ describe('Bounding box with Focus and state [Checkbox, Radio]', function () {
   });
 
   it('draw bounding box', async () => {
-    selectRect([4, 4], [15, 15]);
+    await selectRect([4, 4], [15, 15]);
   });
 
   TestRadioCheckbox(app, 'bbox');
 
   it('submits the sample', async () => {
-    await app.client.keys('Enter');
-    await app.client.keys('Enter');
+    await clickSubmit();
     await sleep(1500);
   });
 
@@ -427,7 +425,7 @@ describe('Display correct box labels', function () {
   });
 
   it('draw bounding box', async () => {
-    selectRect([4, 4], [15, 15]);
+    await selectRect([4, 4], [15, 15]);
   });
 
   TestRadioCheckbox(app, 'bbox');

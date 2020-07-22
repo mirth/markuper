@@ -22,8 +22,8 @@ export const sampleView = writable({
 });
 export const assessState = writable({
   focusedGroup: null,
-
-  markup: {},
+  lastTouchedGroup: null,
+  box: null,
   imageElement: null,
 });
 
