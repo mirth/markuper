@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import _ from 'lodash';
 import {
-  getPath, getRadio, assertRadioLabels, sleep,
+  getPath, radioClick, assertRadioLabels, sleep,
   clickButton, getRadioState, getChecked, getChbox,
 } from './test_common';
 
@@ -82,9 +82,9 @@ export function TestCheckboxRadioRadio(app, prefix) {
   focusIsOn(CN('1'));
 
   it('displays radio 4 selected', async () => {
-    await getRadio(app, CN('1'), 1).click();
-    await getRadio(app, CN('1'), 1).click();
-    await getRadio(app, CN('1'), 4).click();
+    await radioClick(app, CN('1'), 1);
+    await radioClick(app, CN('1'), 1);
+    await radioClick(app, CN('1'), 4);
 
     const selected = await getRadioState(app, CN('1'));
     expect(selected).to.be.deep.eq([false, false, false, true]);
@@ -94,7 +94,7 @@ export function TestCheckboxRadioRadio(app, prefix) {
   focusIsOn(CN('2'));
 
   it('displays radio 2 selected', async () => {
-    await getRadio(app, CN('2'), 2).click();
+    await radioClick(app, CN('2'), 2);
     const selected = await getRadioState(app, CN('2'));
     expect(selected).to.be.deep.eq([false, true]);
     await app.client.keys('Enter');
@@ -140,7 +140,7 @@ export function TestRadioCheckbox(app, prefix) {
   focusIsOn(CN('1'));
 
   it('displays radio 1 selected', async () => {
-    await getRadio(app, CN('0'), 1).click();
+    await radioClick(app, CN('0'), 1);
     const selected = await getRadioState(app, CN('0'));
     expect(selected).to.be.deep.eq([true, false, false, false]);
   });

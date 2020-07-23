@@ -8,7 +8,7 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  getElement, itNavigatesToProject, sleep, clickButton, getRadioState, getRadio,
+  getElement, itNavigatesToProject, sleep, clickButton, getRadioState, radioClick,
   expectSampleMarkupToBeEq,
 } from './test_common';
 import { TestCheckboxRadioRadio, TestRadioCheckbox } from './classification_common';
@@ -98,7 +98,7 @@ describe('Simple bounding box test', function () {
   it('makes correct bounding box', async () => {
     await selectRect([1, 1], [4, 4]);
 
-    await getRadio(app, 'bbox/0', 2).click();
+    await radioClick(app, 'bbox/0', 2);
     await sleep(500);
 
     const selected = await getRadioState(app, 'bbox/0');
@@ -162,7 +162,7 @@ describe('Bounding boxes manipulation', function () {
   const drawAndCheckBBox = async (upperLeft, downRight) => {
     await selectRect(upperLeft, downRight);
 
-    await getRadio(app, 'bbox/0', 2).click();
+    await radioClick(app, 'bbox/0', 2);
     await sleep(500);
 
     const selected = await getRadioState(app, 'bbox/0');

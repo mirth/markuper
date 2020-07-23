@@ -7,7 +7,7 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  getRadio, itNavigatesToProject, getSamplePath,
+  radioClick, itNavigatesToProject, getSamplePath,
   clickButton, getRadioState, getChecked, expectSampleMarkupToBeEq,
 } from './test_common';
 import { TestCheckboxRadioRadio, TestRadioCheckbox, itSubmitsSample } from './classification_common';
@@ -45,7 +45,7 @@ describe('Device state keep for assessed samples', function () {
   });
 
   it('displays radio 2 selected', async () => {
-    await getRadio(app, 'root/0', 2).click();
+    await radioClick(app, 'root/0', 2);
 
     const selected = await getRadioState(app, 'root/0');
     expect(selected).to.be.deep.eq([false, true]);

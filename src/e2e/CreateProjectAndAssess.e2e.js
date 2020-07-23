@@ -6,7 +6,7 @@ import electronPath from 'electron';
 import path from 'path';
 import { expect } from 'chai';
 import {
-  makeUrl, getRadio, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
+  makeUrl, radioClick, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
   sleep, clickButton, getRadioState,
 } from './test_common';
 
@@ -68,7 +68,7 @@ describe('Application launch', function () {
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek1.jpg'));
-      await getRadio(app, 'root/0', 2).click();
+      await radioClick(app, 'root/0', 2);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -88,7 +88,7 @@ describe('Application launch', function () {
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek3.png'));
-      await getRadio(app, 'root/0', 1).click();
+      await radioClick(app, 'root/0', 1);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -98,7 +98,7 @@ describe('Application launch', function () {
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
       const src = await app.client.element('img').getAttribute('src');
       expect(path.normalize(src)).to.be.eq(makeUrl(imgDir, 'kek4.png'));
-      await getRadio(app, 'root/0', 1).click();
+      await radioClick(app, 'root/0', 1);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
     });
@@ -155,7 +155,7 @@ describe('Application launch', function () {
     });
 
     it("changes class to 'gek'", async () => {
-      await getRadio(app, 'root/0', 4).click();
+      await radioClick(app, 'root/0', 4);
       await sleep(1500);
       await app.client.keys('Enter');
       await app.client.keys('Enter');
