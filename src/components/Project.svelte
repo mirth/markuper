@@ -59,7 +59,7 @@ onMount(async () => {
     <Row>
       <Cell>
         <div style='display: flex; justify-content: space-between; flex-direction: row;'>
-          <Button on:click={() => push(`/project/${$activeProject.project_id}/assess_sample`)} iconRight='chevron-right'>
+          <Button on:click|once={() => push(`/project/${$activeProject.project_id}/assess_sample`)} iconRight='chevron-right'>
             Begin assess
           </Button>
           <Button on:click={exportProject($activeProject)} iconLeft='download'>
