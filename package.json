@@ -1,7 +1,7 @@
 {
   "name": "markuper",
-  "version": "0.1.0-alpha.5",
-  "description": "Some cool app",
+  "version": "0.1.0-alpha.7",
+  "description": "Data annotation tool",
   "main": "main.js",
   "license": "Proprietary",
   "private": true,
