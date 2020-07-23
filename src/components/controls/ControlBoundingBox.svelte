@@ -1,4 +1,5 @@
 <script>
+import _ from 'lodash';
 import Table from 'svelte-atoms/Table/Table.svelte';
 import Tbody from 'svelte-atoms/Table/Tbody.svelte';
 import {
@@ -13,7 +14,7 @@ export let onFieldCompleted;
 let upperLeft;
 let downRight;
 
-$assessState.box = {}
+$assessState.box = null;
 
 function cornersToBox() {
   let width = downRight.x - upperLeft.x;
@@ -99,6 +100,14 @@ function selectBox(i) {
   $sampleView.selectedBox = i;
 }
 
+function cloneMarkupValue(value) {
+  if (_.isArray(value)) {
+    return [...value];
+  }
+
+  return value;
+}
+
 function tryPushBox(callerGroup) {
   const isLastControl = field.fields_order.indexOf(callerGroup) === (field.fields_order.length - 1);
 
@@ -107,7 +116,7 @@ function tryPushBox(callerGroup) {
       box: $assessState.box,
     };
     for (const group of field.fields_order) {
-      markupForBox[group] = $sampleMarkup[group];
+      markupForBox[group] = cloneMarkupValue($sampleMarkup[group]);
       delete $sampleMarkup[group];
     }
 

@@ -24,10 +24,10 @@ function handleKeydown(event) {
   keyDown = event.key;
 }
 
-function tryInitWithSample() {
+function tryInitWithSample(smplMarkup) {
   const check = new Array(field.labels.length);
 
-  const markuped = $sampleMarkup[field.group] || [];
+  const markuped = smplMarkup[field.group] || [];
   for (let i = 0; i < field.labels.length; i += 1) {
     if (markuped.indexOf(field.labels[i].value) !== -1) {
       check[i] = true;
@@ -37,7 +37,7 @@ function tryInitWithSample() {
   return check;
 }
 
-const checked = tryInitWithSample();
+$: checked = tryInitWithSample($sampleMarkup);
 
 function saveMarkup() {
   const values = checked.map((check, i) => (check ? field.labels[i].value : null));

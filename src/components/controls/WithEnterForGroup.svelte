@@ -12,6 +12,10 @@ function handleKeydown(event) {
     return;
   }
 
+  if (event.key !== 'Enter') {
+    return;
+  }
+
   keyDown = event.key;
 }
 
@@ -28,6 +32,7 @@ function handleKeyup(event) {
   if (event.key === 'Enter') {
     onEnterPressed();
   }
+  keyDown = null;
 }
 
 </script>

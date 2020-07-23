@@ -9,9 +9,9 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   getElement, itNavigatesToProject, sleep, clickButton, getRadioState, radioClick,
-  expectSampleMarkupToBeEq,
+  expectSampleMarkupToBeEq, getChecked,
 } from './test_common';
-import { TestCheckboxRadioRadio, TestRadioCheckbox } from './classification_common';
+import { TestCheckboxRadioRadio, TestRadioCheckbox, expectFocusIsOn } from './classification_common';
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -335,7 +335,7 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
   });
 });
 
-describe('Bounding box with Focus and state [Checkbox, Radio]', function () {
+describe('Bounding box with Focus and state [Radio, Checkbox]', function () {
   this.timeout(20000);
   before(() => app.start());
   after(() => {
@@ -442,5 +442,108 @@ describe('Display correct box labels', function () {
       ['Black', 'rgba(80, 0, 0, 1)'],
       ['Pink', 'rgba(112, 0, 0, 1)'],
     ]);
+  });
+});
+
+describe('For [Radio, Checkbox] check control values while making multiple boxes', function () {
+  this.timeout(20000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  const xml = `
+  <content>
+    <bounding_box group="bbox">
+      <radio group="animal" value="cat" vizual="Cat" />
+      <radio group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="chuk" vizual="Chuk" />
+      <radio group="animal" value="gek" vizual="Gek" />
+
+      <checkbox group="color" value="black" vizual="Black" />
+      <checkbox group="color" value="white" vizual="White" />
+      <checkbox group="color" value="pink" vizual="Pink" />
+    </bounding_box>
+  </content>
+  `;
+
+  itNavigatesToProject(app, appPath, xml);
+
+  it('begins assess', async () => {
+    await app.client.waitUntilTextExists('span', 'Begin assess');
+    await clickButton(app, 'span', 'Begin assess');
+  });
+
+  it('draw bounding box', async () => {
+    await selectRect([4, 4], [15, 15]);
+  });
+
+  const prefix = 'bbox';
+  TestRadioCheckbox(app, prefix);
+
+  it('draw bounding box', async () => {
+    await selectRect([2, 2], [5, 5]);
+  });
+
+  const CN = (name) => `${prefix}/${name}`;
+  const focusIsOn = (device) => {
+    expectFocusIsOn(app, [CN('0'), CN('1')], device);
+  };
+
+  focusIsOn(CN('0'));
+
+  it('displays no radio selected', async () => {
+    const selected = await getRadioState(app, CN('0'));
+    expect(selected).to.be.deep.eq([false, false, false, false]);
+  });
+
+  it('displays no checkbox selected', async () => {
+    const checked = await getChecked(app, CN('1'));
+    expect(checked).to.be.deep.eq([false, false, false]);
+  });
+
+  it('displays radio 1 selected', async () => {
+    await app.client.keys('2');
+    const selected = await getRadioState(app, CN('0'));
+    expect(selected).to.be.deep.eq([false, true, false, false]);
+    await app.client.keys('Enter');
+  });
+
+  it('displays checkbox 3 as checked', async () => {
+    await app.client.keys('2');
+    await app.client.keys('1');
+
+    const checked = await getChecked(app, CN('1'));
+    expect(checked).to.be.deep.eq([true, true, false]);
+    await app.client.keys('Enter');
+  });
+
+  it('submits the sample', async () => {
+    await clickSubmit();
+    await sleep(1500);
+  });
+
+  it('goes on project page', async () => {
+    await clickButton(app, 'span', 'testproj0');
+    await app.client.waitForText('span', 'Begin assess');
+  });
+
+  expectSampleMarkupToBeEq(app, appPath, {
+    bbox: [{
+      box: {
+        x: 4, y: 4, width: 11, height: 11,
+      },
+      animal: 'cat',
+      color: ['black', 'pink'],
+    },
+    {
+      box: {
+        x: 2, y: 2, width: 3, height: 3,
+      },
+      animal: 'dog',
+      color: ['black', 'white'],
+    }],
   });
 });

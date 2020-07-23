@@ -6,7 +6,7 @@ import {
   clickButton, getRadioState, getChecked, checkboxClick,
 } from './test_common';
 
-function expectFocusIsOn(app, devices, device) {
+export function expectFocusIsOn(app, devices, device) {
   it(`focused on device ${device}`, async () => {
     const cls = await Promise.all(devices.map(async (dev) => {
       const cl = await app.client.element(`//*[@id="${dev}"]/div`).getAttribute('class');
@@ -105,7 +105,6 @@ export function TestCheckboxRadioRadio(app, prefix) {
 
 export function TestRadioCheckbox(app, prefix) {
   const CN = (name) => `${prefix}/${name}`;
-
   const focusIsOn = (device) => {
     expectFocusIsOn(app, [CN('0'), CN('1')], device);
   };
