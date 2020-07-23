@@ -21,7 +21,6 @@ export const checkboxClick = async (app, device, i) => {
   const xpath = `//*[@id="${device}"]/div/label/ul/li[${i}]/label`;
   await xpathClick(app, xpath);
 };
-export const getChbox = (app, device, i) => app.client.element();
 
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 export const getElement = async (app, pth) => {

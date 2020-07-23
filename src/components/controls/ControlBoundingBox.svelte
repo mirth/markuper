@@ -1,14 +1,17 @@
 <script>
 import Table from 'svelte-atoms/Table/Table.svelte';
 import Tbody from 'svelte-atoms/Table/Tbody.svelte';
-import { sampleView, sampleMarkup, assessState, isFieldSelected } from '../../store';
+import {
+  sampleView, sampleMarkup, assessState,
+} from '../../store';
 import ControlList from './ControlList.svelte';
 import BoxMarkup from './BoxMarkup.svelte';
-import WithEnterForGroup from './WithEnterForGroup.svelte';
 
 
 export let field;
 export let onFieldCompleted;
+let upperLeft;
+let downRight;
 
 
 function cornersToBox() {
@@ -95,9 +98,24 @@ function selectBox(i) {
   $sampleView.selectedBox = i;
 }
 
+function tryPushBox(callerGroup) {
+  const isLastControl = field.fields_order.indexOf(callerGroup) === (field.fields_order.length - 1);
 
-let upperLeft;
-let downRight;
+  if (isLastControl) {
+    const markupForBox = {
+      box: $assessState.box,
+    };
+    for (const group of field.fields_order) {
+      markupForBox[group] = $sampleMarkup[group];
+      delete $sampleMarkup[group];
+    }
+
+    $sampleMarkup[field.group] = $sampleMarkup[field.group].concat([markupForBox]);
+    onFieldCompleted(field.group);
+  }
+
+  onFieldCompleted(callerGroup);
+}
 
 $: if (!$sampleMarkup[field.group]) {
   $sampleMarkup[field.group] = [];
@@ -107,25 +125,6 @@ $: img = $assessState.imageElement;
 
 $: if (upperLeft && downRight) {
   $assessState.box = cornersToBox();
-}
-
-function tryPushBox(callerGroup) {
-  const isLastControl = field.fields_order.indexOf(callerGroup) === (field.fields_order.length - 1);
-
-  if(isLastControl) {
-    const markupForBox = {
-      box: $assessState.box,
-    };
-    for(const group of field.fields_order) {
-      markupForBox[group] = $sampleMarkup[group];
-      delete $sampleMarkup[group];
-    }
-
-    $sampleMarkup[field.group] = $sampleMarkup[field.group].concat([markupForBox])
-    onFieldCompleted(field.group);
-  }
-
-  onFieldCompleted(callerGroup);
 }
 
 </script>

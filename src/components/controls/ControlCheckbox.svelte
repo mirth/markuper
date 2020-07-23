@@ -10,6 +10,12 @@ import WithEnterForGroup from './WithEnterForGroup.svelte';
 export let onFieldCompleted;
 export let field;
 
+const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
+let isSelected = false;
+let keyDown;
+
+$: isSelected = isFieldSelected(field, $assessState);
+
 function handleKeydown(event) {
   if (!isSelected) {
     return;
@@ -18,10 +24,23 @@ function handleKeydown(event) {
   keyDown = event.key;
 }
 
+function tryInitWithSample() {
+  const check = new Array(field.labels.length);
+
+  const markuped = $sampleMarkup[field.group] || [];
+  for (let i = 0; i < field.labels.length; i += 1) {
+    if (markuped.indexOf(field.labels[i].value) !== -1) {
+      check[i] = true;
+    }
+  }
+
+  return check;
+}
+
+const checked = tryInitWithSample();
+
 function saveMarkup() {
-  const values = checked.map((checked, i) => {
-    return checked ? field.labels[i].value : null;
-  });
+  const values = checked.map((check, i) => (check ? field.labels[i].value : null));
 
   $sampleMarkup[field.group] = _.compact(values);
 }
@@ -53,27 +72,6 @@ async function handleKeyup(event) {
 function onEnterPressed() {
   onFieldCompleted(field.group);
 }
-
-function tryInitWithSample() {
-  const checked = new Array(field.labels.length);
-
-  const markuped = $sampleMarkup[field.group] || [];
-  for(let i = 0; i < field.labels.length; i++) {
-    if(markuped.indexOf(field.labels[i].value) !== -1) {
-      checked[i] = true;
-    }
-  }
-
-  return checked;
-}
-
-const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
-let isSelected = false;
-let keyDown;
-
-const checked = tryInitWithSample();
-
-$: isSelected = isFieldSelected(field, $assessState);
 
 </script>
 

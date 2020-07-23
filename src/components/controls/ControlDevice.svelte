@@ -1,6 +1,5 @@
 <script>
 
-import _ from 'lodash';
 import ControlList from './ControlList.svelte';
 import { assessState, sampleMarkup } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
@@ -30,32 +29,23 @@ function ownerByChild(childGroup) {
   return [owner, field];
 }
 
-function isFieldFilled(field) {
-  if (field.type === 'radio' && !Object.hasOwnProperty.call($assessState.markup, field.group)) {
-    return false;
-  }
-
-  return true;
-}
-
 function tryIncrementGroup(callerGroup) {
-  if($assessState.focusedGroup === submitGroup) {
+  if ($assessState.focusedGroup === submitGroup) {
     return;
   }
 
-  if(callerGroup !== $assessState.focusedGroup) {
+  if (callerGroup !== $assessState.focusedGroup) {
     return;
   }
 
-  const [owner, field] = ownerByChild($assessState.focusedGroup);
+  const [owner] = ownerByChild($assessState.focusedGroup);
   const ownerFieldsOrder = owner.fields_order;
   const idx = ownerFieldsOrder.indexOf($assessState.focusedGroup);
-
 
   const isLastControl = idx === (ownerFieldsOrder.length - 1);
   if (isLastControl) {
     const isNested = owner.group;
-    if(isNested) {
+    if (isNested) {
       $assessState.focusedGroup = owner.group;
     } else {
       $assessState.focusedGroup = submitGroup;
@@ -65,8 +55,8 @@ function tryIncrementGroup(callerGroup) {
   }
 }
 
-let keyDown;
 
+/* eslint-disable prefer-const */
 $sampleMarkup = (sample.markup && sample.markup.markup) || {};
 $assessState.markup = {};
 

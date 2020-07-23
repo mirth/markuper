@@ -24,6 +24,9 @@
     }
   ],
   "rules": {
+    // ForOfStatement removed
+    "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
+
     "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
 
     // so that svelte export const to be worked

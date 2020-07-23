@@ -11,6 +11,15 @@ import WithEnterForGroup from './WithEnterForGroup.svelte';
 export let field;
 export let onFieldCompleted;
 
+const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
+
+let keyDown;
+let isSelected = false;
+
+$: radio = $sampleMarkup[field.group];
+$: isSelected = isFieldSelected(field, $assessState);
+
+
 function handleKeydown(event) {
   if (!isSelected) {
     return;
@@ -20,7 +29,7 @@ function handleKeydown(event) {
 }
 
 function updateRadio(labelValue) {
-  $sampleMarkup[field.group] = labelValue
+  $sampleMarkup[field.group] = labelValue;
 }
 
 async function handleKeyup(event) {
@@ -45,20 +54,12 @@ async function handleKeyup(event) {
 }
 
 function onEnterPressed() {
-  if(!$sampleMarkup[field.group]) {
+  if (!$sampleMarkup[field.group]) {
     return;
   }
 
   onFieldCompleted(field.group);
 }
-
-const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
-
-let keyDown;
-let isSelected = false;
-
-$: radio = $sampleMarkup[field.group];
-$: isSelected = isFieldSelected(field, $assessState);
 
 </script>
 

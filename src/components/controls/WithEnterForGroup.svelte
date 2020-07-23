@@ -8,7 +8,7 @@ export let onEnterPressed;
 let keyDown;
 
 function handleKeydown(event) {
-  if(!isFieldSelected(field, $assessState)) {
+  if (!isFieldSelected(field, $assessState)) {
     return;
   }
 
@@ -16,7 +16,7 @@ function handleKeydown(event) {
 }
 
 function handleKeyup(event) {
-  if(!isFieldSelected(field, $assessState)) {
+  if (!isFieldSelected(field, $assessState)) {
     return;
   }
 
