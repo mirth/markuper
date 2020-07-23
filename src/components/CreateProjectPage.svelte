@@ -30,10 +30,12 @@ $: isProjectValid = !(
   || dataSources.length === 0
 );
 
-let isCreatingProject = false;
+$: isCreatingProject = false;
+
+$: isCreateProjectButtonEnabled = isProjectValid && !isCreatingProject;
 
 async function createNewProject() {
-  if (!isProjectValid) {
+  if (!isCreateProjectButtonEnabled) {
     return;
   }
   isCreatingProject = true;
@@ -90,8 +92,8 @@ async function createNewProject() {
           <span id='create_project_error'>{createProjectError}</span>
         {/if}
         <Button
-          on:click|once={createNewProject} style='float: right;'
-          type={isProjectValid ? 'filled' : 'flat'}
+          on:click={createNewProject} style='float: right;'
+          disabled={!isCreateProjectButtonEnabled}
           isLoading={isCreatingProject}
         >
           Create
