@@ -85,7 +85,7 @@ async function createNewProject() {
           <span id='create_project_error'>{createProjectError}</span>
         {/if}
         <Button
-          on:click={createNewProject} style='float: right;'
+          on:click|once={createNewProject} style='float: right;'
           type={isProjectValid ? 'filled' : 'flat'}
         >
           Create
