@@ -30,10 +30,13 @@ $: isProjectValid = !(
   || dataSources.length === 0
 );
 
+let isCreatingProject = false;
+
 async function createNewProject() {
   if (!isProjectValid) {
     return;
   }
+  isCreatingProject = true;
 
   selectedTemplate.template.xml = enrichWithColor(selectedTemplate.template.xml);
 
@@ -54,6 +57,8 @@ async function createNewProject() {
     createProjectError = null;
     await goToProject(res.project_id)();
   }
+
+  isCreatingProject = false;
 }
 
 </script>
@@ -87,6 +92,7 @@ async function createNewProject() {
         <Button
           on:click|once={createNewProject} style='float: right;'
           type={isProjectValid ? 'filled' : 'flat'}
+          isLoading={isCreatingProject}
         >
           Create
         </Button>
