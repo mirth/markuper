@@ -7,14 +7,21 @@ import { expect, assert } from 'chai';
 import api from '../api';
 
 export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
-export const radioClick = async (app, device, i) => {
-  const xpath = `//*[@id="${device}"]/div/label/ul/li[${i}]/div/label`;
+const xpathClick = async (app, xpath) => {
   await app.client.waitForExist(xpath);
   const el = app.client.element(xpath);
   await el.click();
 };
 
-export const getChbox = (app, device, i) => app.client.element(`//*[@id="${device}"]/div/label/ul/li[${i}]/label`);
+export const radioClick = async (app, device, i) => {
+  const xpath = `//*[@id="${device}"]/div/label/ul/li[${i}]/div/label`;
+  await xpathClick(app, xpath);
+};
+export const checkboxClick = async (app, device, i) => {
+  const xpath = `//*[@id="${device}"]/div/label/ul/li[${i}]/label`;
+  await xpathClick(app, xpath);
+};
+export const getChbox = (app, device, i) => app.client.element();
 
 export const getPath = (app, el, pth) => app.client.elementIdElement(el.ELEMENT, pth);
 export const getElement = async (app, pth) => {
