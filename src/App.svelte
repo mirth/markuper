@@ -4,7 +4,7 @@ import 'svelte-atoms/Variables.svelte';
 
 import Router from 'svelte-spa-router';
 import GetStarted from './components/GetStarted.svelte';
-import Project from './components/Project.svelte';
+import Project from './components/project/Project.svelte';
 import AssessSample from './components/AssessSample.svelte';
 import CreateProjectPage from './components/CreateProjectPage.svelte';
 

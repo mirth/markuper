@@ -97,7 +97,7 @@ export const itNavigatesToProject = (app, appPath, xml) => {
 };
 
 export const getSamplePath = (app, filename) => app.client.element(`small*=${filename}`);
-export const getSampleClass = (app, filename) => getSamplePath(app, filename).element('../..').element('./span');
+export const getSampleClass = (app, filename) => getSamplePath(app, filename).element('../..').element('./small');
 
 export function assertBoxAlmostEqual(a, b) {
   const thresh = 1;
@@ -165,7 +165,7 @@ export function createProjectWithTemplate(app, appPath, xml) {
   return [imgDir, glob0, glob1];
 }
 
-const waitForAssessPage = async (app) => {
+export const waitForAssessPage = async (app) => {
   await app.client.waitForExist('#image-container');
 };
 

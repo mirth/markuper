@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import {
   radioClick, itNavigatesToProject, getSamplePath,
   clickButton, getRadioState, getChecked, expectSampleMarkupToBeEq,
+  waitForAssessPage,
 } from './test_common';
 import { TestCheckboxRadioRadio, TestRadioCheckbox, itSubmitsSample } from './classification_common';
 
@@ -76,7 +77,7 @@ describe('Device state keep for assessed samples', function () {
     await clickButton(app, 'span', 'testproj0');
     await app.client.waitForText('span', 'Begin assess');
     await getSamplePath(app, 'kek0.jpg').element('..').click();
-    await app.client.waitForVisible("button/*[@innertext='Cat']");
+    await waitForAssessPage(app);
 
     const selected = await getRadioState(app, 'root/0');
     expect(selected).to.be.deep.eq([false, true]);

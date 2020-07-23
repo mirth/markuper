@@ -9,11 +9,12 @@ import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Spacer from 'svelte-atoms/Spacer.svelte';
 import Block from 'svelte-atoms/Block.svelte';
-import api from '../api';
-import PageBlank from './PageBlank.svelte';
-import { activeProject, fetchProject } from '../store';
-import { deterministicStrigify } from '../project';
-import ControlList from './controls/ControlList.svelte';
+import api from '../../api';
+import PageBlank from '../PageBlank.svelte';
+import { activeProject, fetchProject } from '../../store';
+import ControlList from '../controls/ControlList.svelte';
+import ProjectAssessedSamplesList from './ProjectAssessedSamplesList.svelte';
+
 
 export let params;
 
@@ -23,10 +24,6 @@ function exportProject(p) {
     const [data, filename] = await res;
     jsFileDownload(data, filename);
   };
-}
-
-function formatMarkup(markup) {
-  return deterministicStrigify(markup);
 }
 
 let assessedList = [];
@@ -87,18 +84,9 @@ onMount(async () => {
 {:else}
 <Typography type='title' block>Assessed samples:</Typography>
 {/if}
-<ul>
-  {#each assessedList as forSample}
-    <li>
-      <p>
-        <a href={`#/project/${forSample.sample_id.project_id}/samples/${forSample.sample_id.sample_id}`}>
-          <small>{forSample.sample_uri}: </small>
-        </a>
-        <span>{formatMarkup(forSample.sample_markup.markup)}</span>
-      </p>
-    </li>
-  {/each}
-</ul>
+
+<ProjectAssessedSamplesList {assessedList} />
+
 </Cell>
 </Row>
 </Block>
