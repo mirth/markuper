@@ -165,7 +165,12 @@ export function createProjectWithTemplate(app, appPath, xml) {
   return [imgDir, glob0, glob1];
 }
 
+const waitForAssessPage = async (app) => {
+  await app.client.waitForExist('#image-container');
+};
+
 export const getRadioState = async (app, device) => {
+  await waitForAssessPage(app);
   const elements = await app.client.elements(`//*[@id="${device}"]/div/label/ul/li/div/label/input`);
   const disabled = await Promise.all(elements.value.map(async (el) => {
     const isSelected = await app.client.elementIdSelected(el.ELEMENT);
@@ -175,6 +180,7 @@ export const getRadioState = async (app, device) => {
   return disabled;
 };
 export const getChecked = async (app, device) => {
+  await waitForAssessPage(app);
   const elements = await app.client.elements(`//*[@id="${device}"]/div/label/ul/li/label/input`);
   const checked = await Promise.all(elements.value.map(async (el) => {
     const ch = await app.client.elementIdSelected(el.ELEMENT, 'checked');
