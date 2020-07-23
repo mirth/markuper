@@ -13,6 +13,7 @@ export let onFieldCompleted;
 let upperLeft;
 let downRight;
 
+$assessState.box = {}
 
 function cornersToBox() {
   let width = downRight.x - upperLeft.x;
