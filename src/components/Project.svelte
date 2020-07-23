@@ -62,7 +62,7 @@ onMount(async () => {
           <Button on:click|once={() => push(`/project/${$activeProject.project_id}/assess_sample`)} iconRight='chevron-right'>
             Begin assess
           </Button>
-          <Button on:click={exportProject($activeProject)} iconLeft='download'>
+          <Button on:click|once={exportProject($activeProject)} iconLeft='download'>
             Export CSV
           </Button>
         </div>
