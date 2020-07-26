@@ -18,7 +18,6 @@
     "pack:windows": "cross-env yarn _pack --win --x64 --p never",
     "pack:linux": "yarn _pack --linux --x64 --p never",
     "_pack": "yarn build && yarn electron-builder",
-    "_dmg": "yarn electron-installer-dmg markuper-darwin-x64/markuper.app markuper",
     "_test_e2e": "yarn build && cross-env-shell NODE_ENV=test yarn mocha --require @babel/register --require babel-polyfill ./src/e2e",
     "_test_backend": "yarn _build_backend && cd backend && cross-env-shell NODE_ENV=test go test -v ./... && cd ..",
     "_lint_backend": "cd backend/cmd && go vet && cd ../../",
