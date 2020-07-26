@@ -60,7 +60,9 @@ async function submitMarkupAndFetchNext() {
     {/if}
   </Cell>
   <Cell xs={4}>
-    <ControlDevice {sample} {submitMarkupAndFetchNext} />
+    <ControlDevice {sample} submitMarkupAndFetchNext={
+      sample.sample === null ? () => {} : submitMarkupAndFetchNext
+    } />
     <hr />
     <span>
       Project:
