@@ -10,19 +10,9 @@ import WithEnterForGroup from './WithEnterForGroup.svelte';
 export let onFieldCompleted;
 export let field;
 
-const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
-let isSelected = false;
-let keyDown;
+const [, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
 $: isSelected = isFieldSelected(field, $assessState);
-
-function handleKeydown(event) {
-  if (!isSelected) {
-    return;
-  }
-
-  keyDown = event.key;
-}
 
 function tryInitWithSample(smplMarkup) {
   const check = new Array(field.labels.length);
@@ -50,23 +40,9 @@ function updateCheckedWith(labelIndex) {
   saveMarkup();
 }
 
-async function handleKeyup(event) {
-  if (!isSelected) {
-    return;
-  }
-
-  if (event.key !== keyDown) {
-    return;
-  }
-
-  if (!keys.includes(event.key)) {
-    return;
-  }
-
-  const labelIndex = parseInt(event.key, 10) - 1;
+function handleKeyboardKeyPressed(key) {
+  const labelIndex = parseInt(key, 10) - 1;
   updateCheckedWith(labelIndex);
-
-  keyDown = null;
 }
 
 function onEnterPressed() {
@@ -77,8 +53,6 @@ function onEnterPressed() {
 
 <WithEnterForGroup {field} {onEnterPressed}/>
 
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
-
 
 <ul>
 {#each labelsWithKeys as [label, key], labelIndex}
@@ -88,7 +62,7 @@ function onEnterPressed() {
     </Checkbox>
     <Spacer size={8} />
     {#if isSelected}
-      <KeyboardButton {key} isKeyDown={key === keyDown} />
+      <KeyboardButton {field} {key} onKeyPressed={handleKeyboardKeyPressed} />
     {/if}
   </li>
 {/each}

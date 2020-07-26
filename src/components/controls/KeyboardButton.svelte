@@ -1,10 +1,57 @@
 <script>
+import { assessState, isFieldSelected } from '../../store';
+import { makeLabelsWithKeys } from '../../control';
+
+export let field;
 export let key;
-export let isKeyDown;
+export let onKeyPressed;
+
+
+let keyDown;
+const [keys] = field.labels ? makeLabelsWithKeys(field.labels) : ['Enter'];
+
+$: isSelected = isFieldSelected(field, $assessState);
+
+function handleKeydown(event) {
+  if (!isSelected) {
+    return;
+  }
+
+  if (key !== event.key) {
+    return;
+  }
+
+  keyDown = event.key;
+}
+
+async function handleKeyup(event) {
+  if (!isSelected) {
+    return;
+  }
+
+  if (key !== event.key) {
+    return;
+  }
+
+  if (event.key !== keyDown) {
+    return;
+  }
+
+  if (!keys.includes(event.key)) {
+    return;
+  }
+
+  onKeyPressed(event.key);
+
+  keyDown = null;
+}
 
 </script>
 
-<kbd class:kbd-down={isKeyDown}>{key}</kbd>
+<kbd class:kbd-down={key === keyDown}>{key}</kbd>
+
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup}/>
+
 
 <style>
 kbd {

@@ -11,46 +11,20 @@ import WithEnterForGroup from './WithEnterForGroup.svelte';
 export let field;
 export let onFieldCompleted;
 
-const [keys, labelsWithKeys] = makeLabelsWithKeys(field.labels);
+const [, labelsWithKeys] = makeLabelsWithKeys(field.labels);
 
-let keyDown;
-let isSelected = false;
-
-$: radio = $sampleMarkup[field.group];
 $: isSelected = isFieldSelected(field, $assessState);
-
-
-function handleKeydown(event) {
-  if (!isSelected) {
-    return;
-  }
-
-  keyDown = event.key;
-}
+$: radio = $sampleMarkup[field.group];
 
 function updateRadio(labelValue) {
   $sampleMarkup[field.group] = labelValue;
 }
 
-async function handleKeyup(event) {
-  if (!isSelected) {
-    return;
-  }
-
-  if (event.key !== keyDown) {
-    return;
-  }
-
-  if (!keys.includes(event.key)) {
-    return;
-  }
-
-  const labelIndex = parseInt(event.key, 10) - 1;
+async function handleKeyboardKeyPressed(key) {
+  const labelIndex = parseInt(key, 10) - 1;
   const label = field.labels[labelIndex];
 
   updateRadio(label.value);
-
-  keyDown = null;
 }
 
 function onEnterPressed() {
@@ -62,8 +36,6 @@ function onEnterPressed() {
 }
 
 </script>
-
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 <WithEnterForGroup {field} {onEnterPressed}/>
 
@@ -80,7 +52,7 @@ function onEnterPressed() {
       </Radio>
       <Spacer size={8} />
       {#if isSelected}
-        <KeyboardButton {key} isKeyDown={key === keyDown} />
+        <KeyboardButton {field} {key} onKeyPressed={handleKeyboardKeyPressed} />
       {/if}
     </Cell>
   </li>
