@@ -100,11 +100,8 @@ func fetchSampleList(db *DB, proj Project, src DataSource) ([]Jsonable, error) {
 }
 
 func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
-	for i, sample := range list {
-		sID := SampleID{
-			ProjectID: projectID,
-			SampleID:  int64(i), //fixme -> uuid
-		}
+	for _, sample := range list {
+		sID := NewSampleIDFor(projectID)
 
 		j, err := sample.JSON()
 		if err != nil {

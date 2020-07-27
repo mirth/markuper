@@ -30,6 +30,11 @@ export function getFieldsInOrderFor(template) {
   return fields;
 }
 
+export function getProjectIDFromSampleID(sampleID) {
+  const [projID] = sampleID.split('-');
+  return projID;
+}
+
 // FIXME test_common.js
 const sortObj = (obj) => (obj === null || typeof obj !== 'object'
   ? obj
