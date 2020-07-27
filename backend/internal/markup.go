@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"math/rand"
@@ -116,25 +117,17 @@ func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]Sa
 	sIDs := make([]SampleID, 0)
 
 	err := db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucket))
-		err := b.ForEach(func(k, _v []byte) error {
-			sID := string(k)
+		c := tx.Bucket([]byte(bucket)).Cursor()
 
-			if GetProjectIDFromSampleID(sID) == projectID {
-				sIDs = append(sIDs, sID)
-			}
+		prefix := []byte(projectID)
+		for k, _ := c.Seek(prefix); k != nil && bytes.HasPrefix(k, prefix); k, _ = c.Next() {
+			sIDs = append(sIDs, string(k))
+		}
 
-			return nil
-		})
-
-		return err
+		return nil
 	})
 
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return sIDs, nil
+	return sIDs, errors.WithStack(err)
 }
 
 func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, error) {
