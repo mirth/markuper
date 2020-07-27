@@ -47,10 +47,7 @@ func (db *DB) GetProject(pID ProjectID) (Project, error) {
 	proj := Project{}
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Projects)
-		pIDBin, err := encodeBin(pID)
-		if err != nil {
-			return err
-		}
+		pIDBin := []byte(pID)
 		projBin := b.Get(pIDBin)
 
 		if projBin == nil {
@@ -70,14 +67,11 @@ func (db *DB) GetProject(pID ProjectID) (Project, error) {
 }
 
 func (db *DB) GetSample(sID SampleID) ([]byte, error) {
-	sIDBin, err := encodeBin(sID)
-	if err != nil {
-		return nil, err
-	}
+	sIDBin := []byte(sID)
 
 	var sample []byte
 
-	err = db.DB.View(func(tx *bolt.Tx) error {
+	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Samples)
 		sampleBin := b.Get(sIDBin)
 		if sampleBin == nil {
@@ -97,13 +91,10 @@ func (db *DB) GetSample(sID SampleID) ([]byte, error) {
 }
 
 func (db *DB) GetMarkup(sID SampleID) (*SampleMarkup, error) {
-	sIDbin, err := encodeBin(sID)
-	if err != nil {
-		return nil, err
-	}
+	sIDbin := []byte(sID)
 
 	var smBin []byte
-	err = db.DB.View(func(tx *bolt.Tx) error {
+	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Markups)
 		smBin = b.Get(sIDbin)
 
@@ -126,11 +117,8 @@ func (db *DB) GetMarkup(sID SampleID) (*SampleMarkup, error) {
 	return &sm, nil
 }
 
-func (db *DB) Put(bucket string, key, value interface{}) error {
-	keyBin, err := encodeBin(key)
-	if err != nil {
-		return err
-	}
+func (db *DB) Put(bucket, key string, value interface{}) error {
+	keyBin := []byte(key)
 
 	valueBin, err := encodeBin(value)
 	if err != nil {

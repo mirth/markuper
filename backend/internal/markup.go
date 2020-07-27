@@ -118,17 +118,10 @@ func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]Sa
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		err := b.ForEach(func(k, _v []byte) error {
-			sID := ""
+			sID := string(k)
 
-			{
-				err := decodeBin(k).Decode(&sID)
-				if err != nil {
-					return errors.WithStack(err)
-				}
-
-				if GetProjectIDFromSampleID(sID) == projectID {
-					sIDs = append(sIDs, sID)
-				}
+			if GetProjectIDFromSampleID(sID) == projectID {
+				sIDs = append(sIDs, sID)
 			}
 
 			return nil
@@ -150,16 +143,14 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("samples"))
 		err := b.ForEach(func(k, v []byte) error {
-			sID := ""
+			sID := string(k)
 			s := json.RawMessage{}
 
 			{
-				err := decodeBin(k).Decode(&sID)
+				err := decodeBin(v).Decode(&s)
 				if err != nil {
 					return errors.WithStack(err)
 				}
-
-				err = decodeBin(v).Decode(&s)
 
 				if GetProjectIDFromSampleID(sID) == projectID {
 					samples = append(samples, s)
@@ -260,10 +251,7 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 		m := tx.Bucket(Markups)
 		s := tx.Bucket(Samples)
 		for _, id := range ids {
-			binID, err := encodeBin(id)
-			if err != nil {
-				return err
-			}
+			binID := []byte(id)
 			smBin := m.Get(binID)
 			sm := SampleMarkup{}
 			{
