@@ -14,6 +14,10 @@ func fillTestDB(db *DB) Project {
 	return fillTestDBWithProj(db, "testp0")
 }
 
+func newSampleIDForTest(projID ProjectID, i int) string {
+	return fmt.Sprintf("%s-%d", string(projID), i)
+}
+
 func fillTestDBWithProj(db *DB, projName string) Project {
 	svc := NewProjectService(db)
 	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName))
@@ -26,10 +30,7 @@ func fillTestDBWithProj(db *DB, projName string) Project {
 	}
 
 	for i, sample := range samples {
-		sk := SampleID{
-			ProjectID: p.ProjectID,
-			SampleID:  int64(i),
-		}
+		sk := newSampleIDForTest(p.ProjectID, i)
 
 		j, _ := json.Marshal(sample)
 		db.Put("samples", sk, j)
@@ -75,7 +76,7 @@ func TestMarkupAssess(t *testing.T) {
 			db: db,
 		}
 
-		AssessWithMarkup(t, svc, SampleID{ProjectID: "kek", SampleID: 0}, `{"kek": "kek"}`)
+		AssessWithMarkup(t, svc, newSampleIDForTest("kek", 0), `{"kek": "kek"}`)
 	}
 }
 
@@ -88,15 +89,13 @@ func TestMarkupNext(t *testing.T) {
 		db: db,
 	}
 
-	assertNext := func(i int64) SampleID {
+	assertNext := func(i int) SampleID {
 		a, err := svc.GetNext(WithProjectIDRequest{
 			ProjectID: proj.ProjectID,
 		})
 		assert.Nil(t, err)
-		sID := SampleID{
-			ProjectID: proj.ProjectID,
-			SampleID:  i,
-		}
+		sID := newSampleIDForTest(proj.ProjectID, i)
+
 		e := SampleResponse{
 			SampleID: sID,
 			Sample:   json.RawMessage(fmt.Sprintf(`{"image_uri":"sampleuri%d"}`, i)),
@@ -139,7 +138,7 @@ func TestGetSample(t *testing.T) {
 		db: db,
 	}
 
-	sID := SampleID{proj0.ProjectID, 0}
+	sID := newSampleIDForTest(proj0.ProjectID, 0)
 	es, _ := db.GetSample(sID)
 
 	{
@@ -170,7 +169,7 @@ func assessSample(t *testing.T, svc MarkupService, sID SampleID) {
 	r := AssessRequest{
 		SampleID: sID,
 		SampleMarkup: SampleMarkup{
-			Markup: json.RawMessage(fmt.Sprintf(`{"kek":mark%d}`, sID.SampleID)),
+			Markup: json.RawMessage(fmt.Sprintf(`{"kek":mark%s}`, sID)),
 		},
 	}
 	err := svc.Assess(r)
@@ -194,12 +193,12 @@ func TestListMarkup(t *testing.T) {
 		assessSample(t, &svc, sID)
 	}
 
-	ass(SampleID{proj0.ProjectID, 0})
-	ass(SampleID{proj0.ProjectID, 1})
-	ass(SampleID{proj0.ProjectID, 2})
+	ass(newSampleIDForTest(proj0.ProjectID, 0))
+	ass(newSampleIDForTest(proj0.ProjectID, 1))
+	ass(newSampleIDForTest(proj0.ProjectID, 2))
 
-	ass(SampleID{proj1.ProjectID, 0})
-	ass(SampleID{proj1.ProjectID, 2})
+	ass(newSampleIDForTest(proj1.ProjectID, 0))
+	ass(newSampleIDForTest(proj1.ProjectID, 2))
 
 	c = testGetBucketSize(db, "markups")
 	assert.Equal(t, 5, c)
@@ -209,31 +208,30 @@ func TestListMarkup(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
+	newSampleMarkup := func(i int) SampleMarkup {
+		sID := newSampleIDForTest(proj0.ProjectID, i)
+		return SampleMarkup{
+			CreatedAt: utils.TestNowUTC(),
+			Markup:    json.RawMessage(fmt.Sprintf(`{"kek":mark%s}`, sID)),
+		}
+	}
+
 	{
 		assert.ElementsMatch(t, []MarkupListElement{
 			NewMarkupListElement(
-				SampleID{ProjectID: proj0.ProjectID, SampleID: 0},
+				newSampleIDForTest(proj0.ProjectID, 0),
 				"sampleuri0",
-				SampleMarkup{
-					CreatedAt: utils.TestNowUTC(),
-					Markup:    json.RawMessage(`{"kek":mark0}`),
-				},
+				newSampleMarkup(0),
 			),
 			NewMarkupListElement(
-				SampleID{ProjectID: proj0.ProjectID, SampleID: 1},
+				newSampleIDForTest(proj0.ProjectID, 1),
 				"sampleuri1",
-				SampleMarkup{
-					CreatedAt: utils.TestNowUTC(),
-					Markup:    json.RawMessage(`{"kek":mark1}`),
-				},
+				newSampleMarkup(1),
 			),
 			NewMarkupListElement(
-				SampleID{ProjectID: proj0.ProjectID, SampleID: 2},
+				newSampleIDForTest(proj0.ProjectID, 2),
 				"sampleuri2",
-				SampleMarkup{
-					CreatedAt: utils.TestNowUTC(),
-					Markup:    json.RawMessage(`{"kek":mark2}`),
-				},
+				newSampleMarkup(2),
 			),
 		}, list.List)
 	}
@@ -260,15 +258,15 @@ func TestOutOfSamples(t *testing.T) {
 		return s
 	}
 
-	ass(SampleID{proj0.ProjectID, 0})
+	ass(newSampleIDForTest(proj0.ProjectID, 0))
 	getNext()
-	ass(SampleID{proj0.ProjectID, 1})
+	ass(newSampleIDForTest(proj0.ProjectID, 1))
 	getNext()
-	ass(SampleID{proj0.ProjectID, 2})
+	ass(newSampleIDForTest(proj0.ProjectID, 2))
 	getNext()
-	ass(SampleID{proj0.ProjectID, 3})
+	ass(newSampleIDForTest(proj0.ProjectID, 3))
 	getNext()
-	ass(SampleID{proj0.ProjectID, 4})
+	ass(newSampleIDForTest(proj0.ProjectID, 4))
 	s := getNext()
 	assert.Nil(t, s.Sample)
 	assert.Equal(t, s.Project, proj0)

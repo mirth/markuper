@@ -1,10 +1,12 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"math/rand"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -29,6 +31,10 @@ type ProjectMeta struct {
 type AssessRequest struct {
 	SampleID     SampleID     `json:"sample_id"`
 	SampleMarkup SampleMarkup `json:"sample_markup"`
+}
+
+type SampleRequest struct {
+	SampleID SampleID `json:"sample_id"`
 }
 
 type SampleResponse struct {
@@ -111,32 +117,17 @@ func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]Sa
 	sIDs := make([]SampleID, 0)
 
 	err := db.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucket))
-		err := b.ForEach(func(k, _v []byte) error {
-			sID := SampleID{}
+		c := tx.Bucket([]byte(bucket)).Cursor()
 
-			{
-				err := decodeBin(k).Decode(&sID)
-				if err != nil {
-					return errors.WithStack(err)
-				}
+		prefix := []byte(projectID)
+		for k, _ := c.Seek(prefix); k != nil && bytes.HasPrefix(k, prefix); k, _ = c.Next() {
+			sIDs = append(sIDs, string(k))
+		}
 
-				if sID.ProjectID == projectID {
-					sIDs = append(sIDs, sID)
-				}
-			}
-
-			return nil
-		})
-
-		return err
+		return nil
 	})
 
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return sIDs, nil
+	return sIDs, errors.WithStack(err)
 }
 
 func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, error) {
@@ -145,18 +136,16 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("samples"))
 		err := b.ForEach(func(k, v []byte) error {
-			sID := SampleID{}
+			sID := string(k)
 			s := json.RawMessage{}
 
 			{
-				err := decodeBin(k).Decode(&sID)
+				err := decodeBin(v).Decode(&s)
 				if err != nil {
 					return errors.WithStack(err)
 				}
 
-				err = decodeBin(v).Decode(&s)
-
-				if sID.ProjectID == projectID {
+				if GetProjectIDFromSampleID(sID) == projectID {
 					samples = append(samples, s)
 				}
 			}
@@ -184,7 +173,7 @@ func getRandomSample(toAssess []SampleID) SampleID {
 
 func getSampleInOrder(toAssess []SampleID) SampleID {
 	sort.SliceStable(toAssess, func(i, j int) bool {
-		return toAssess[i].SampleID < toAssess[j].SampleID
+		return strings.Compare(toAssess[i], toAssess[j]) < 0
 	})
 
 	return toAssess[0]
@@ -220,7 +209,7 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		}, nil
 	}
 
-	sID := SampleID{}
+	sID := ""
 
 	if proj.ShuffleSamples {
 		sID = getRandomSample(toAssess)
@@ -255,10 +244,7 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 		m := tx.Bucket(Markups)
 		s := tx.Bucket(Samples)
 		for _, id := range ids {
-			binID, err := encodeBin(id)
-			if err != nil {
-				return err
-			}
+			binID := []byte(id)
 			smBin := m.Get(binID)
 			sm := SampleMarkup{}
 			{
@@ -312,7 +298,7 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 		return SampleWithMarkupResponse{}, err
 	}
 
-	proj, err := s.db.GetProject(sID.ProjectID)
+	proj, err := s.db.GetProject(GetProjectIDFromSampleID(sID))
 	if err != nil {
 		return SampleWithMarkupResponse{}, err
 	}
@@ -325,9 +311,9 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 
 func GetSampleEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := *request.(*SampleID)
+		req := *request.(*SampleRequest)
 
-		return s.GetSample(req)
+		return s.GetSample(req.SampleID)
 	}
 }
 

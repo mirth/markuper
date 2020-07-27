@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
-	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/pkg/errors"
@@ -104,10 +103,8 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 	}
 
 	for _, entry := range list.List {
-		sampleID := strconv.FormatInt(entry.SampleID.SampleID, 10)
-
 		row := []string{
-			sampleID,
+			entry.SampleID,
 			entry.SampleURI,
 			entry.SampleMarkup.CreatedAt.Format("2006-01-02T15:04:05"),
 		}
