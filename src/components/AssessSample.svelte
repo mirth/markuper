@@ -35,7 +35,7 @@ async function submitMarkupAndFetchNext() {
   sample = await sample;
   const { sample_id: sampleId } = sample;
 
-  const projID = getProjectIDFromSampleID(sampleId)
+  const projID = getProjectIDFromSampleID(sampleId);
   await api.post(`/project/${projID}/assess`, {
     sample_id: sampleId,
     sample_markup: {
@@ -65,7 +65,7 @@ async function submitMarkupAndFetchNext() {
       sample.sample === null ? () => {} : submitMarkupAndFetchNext
     } />
     <hr />
-    <span>
+    <p>
       Project:
       <Button
         type='empty'
@@ -77,7 +77,10 @@ async function submitMarkupAndFetchNext() {
       {#await projStats then projStats}
         ({projStats.assessed_number_of_samples} / {projStats.total_number_of_samples})
       {/await}
-    </span>
+    </p>
+    {#if sample.sample !== null}
+      <p>Sample:<small id='sample_uri'>{sample.sample.image_uri}</small></p>
+    {/if}
   </Cell>
 {/await}
 </Row>
@@ -91,6 +94,11 @@ hr {
   border: none;
   background-color: lightgray;
   height: 1px;
+}
+
+small {
+  word-wrap: break-word;
+  margin-left: 10px;
 }
 
 </style>

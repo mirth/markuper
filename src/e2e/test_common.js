@@ -6,7 +6,6 @@ import path from 'path';
 import { expect, assert } from 'chai';
 import api from '../api';
 
-export const makeUrl = (imgDir, filename) => path.normalize(`file://${path.join(imgDir, filename)}`);
 const xpathClick = async (app, xpath) => {
   await app.client.waitForExist(xpath);
   const el = app.client.element(xpath);
