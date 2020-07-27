@@ -74,6 +74,8 @@ func newServer(
 		if errors.As(err, &e) {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, e.Error())))
+		} else if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}))
 }
