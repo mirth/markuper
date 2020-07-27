@@ -100,6 +100,8 @@ func fetchSampleList(db *DB, proj Project, src DataSource) ([]Jsonable, error) {
 }
 
 func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
+	pairs := make([]KeyValue, 0)
+
 	for _, sample := range list {
 		sID := NewSampleIDFor(projectID)
 
@@ -108,13 +110,15 @@ func putSamples(db *DB, projectID ProjectID, list []Jsonable) error {
 			return errors.WithStack(err)
 		}
 
-		err = db.Put("samples", sID, j)
-		if err != nil {
-			return errors.WithStack(err)
-		}
+		pairs = append(pairs, KeyValue{
+			Key:   sID,
+			Value: j,
+		})
 	}
 
-	return nil
+	err := db.PutMany("samples", pairs)
+
+	return err
 }
 
 func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, error) {
@@ -138,7 +142,7 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 		return Project{}, err
 	}
 
-	err = s.db.Put("projects", project.ProjectID, project)
+	err = s.db.PutOne("projects", project.ProjectID, project)
 	if err != nil {
 		return Project{}, errors.WithStack(err)
 	}

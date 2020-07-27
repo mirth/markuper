@@ -117,7 +117,7 @@ func (db *DB) GetMarkup(sID SampleID) (*SampleMarkup, error) {
 	return &sm, nil
 }
 
-func (db *DB) Put(bucket, key string, value interface{}) error {
+func (db *DB) PutOne(bucket, key string, value interface{}) error {
 	keyBin := []byte(key)
 
 	valueBin, err := encodeBin(value)
@@ -144,6 +144,34 @@ func (db *DB) Put(bucket, key string, value interface{}) error {
 	}
 
 	return nil
+}
+
+type KeyValue struct {
+	Key   string
+	Value interface{}
+}
+
+func (db *DB) PutMany(bucket string, pairs []KeyValue) error {
+	err := db.DB.Batch(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		if b == nil {
+			return errors.New(fmt.Sprintf("No such bucket [%s]", bucket))
+		}
+
+		for _, pair := range pairs {
+			keyBin := []byte(pair.Key)
+			valueBin, err := encodeBin(pair.Value)
+
+			err = b.Put(keyBin, valueBin)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 func encodeBin(x interface{}) ([]byte, error) {

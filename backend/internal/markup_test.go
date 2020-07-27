@@ -33,7 +33,7 @@ func fillTestDBWithProj(db *DB, projName string) Project {
 		sk := newSampleIDForTest(p.ProjectID, i)
 
 		j, _ := json.Marshal(sample)
-		db.Put("samples", sk, j)
+		db.PutOne("samples", sk, j)
 	}
 
 	return p

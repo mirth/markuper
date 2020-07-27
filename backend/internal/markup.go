@@ -228,7 +228,7 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
 	r.SampleMarkup.CreatedAt = utils.NowUTC()
-	err := s.db.Put("markups", r.SampleID, r.SampleMarkup)
+	err := s.db.PutOne("markups", r.SampleID, r.SampleMarkup)
 
 	return err
 }

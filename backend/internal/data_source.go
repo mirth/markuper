@@ -88,6 +88,7 @@ func removeWithoutExtention(paths []string) []string {
 func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 	sourceURI := s.SourceURI
 	_, err := os.Stat(s.SourceURI)
+	// fixme should check if glob
 	if err == nil {
 		sourceURI = filepath.Join(sourceURI, "*")
 	}
