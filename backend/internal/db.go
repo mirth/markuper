@@ -82,10 +82,8 @@ func (db *DB) GetSample(sID SampleID) ([]byte, error) {
 		sampleBin := b.Get(sIDBin)
 		if sampleBin == nil {
 			return errors.New(fmt.Sprintf(
-				"No sample exists for [%s, %d]",
-				sID.ProjectID,
-				sID.SampleID,
-			))
+				"No sample exists for [%s]", sID),
+			)
 		}
 
 		return decodeBin(sampleBin).Decode(&sample)

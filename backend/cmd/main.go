@@ -75,6 +75,7 @@ func newServer(
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, e.Error())))
 		} else if err != nil {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}))
@@ -166,7 +167,7 @@ func main() {
 	getSampleEndpoint := newServer(
 		internal.GetSampleEndpoint(ms),
 		MakeHTTPRequestDecoder(func() interface{} {
-			return &internal.SampleID{}
+			return &internal.SampleRequest{}
 		}),
 		encodeResponse,
 	)

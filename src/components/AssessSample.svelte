@@ -8,7 +8,7 @@ import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
 import SampleView from './SampleView.svelte';
 import { sampleMarkup, assessState } from '../store';
-import { goToProject } from '../project';
+import { goToProject, getProjectIDFromSampleID } from '../project';
 
 export let params = {};
 
@@ -35,16 +35,17 @@ async function submitMarkupAndFetchNext() {
   sample = await sample;
   const { sample_id: sampleId } = sample;
 
-  await api.post(`/project/${sampleId.project_id}/assess`, {
+  const projID = getProjectIDFromSampleID(sampleId)
+  await api.post(`/project/${projID}/assess`, {
     sample_id: sampleId,
     sample_markup: {
       markup: $sampleMarkup,
     },
   });
-  sample = fetchNext(sampleId.project_id);
+  sample = fetchNext(projID);
   $assessState.focusedGroup = null;
 
-  projStats = getProjStats(sampleId.project_id);
+  projStats = getProjStats(projID);
 }
 
 </script>

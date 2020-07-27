@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"math/rand"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -29,6 +30,10 @@ type ProjectMeta struct {
 type AssessRequest struct {
 	SampleID     SampleID     `json:"sample_id"`
 	SampleMarkup SampleMarkup `json:"sample_markup"`
+}
+
+type SampleRequest struct {
+	SampleID SampleID `json:"sample_id"`
 }
 
 type SampleResponse struct {
@@ -113,7 +118,7 @@ func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]Sa
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		err := b.ForEach(func(k, _v []byte) error {
-			sID := SampleID{}
+			sID := ""
 
 			{
 				err := decodeBin(k).Decode(&sID)
@@ -121,7 +126,7 @@ func getAllSampleIDsForProject(db *DB, bucket string, projectID ProjectID) ([]Sa
 					return errors.WithStack(err)
 				}
 
-				if sID.ProjectID == projectID {
+				if GetProjectIDFromSampleID(sID) == projectID {
 					sIDs = append(sIDs, sID)
 				}
 			}
@@ -145,7 +150,7 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("samples"))
 		err := b.ForEach(func(k, v []byte) error {
-			sID := SampleID{}
+			sID := ""
 			s := json.RawMessage{}
 
 			{
@@ -156,7 +161,7 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 
 				err = decodeBin(v).Decode(&s)
 
-				if sID.ProjectID == projectID {
+				if GetProjectIDFromSampleID(sID) == projectID {
 					samples = append(samples, s)
 				}
 			}
@@ -184,7 +189,7 @@ func getRandomSample(toAssess []SampleID) SampleID {
 
 func getSampleInOrder(toAssess []SampleID) SampleID {
 	sort.SliceStable(toAssess, func(i, j int) bool {
-		return toAssess[i].SampleID < toAssess[j].SampleID
+		return strings.Compare(toAssess[i], toAssess[j]) < 0
 	})
 
 	return toAssess[0]
@@ -220,7 +225,7 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		}, nil
 	}
 
-	sID := SampleID{}
+	sID := ""
 
 	if proj.ShuffleSamples {
 		sID = getRandomSample(toAssess)
@@ -312,7 +317,7 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 		return SampleWithMarkupResponse{}, err
 	}
 
-	proj, err := s.db.GetProject(sID.ProjectID)
+	proj, err := s.db.GetProject(GetProjectIDFromSampleID(sID))
 	if err != nil {
 		return SampleWithMarkupResponse{}, err
 	}
@@ -325,9 +330,9 @@ func (s *MarkupServiceImpl) GetSample(sID SampleID) (SampleWithMarkupResponse, e
 
 func GetSampleEndpoint(s MarkupService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := *request.(*SampleID)
+		req := *request.(*SampleRequest)
 
-		return s.GetSample(req)
+		return s.GetSample(req.SampleID)
 	}
 }
 

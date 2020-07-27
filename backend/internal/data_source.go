@@ -9,17 +9,21 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 )
 
 type SampleURI = string
 
-type SampleID struct {
-	ProjectID ProjectID `json:"project_id"`
-	SampleID  int64     `json:"sample_id"`
+type SampleID = string
+
+func GetProjectIDFromSampleID(id SampleID) ProjectID {
+	pair := strings.Split(string(id), "-")
+
+	return ProjectID(pair[0])
 }
 
-func (s SampleID) toString() string {
-	return fmt.Sprintf("%s|%d", s.ProjectID, s.SampleID)
+func NewSampleIDFor(projID ProjectID) string {
+	return fmt.Sprintf("%s-%s", string(projID), xid.New().String())
 }
 
 type Jsonable interface {
