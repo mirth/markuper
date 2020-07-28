@@ -140,7 +140,7 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 			s := json.RawMessage{}
 
 			{
-				err := decodeBin(v).Decode(&s)
+				err := json.Unmarshal(v, &s)
 				if err != nil {
 					return errors.WithStack(err)
 				}
@@ -228,7 +228,12 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 
 func (s *MarkupServiceImpl) Assess(r AssessRequest) error {
 	r.SampleMarkup.CreatedAt = utils.NowUTC()
-	err := s.db.PutOne("markups", r.SampleID, r.SampleMarkup)
+	m, err := json.Marshal(r.SampleMarkup)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = s.db.PutOne("markups", r.SampleID, m)
 
 	return err
 }
@@ -245,23 +250,18 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 		s := tx.Bucket(Samples)
 		for _, id := range ids {
 			binID := []byte(id)
-			smBin := m.Get(binID)
+			smJson := m.Get(binID)
 			sm := SampleMarkup{}
 			{
-				err := decodeBin(smBin).Decode(&sm)
+				err := json.Unmarshal(smJson, &sm)
 				if err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 			}
 
-			sBin := s.Get(binID)
-			sJson := []byte{}
+			sJson := s.Get(binID)
 			sample := ImageSample{}
 			{
-				err := decodeBin(sBin).Decode(&sJson)
-				if err != nil {
-					return err
-				}
 				err = json.Unmarshal(sJson, &sample)
 				if err != nil {
 					return errors.WithStack(err)

@@ -76,7 +76,7 @@ func TestMarkupAssess(t *testing.T) {
 			db: db,
 		}
 
-		AssessWithMarkup(t, svc, newSampleIDForTest("kek", 0), `{"kek": "kek"}`)
+		AssessWithMarkup(t, svc, newSampleIDForTest("kek", 0), `{"kek":"kek"}`)
 	}
 }
 
@@ -169,7 +169,7 @@ func assessSample(t *testing.T, svc MarkupService, sID SampleID) {
 	r := AssessRequest{
 		SampleID: sID,
 		SampleMarkup: SampleMarkup{
-			Markup: json.RawMessage(fmt.Sprintf(`{"kek":mark%s}`, sID)),
+			Markup: json.RawMessage(fmt.Sprintf(`{"kek":"mark%s"}`, sID)),
 		},
 	}
 	err := svc.Assess(r)
@@ -212,7 +212,7 @@ func TestListMarkup(t *testing.T) {
 		sID := newSampleIDForTest(proj0.ProjectID, i)
 		return SampleMarkup{
 			CreatedAt: utils.TestNowUTC(),
-			Markup:    json.RawMessage(fmt.Sprintf(`{"kek":mark%s}`, sID)),
+			Markup:    json.RawMessage(fmt.Sprintf(`{"kek":"mark%s"}`, sID)),
 		}
 	}
 

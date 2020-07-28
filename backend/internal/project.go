@@ -2,9 +2,8 @@ package internal
 
 import (
 	"backend/pkg/utils"
-	"bytes"
 	"context"
-	"encoding/gob"
+	"encoding/json"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -142,7 +141,8 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 		return Project{}, err
 	}
 
-	err = s.db.PutOne("projects", project.ProjectID, project)
+	projJson, err := json.Marshal(project)
+	err = s.db.PutOne("projects", project.ProjectID, projJson)
 	if err != nil {
 		return Project{}, errors.WithStack(err)
 	}
@@ -163,9 +163,7 @@ func (s *ProjectServiceImpl) ListProjects() (ProjectList, error) {
 			project := Project{}
 
 			{
-				buf := bytes.NewBuffer(v)
-				dec := gob.NewDecoder(buf)
-				err := dec.Decode(&project)
+				err := json.Unmarshal(v, &project)
 				if err != nil {
 					return errors.WithStack(err)
 				}

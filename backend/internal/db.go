@@ -1,8 +1,7 @@
 package internal
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -48,13 +47,15 @@ func (db *DB) GetProject(pID ProjectID) (Project, error) {
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Projects)
 		pIDBin := []byte(pID)
-		projBin := b.Get(pIDBin)
+		projJson := b.Get(pIDBin)
 
-		if projBin == nil {
+		if projJson == nil {
 			return errors.New("No project exists for [" + pID + "]")
 		}
 
-		return decodeBin(projBin).Decode(&proj)
+		err := json.Unmarshal(projJson, &proj)
+
+		return errors.WithStack(err)
 	})
 
 	if err != nil {
@@ -73,14 +74,14 @@ func (db *DB) GetSample(sID SampleID) ([]byte, error) {
 
 	err := db.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(Samples)
-		sampleBin := b.Get(sIDBin)
-		if sampleBin == nil {
+		sample = b.Get(sIDBin)
+		if sample == nil {
 			return errors.New(fmt.Sprintf(
 				"No sample exists for [%s]", sID),
 			)
 		}
 
-		return decodeBin(sampleBin).Decode(&sample)
+		return nil
 	})
 
 	if err != nil {
@@ -109,34 +110,26 @@ func (db *DB) GetMarkup(sID SampleID) (*SampleMarkup, error) {
 	}
 
 	sm := SampleMarkup{}
-	err = decodeBin(smBin).Decode(&sm)
+	err = json.Unmarshal(smBin, &sm)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &sm, nil
 }
 
-func (db *DB) PutOne(bucket, key string, value interface{}) error {
+func (db *DB) PutOne(bucket, key string, value json.RawMessage) error {
 	keyBin := []byte(key)
 
-	valueBin, err := encodeBin(value)
-	if err != nil {
-		return err
-	}
-
-	err = db.DB.Update(func(tx *bolt.Tx) error {
+	err := db.DB.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		if b == nil {
 			return errors.New(fmt.Sprintf("No such bucket [%s]", bucket))
 		}
 
-		err := b.Put(keyBin, valueBin)
-		if err != nil {
-			return errors.WithStack(err)
-		}
+		err := b.Put(keyBin, value)
 
-		return nil
+		return errors.WithStack(err)
 	})
 
 	if err != nil {
@@ -148,7 +141,7 @@ func (db *DB) PutOne(bucket, key string, value interface{}) error {
 
 type KeyValue struct {
 	Key   string
-	Value interface{}
+	Value json.RawMessage
 }
 
 func (db *DB) PutMany(bucket string, pairs []KeyValue) error {
@@ -160,9 +153,8 @@ func (db *DB) PutMany(bucket string, pairs []KeyValue) error {
 
 		for _, pair := range pairs {
 			keyBin := []byte(pair.Key)
-			valueBin, err := encodeBin(pair.Value)
 
-			err = b.Put(keyBin, valueBin)
+			err := b.Put(keyBin, pair.Value)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -172,22 +164,6 @@ func (db *DB) PutMany(bucket string, pairs []KeyValue) error {
 	})
 
 	return err
-}
-
-func encodeBin(x interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(x)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return buf.Bytes(), nil
-}
-
-func decodeBin(bin []byte) *gob.Decoder {
-	buf := bytes.NewBuffer(bin)
-	return gob.NewDecoder(buf)
 }
 
 func OpenDB(test bool) (*DB, error) {
