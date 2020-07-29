@@ -131,8 +131,16 @@ func isClField(fieldName string) bool {
 	return false
 }
 
-func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) {
+func isClassificationGroupReserved(group string) bool {
+	return group == "box"
+}
+
+func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) error {
 	g := getGroup(n)
+	if isClassificationGroupReserved(g) {
+		return NewBusinessError("Group name [box] is reserved for bounding_box box markup")
+	}
+
 	var f *ClassificationField
 
 	switch n.XMLName.Local {
@@ -153,6 +161,8 @@ func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) {
 	f.Labels = append(f.Labels, NewValueWithVizualFromNode(n))
 
 	appendIfNotExists(&t.FieldsOrder, g)
+
+	return nil
 }
 
 func NewValueWithVizualFromNode(n Node) ValueWithVizual {
@@ -190,7 +200,10 @@ func (t *Template) CreateOrUpdateBBoxFieldFor(n Node) error {
 				fmt.Sprintf("Unsupported element [%s] in bounding_box field", n.XMLName.Local),
 			)
 		}
-		box.CreateOrUpdateClFieldFor(iterNode)
+		err := box.CreateOrUpdateClFieldFor(iterNode)
+		if err != nil {
+			return err
+		}
 	}
 
 	appendIfNotExists(&t.FieldsOrder, g)

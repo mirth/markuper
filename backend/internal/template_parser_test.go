@@ -187,24 +187,6 @@ func TestXMLToFields(t *testing.T) {
 
 	{
 		data := `
-	  <content>
-	    <bounding_box group="box">
-	      <checkbox group="color" value="black" vizual="Black" />
-	      <checkbox group="color" value="white" vizual="White" />
-	      <checkbox group="color" value="pink" vizual="Pink" />
-
-	      <checkbox group="box" value="cat" vizual="Cat" />
-	      <checkbox group="box" value="dog" vizual="Dog" />
-	    </bounding_box>
-	  </content>
-		`
-		_, err := XMLToTemplate(data)
-
-		assert.Equal(t, "Template has duplicate groups: box", err.Error())
-	}
-
-	{
-		data := `
 		<content>
 			<radio group="animal" value="cat" vizual="Cat" />
 			<radio group="animal" value="dog" vizual="Dog" />
@@ -288,6 +270,32 @@ func TestXMLToFields(t *testing.T) {
 		_, err := XMLToTemplate(data)
 
 		assert.Equal(t, "Template has duplicate groups: color", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+			<checkbox group="box" value="black" vizual="Black" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Group name [box] is reserved for bounding_box box markup", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+		    <bounding_box group="box1">
+					<checkbox group="box" value="black" vizual="Black" />
+		    </bounding_box>
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Group name [box] is reserved for bounding_box box markup", err.Error())
 	}
 }
 

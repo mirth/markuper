@@ -85,9 +85,15 @@ func emptyAttribute(nodes []Node) (Node, string) {
 func nodeToUpdatedField(t *Template, n Node) error {
 	switch n.XMLName.Local {
 	case "radio":
-		t.CreateOrUpdateClFieldFor(n)
+		err := t.CreateOrUpdateClFieldFor(n)
+		if err != nil {
+			return err
+		}
 	case "checkbox":
-		t.CreateOrUpdateClFieldFor(n)
+		err := t.CreateOrUpdateClFieldFor(n)
+		if err != nil {
+			return err
+		}
 	case "bounding_box":
 		err := t.CreateOrUpdateBBoxFieldFor(n)
 		if err != nil {

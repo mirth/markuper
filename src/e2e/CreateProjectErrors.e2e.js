@@ -211,3 +211,29 @@ describe('Application launch', function () {
     });
   });
 });
+
+describe('Application launch', function () {
+  this.timeout(30000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  describe('Unable to create project because of classification field group is named [box]', () => {
+    const xml = `
+    <content>
+      <checkbox group="box" value="black" vizual="Black" />
+    </content>
+    `;
+    createProjectWithTemplate(app, appPath, xml);
+
+    it('display group [box] is reserved error', async () => {
+      await app.client.waitForVisible('//*[@id="create_project_error"]');
+      const el = app.client.element('//*[@id="create_project_error"]');
+      const err = await el.getText();
+      expect(err).to.be.eq('Group name [box] is reserved for bounding_box box markup');
+    });
+  });
+});
