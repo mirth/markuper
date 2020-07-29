@@ -41,7 +41,7 @@ describe('Application launch', function () {
       await app.client.waitForVisible('//*[@id="create_project_error"]');
       const el = app.client.element('//*[@id="create_project_error"]');
       const err = await el.getText();
-      expect(err).to.be.eq('Template has duplicate groups: box');
+      expect(err).to.be.eq('Group name [box] is reserved for bounding_box box markup');
     });
   });
 });
