@@ -33,10 +33,6 @@ type WithHttpRequest struct {
 	Payload WithProjectIDRequest
 }
 
-func rawMessageToString(m json.RawMessage) string {
-	return string(m)
-}
-
 func takeFirstLevelGroups(j json.RawMessage, sampleColumns []string) ([]string, error) {
 	var objmap map[string]json.RawMessage
 	err := json.Unmarshal(j, &objmap)
@@ -51,7 +47,7 @@ func takeFirstLevelGroups(j json.RawMessage, sampleColumns []string) ([]string, 
 			return nil, errors.New(fmt.Sprintf("Column [%s] doesn't exist in markup", c))
 		}
 
-		values = append(values, rawMessageToString(value))
+		values = append(values, string(value))
 	}
 
 	return values, nil
@@ -68,7 +64,7 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		return ExportResponse{}, err
 	}
 
-	sampleColumns := append([]string(nil), p.Template.ClassificationComponents.FieldsOrder...)
+	sampleColumns := append([]string(nil), p.Template.FieldsOrder...)
 
 	header := []string{"sample_id", "sample_uri", "assessed_at"}
 	header = append(header, sampleColumns...)
