@@ -187,16 +187,16 @@ func TestXMLToFields(t *testing.T) {
 
 	{
 		data := `
-    <content>
-      <bounding_box group="box">
-        <checkbox group="color" value="black" vizual="Black" />
-        <checkbox group="color" value="white" vizual="White" />
-        <checkbox group="color" value="pink" vizual="Pink" />
+	  <content>
+	    <bounding_box group="box">
+	      <checkbox group="color" value="black" vizual="Black" />
+	      <checkbox group="color" value="white" vizual="White" />
+	      <checkbox group="color" value="pink" vizual="Pink" />
 
-        <checkbox group="box" value="cat" vizual="Cat" />
-        <checkbox group="box" value="dog" vizual="Dog" />
-      </bounding_box>
-    </content>
+	      <checkbox group="box" value="cat" vizual="Cat" />
+	      <checkbox group="box" value="dog" vizual="Dog" />
+	    </bounding_box>
+	  </content>
 		`
 		_, err := XMLToTemplate(data)
 
@@ -233,6 +233,61 @@ func TestXMLToFields(t *testing.T) {
 		_, err := XMLToTemplate(data)
 
 		assert.Equal(t, "Template has duplicate labels: group [animal] labels [cat], group [color] labels [white]", err.Error())
+	}
+
+	{
+		data := `
+				<radio group="animal" value="cat" vizual="Cat" />
+				<radio group="animal" value="cat" vizual="Dog" />
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Root node <content> not found", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+			<bounding_box group="box" value="cat" vizual="Cat" />
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "bounding_box field should have some classification fields in it", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+		    <bounding_box group="box1">
+		      <checkbox group="color1" value="black" vizual="Black" />
+				</bounding_box>
+		    <bounding_box group="box2">
+		      <checkbox group="color2" value="black" vizual="Black" />
+		    </bounding_box>
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Only one bounding_box field supported for now", err.Error())
+	}
+
+	{
+		data := `
+		<content>
+		    <bounding_box group="box">
+					<checkbox group="color" value="black" vizual="Black" />
+					<radio group="color" value="cat" vizual="Dog" />
+		    </bounding_box>
+		</content>
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Template has duplicate groups: color", err.Error())
 	}
 }
 

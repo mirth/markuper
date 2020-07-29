@@ -154,3 +154,60 @@ describe('Application launch', function () {
     });
   });
 });
+
+describe('Application launch', function () {
+  this.timeout(30000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  describe('Unable to create project because of empty bounding_box field', () => {
+    const xml = `
+    <content>
+      <bounding_box group="box" value="cat" vizual="Cat" />
+    </content>
+    `;
+    createProjectWithTemplate(app, appPath, xml);
+
+    it('display empty bounding_box error', async () => {
+      await app.client.waitForVisible('//*[@id="create_project_error"]');
+      const el = app.client.element('//*[@id="create_project_error"]');
+      const err = await el.getText();
+      expect(err).to.be.eq('bounding_box field should have some classification fields in it');
+    });
+  });
+});
+
+describe('Application launch', function () {
+  this.timeout(30000);
+  before(() => app.start());
+  after(() => {
+    if (app && app.isRunning()) {
+      return app.stop();
+    }
+  });
+
+  describe('Unable to create project because of multiple bounding_box', () => {
+    const xml = `
+    <content>
+      <bounding_box group="box1">
+        <checkbox group="color1" value="black" vizual="Black" />
+      </bounding_box>
+      <bounding_box group="box2">
+        <checkbox group="color2" value="black" vizual="Black" />
+      </bounding_box>
+    </content>
+    `;
+    createProjectWithTemplate(app, appPath, xml);
+
+    it('display multiple bounding_box error', async () => {
+      await app.client.waitForVisible('//*[@id="create_project_error"]');
+      const el = app.client.element('//*[@id="create_project_error"]');
+      const err = await el.getText();
+      expect(err).to.be.eq('Only one bounding_box field supported for now');
+    });
+  });
+});

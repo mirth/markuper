@@ -136,6 +136,10 @@ func XMLToTemplate(s string) (Template, error) {
 		return Template{}, errors.WithStack(err)
 	}
 
+	if n.XMLName.Local != "content" {
+		return Template{}, NewBusinessError("Root node <content> not found")
+	}
+
 	nodes := []Node{}
 	walkFirstLevel([]Node{n}, func(n Node) bool {
 		nodes = append(nodes, n)

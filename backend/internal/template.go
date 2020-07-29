@@ -167,11 +167,21 @@ func NewValueWithVizualFromNode(n Node) ValueWithVizual {
 }
 
 func (t *Template) CreateOrUpdateBBoxFieldFor(n Node) error {
+	if len(t.BoundingBoxes) > 0 {
+		return NewBusinessError("Only one bounding_box field supported for now")
+	}
+
 	g := getGroup(n)
 	box := findBBoxField(t.BoundingBoxes, g)
 	if box == nil {
 		box = NewBoundingBoxField(g)
 		t.BoundingBoxes = append(t.BoundingBoxes, box)
+	}
+
+	if len(n.Nodes) == 0 {
+		return NewBusinessError(
+			"bounding_box field should have some classification fields in it",
+		)
 	}
 
 	for _, iterNode := range n.Nodes {
