@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestCreateProjectRequest(name string) CreateProjectRequest {
+func newTestCreateProjectRequest(name string, template TemplateXML) CreateProjectRequest {
 	return CreateProjectRequest{
-		Template: DEFAULT_CLASSIFICATION_TEMPLATE,
+		Template: template,
 		DataSources: []DataSource{{
 			Type:      "local_directory",
 			SourceURI: "/tmp/*.jpg",
@@ -29,7 +29,7 @@ func TestCreateProject(t *testing.T) {
 	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
-	req := newTestCreateProjectRequest("testproject0")
+	req := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 
 	c := testGetBucketSize(db, "projects")
 	assert.Zero(t, c)
@@ -55,7 +55,7 @@ func TestGetProject(t *testing.T) {
 	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
-	req := newTestCreateProjectRequest("testproject0")
+	req := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 
 	c := testGetBucketSize(db, "projects")
 	assert.Zero(t, c)
@@ -83,7 +83,7 @@ func TestListProjects(t *testing.T) {
 	defer testCloseAndReset(db)
 	svc := NewProjectService(db)
 
-	req1 := newTestCreateProjectRequest("testproject0")
+	req1 := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 
 	c := testGetBucketSize(db, "projects")
 	assert.Zero(t, c)
@@ -102,7 +102,7 @@ func TestListProjects(t *testing.T) {
 		}, descs)
 	}
 
-	req2 := newTestCreateProjectRequest("testproject1")
+	req2 := newTestCreateProjectRequest("testproject1", DEFAULT_CLASSIFICATION_TEMPLATE)
 	_, _ = svc.CreateProject(req2)
 
 	{
@@ -180,7 +180,7 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 	imgs1 := fillDirWithSamples(tmpDir1, "png", 2)
 	fillDirWithSamples(tmpDir2, "tiff", 2)
 
-	req := newTestCreateProjectRequest("testproject0")
+	req := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 	req.DataSources = append(
 		req.DataSources,
 		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
@@ -234,7 +234,7 @@ func TestCreateProjectWithMultipleDataSourcesWhenSourceFail(t *testing.T) {
 	fillDirWithSamples(tmpDir1, "png", 2)
 	fillDirWithSamples(tmpDir2, "tiff", 2)
 
-	req := newTestCreateProjectRequest("testproject0")
+	req := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 	req.DataSources = append(
 		req.DataSources,
 		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,

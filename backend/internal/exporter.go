@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"sort"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/pkg/errors"
@@ -34,47 +33,28 @@ type WithHttpRequest struct {
 	Payload WithProjectIDRequest
 }
 
-func markupKeys(j json.RawMessage) ([]string, error) {
-	return markupToCSVColumns(j, false)
-}
-
-func markupValues(j json.RawMessage) ([]string, error) {
-	return markupToCSVColumns(j, true)
-}
-
 func rawMessageToString(m json.RawMessage) string {
 	return string(m)
 }
 
-func markupToCSVColumns(j json.RawMessage, takeValues bool) ([]string, error) {
+func takeFirstLevelGroups(j json.RawMessage, sampleColumns []string) ([]string, error) {
 	var objmap map[string]json.RawMessage
 	err := json.Unmarshal(j, &objmap)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	pairs := make([][2]string, len(objmap))
-	i := 0
-	for key, value := range objmap {
-		pairs[i][0] = key
-		pairs[i][1] = rawMessageToString(value)
-		i += 1
-	}
-	sort.Slice(pairs, func(i, j int) bool {
-		return pairs[i][0] < pairs[j][0]
-	})
+	values := []string{}
+	for _, c := range sampleColumns {
+		value, ok := objmap[c]
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("Column [%s] doesn't exist in markup", c))
+		}
 
-	var takeValuesI int
-	if takeValues {
-		takeValuesI = 1
+		values = append(values, rawMessageToString(value))
 	}
 
-	cells := make([]string, 0)
-	for _, pair := range pairs {
-		cells = append(cells, pair[takeValuesI])
-	}
-
-	return cells, nil
+	return values, nil
 }
 
 func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error) {
@@ -83,18 +63,12 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		return ExportResponse{}, err
 	}
 
-	if len(list.List) == 0 {
-		return ExportResponse{}, errors.New("Markup list is empty")
-	}
-
-	var buf bytes.Buffer
-	w := csv.NewWriter(&buf)
-
-	firstSample := list.List[0]
-	sampleColumns, err := markupKeys(firstSample.SampleMarkup.Markup)
+	p, err := s.db.GetProject(req.Payload.ProjectID)
 	if err != nil {
 		return ExportResponse{}, err
 	}
+
+	sampleColumns := append([]string(nil), p.Template.ClassificationComponents.FieldsOrder...)
 
 	header := []string{"sample_id", "sample_uri", "assessed_at"}
 	header = append(header, sampleColumns...)
@@ -108,7 +82,7 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 			entry.SampleURI,
 			entry.SampleMarkup.CreatedAt.Format("2006-01-02T15:04:05"),
 		}
-		sampleValues, err := markupValues(entry.SampleMarkup.Markup)
+		sampleValues, err := takeFirstLevelGroups(entry.SampleMarkup.Markup, sampleColumns)
 		if err != nil {
 			return ExportResponse{}, err
 		}
@@ -117,14 +91,11 @@ func (s *ExporterServiceImpl) Export(req WithHttpRequest) (ExportResponse, error
 		rows = append(rows, row)
 	}
 
+	var buf bytes.Buffer
+	w := csv.NewWriter(&buf)
 	err = w.WriteAll(rows)
 	if err != nil {
 		return ExportResponse{}, errors.WithStack(err)
-	}
-
-	p, err := s.db.GetProject(req.Payload.ProjectID)
-	if err != nil {
-		return ExportResponse{}, err
 	}
 
 	now := utils.NowUTC()

@@ -11,16 +11,16 @@ import (
 )
 
 func fillTestDB(db *DB) Project {
-	return fillTestDBWithProj(db, "testp0")
+	return fillTestDBWithProj(db, "testp0", DEFAULT_CLASSIFICATION_TEMPLATE)
 }
 
 func newSampleIDForTest(projID ProjectID, i int) string {
 	return fmt.Sprintf("%s-%d", string(projID), i)
 }
 
-func fillTestDBWithProj(db *DB, projName string) Project {
+func fillTestDBWithProj(db *DB, projName string, template TemplateXML) Project {
 	svc := NewProjectService(db)
-	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName))
+	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName, template))
 
 	samples := make([]ImageSample, 0)
 	for i := 0; i < 5; i++ {
@@ -132,7 +132,7 @@ func TestGetSample(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
 
-	proj0 := fillTestDBWithProj(db, "proj0")
+	proj0 := fillTestDBWithProj(db, "proj0", DEFAULT_CLASSIFICATION_TEMPLATE)
 
 	svc := MarkupServiceImpl{
 		db: db,
@@ -179,8 +179,8 @@ func assessSample(t *testing.T, svc MarkupService, sID SampleID) {
 func TestListMarkup(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
-	proj0 := fillTestDBWithProj(db, "proj0")
-	proj1 := fillTestDBWithProj(db, "proj1")
+	proj0 := fillTestDBWithProj(db, "proj0", DEFAULT_CLASSIFICATION_TEMPLATE)
+	proj1 := fillTestDBWithProj(db, "proj1", DEFAULT_CLASSIFICATION_TEMPLATE)
 
 	svc := MarkupServiceImpl{
 		db: db,
@@ -240,7 +240,7 @@ func TestListMarkup(t *testing.T) {
 func TestOutOfSamples(t *testing.T) {
 	db := openTestDB()
 	defer testCloseAndReset(db)
-	proj0 := fillTestDBWithProj(db, "proj0")
+	proj0 := fillTestDBWithProj(db, "proj0", DEFAULT_CLASSIFICATION_TEMPLATE)
 
 	svc := MarkupServiceImpl{
 		db: db,
