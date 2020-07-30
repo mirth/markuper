@@ -22,10 +22,11 @@ func fillTestDBWithProj(db *DB, projName string, template TemplateXML) Project {
 	svc := NewProjectService(db)
 	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName, template))
 
-	samples := make([]ImageSample, 0)
+	samples := make([]MediaSample, 0)
 	for i := 0; i < 5; i++ {
-		samples = append(samples, ImageSample{
-			ImageURI: fmt.Sprintf("sampleuri%d", i),
+		samples = append(samples, MediaSample{
+			MediaURI:  fmt.Sprintf("sampleuri%d", i),
+			MediaType: IMAGE_FILE_TYPE,
 		})
 	}
 
@@ -98,7 +99,7 @@ func TestMarkupNext(t *testing.T) {
 
 		e := SampleResponse{
 			SampleID: sID,
-			Sample:   json.RawMessage(fmt.Sprintf(`{"image_uri":"sampleuri%d"}`, i)),
+			Sample:   json.RawMessage(fmt.Sprintf(`{"media_uri":"sampleuri%d","media_type":"IMAGE_FILE_TYPE"}`, i)),
 			Project:  proj,
 		}
 		assert.Equal(t, e, a)

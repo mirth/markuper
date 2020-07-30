@@ -7,10 +7,8 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   radioClick, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
-  sleep, clickButton, getRadioState,
+  sleep, clickButton, getRadioState, makeSampleUri,
 } from './test_common';
-
-export const makeSampleUri = (imgDir, filename) => path.normalize(`${path.join(imgDir, filename)}`);
 
 const appPath = path.join(__dirname, '../..');
 const app = new Application({
@@ -23,7 +21,7 @@ const assertSampleUri = async (imgDir, sampleName) => {
   const src = await app.client.element('img').getAttribute('src');
   const expectedSampleUri = makeSampleUri(imgDir, sampleName);
   expect(path.normalize(src)).to.be.eq(path.normalize('file://' + expectedSampleUri));
-  
+
   await app.client.waitForExist('//*[@id="sample_uri"]');
   const actualSampleURI = await app.client.element('//*[@id="sample_uri"]').getText();
   expect(actualSampleURI).to.be.eq(expectedSampleUri);
