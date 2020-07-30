@@ -260,7 +260,7 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 			}
 
 			sJson := s.Get(binID)
-			sample := ImageSample{}
+			sample := MediaSample{}
 			{
 				err = json.Unmarshal(sJson, &sample)
 				if err != nil {
@@ -270,7 +270,7 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 
 			samples = append(samples, NewMarkupListElement(
 				id,
-				sample.ImageURI,
+				sample.MediaURI,
 				sm,
 			))
 		}

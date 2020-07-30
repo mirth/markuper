@@ -79,7 +79,7 @@ async function submitMarkupAndFetchNext() {
       {/await}
     </p>
     {#if sample.sample !== null}
-      <p>Sample:<small id='sample_uri'>{sample.sample.image_uri}</small></p>
+      <p>Sample:<small id='sample_uri'>{sample.sample.media_uri}</small></p>
     {/if}
   </Cell>
 {/await}

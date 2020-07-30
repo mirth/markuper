@@ -148,13 +148,14 @@ func TestFetchSampleList(t *testing.T) {
 	assert.Nil(t, err)
 
 	{
-		j := func(imgPath string) ImageSample {
-			return ImageSample{
-				ImageURI: (imgPath),
+		j := func(imgPath string) MediaSample {
+			return MediaSample{
+				MediaURI:  (imgPath),
+				MediaType: IMAGE_FILE_TYPE,
 			}
 		}
 
-		assert.ElementsMatch(t, []ImageSample{
+		assert.ElementsMatch(t, []MediaSample{
 			j(imgPaths[0]),
 			j(imgPaths[1]),
 			j(imgPaths[2]),
@@ -183,9 +184,9 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 	req := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 	req.DataSources = append(
 		req.DataSources,
-		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
-		NewImageGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
-		NewImageGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
+		NewMediaGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
+		NewMediaGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
+		NewMediaGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
 	)
 
 	c := testGetBucketSize(db, "samples")
@@ -206,7 +207,7 @@ func TestCreateProjectWithMultipleDataSources(t *testing.T) {
 			var objmap map[string]json.RawMessage
 			json.Unmarshal(s, &objmap)
 			uri := ""
-			json.Unmarshal(objmap["image_uri"], &uri)
+			json.Unmarshal(objmap["media_uri"], &uri)
 			uris = append(uris, uri)
 		}
 
@@ -237,9 +238,9 @@ func TestCreateProjectWithMultipleDataSourcesWhenSourceFail(t *testing.T) {
 	req := newTestCreateProjectRequest("testproject0", DEFAULT_CLASSIFICATION_TEMPLATE)
 	req.DataSources = append(
 		req.DataSources,
-		NewImageGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
-		NewFailImageGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
-		NewImageGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
+		NewMediaGlobDataSource(filepath.Join(tmpDir0, "*.jpg")).DataSource,
+		NewFailMediaGlobDataSource(filepath.Join(tmpDir1, "*.png")).DataSource,
+		NewMediaGlobDataSource(filepath.Join(tmpDir2, "*.png")).DataSource,
 	)
 
 	c := testGetBucketSize(db, "projects")

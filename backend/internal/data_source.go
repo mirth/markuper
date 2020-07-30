@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"backend/pkg/utils"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/golang-collections/collections/set"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 )
@@ -30,12 +32,14 @@ type Jsonable interface {
 	JSON() ([]byte, error)
 }
 type SampleData = Jsonable
+type MediaType = string
 
-type ImageSample struct {
-	ImageURI SampleURI `json:"image_uri"`
+type MediaSample struct {
+	MediaURI  SampleURI `json:"media_uri"`
+	MediaType MediaType `json:"media_type"`
 }
 
-func (s ImageSample) JSON() ([]byte, error) {
+func (s MediaSample) JSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
@@ -48,12 +52,12 @@ type DataSource struct {
 	SourceURI string `json:"source_uri"`
 }
 
-type ImageGlobDataSource struct {
+type MediaGlobDataSource struct {
 	DataSource
 }
 
-func NewImageGlobDataSource(sourceURI string) ImageGlobDataSource {
-	return ImageGlobDataSource{
+func NewMediaGlobDataSource(sourceURI string) MediaGlobDataSource {
+	return MediaGlobDataSource{
 		DataSource: DataSource{
 			Type:      "local_directory",
 			SourceURI: sourceURI,
@@ -85,7 +89,35 @@ func removeWithoutExtention(paths []string) []string {
 	return filtered
 }
 
-func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
+var audioFileMediaTypes = set.New(utils.ToSliceOfInterfaces([]string{
+	"m4a", "flack", "mp3", "mp4", "wav", "wma", "aac", "ogg",
+})...)
+
+var imageFileMediaTypes = set.New(utils.ToSliceOfInterfaces([]string{
+	"jpg", "jpeg", "png", "bmp", "gif",
+})...)
+
+var AUDIO_FILE_TYPE = "AUDIO_FILE_TYPE"
+var IMAGE_FILE_TYPE = "IMAGE_FILE_TYPE"
+
+func detectMediaDataType(sampleURI string) (string, error) {
+	ext := filepath.Ext(sampleURI)
+	ext = strings.ToLower(ext)[1:]
+
+	if imageFileMediaTypes.Has(ext) {
+		return IMAGE_FILE_TYPE, nil
+	}
+
+	if audioFileMediaTypes.Has(ext) {
+		return AUDIO_FILE_TYPE, nil
+	}
+
+	return "", NewBusinessError(fmt.Sprintf(
+		"Unsupported sample file type [%s] for %s", ext, sampleURI,
+	))
+}
+
+func (s MediaGlobDataSource) FetchSampleList() ([]SampleData, error) {
 	sourceURI := s.SourceURI
 	_, err := os.Stat(s.SourceURI)
 	// fixme should check if glob
@@ -104,8 +136,13 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 
 	samples := []SampleData{}
 	for _, path := range matches {
-		samples = append(samples, ImageSample{
-			ImageURI: path,
+		mediaType, err := detectMediaDataType(path)
+		if err != nil {
+			return nil, err
+		}
+		samples = append(samples, MediaSample{
+			MediaURI:  path,
+			MediaType: mediaType,
 		})
 	}
 
@@ -115,24 +152,24 @@ func (s ImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
 func GetSampleListFetcher(src DataSource) SampleListFetcher {
 	switch src.Type {
 	case "local_directory":
-		return NewImageGlobDataSource(src.SourceURI)
+		return NewMediaGlobDataSource(src.SourceURI)
 	case "fail_local_directory":
-		return NewFailImageGlobDataSource(src.SourceURI)
+		return NewFailMediaGlobDataSource(src.SourceURI)
 	}
 
 	return nil
 }
 
-type FailImageGlobDataSource struct {
+type FailMediaGlobDataSource struct {
 	DataSource
 }
 
-func (s FailImageGlobDataSource) FetchSampleList() ([]SampleData, error) {
+func (s FailMediaGlobDataSource) FetchSampleList() ([]SampleData, error) {
 	return nil, errors.New("fail")
 }
 
-func NewFailImageGlobDataSource(sourceURI string) FailImageGlobDataSource {
-	return FailImageGlobDataSource{
+func NewFailMediaGlobDataSource(sourceURI string) FailMediaGlobDataSource {
+	return FailMediaGlobDataSource{
 		DataSource: DataSource{
 			Type:      "fail_local_directory",
 			SourceURI: sourceURI,

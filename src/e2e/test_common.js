@@ -44,7 +44,7 @@ export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const createProject = async (appPath, xml) => {
+export const createProjectWithImages = async (appPath, xml) => {
   const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
   const glob0 = path.join(imgDir, '*.jpg');
   const glob1 = path.join(imgDir, '*.png');
@@ -66,6 +66,26 @@ export const createProject = async (appPath, xml) => {
   expect(res).not.to.have.property('status');
 };
 
+export const createProjectWithAudio = async (appPath, xml) => {
+  const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
+  const glob0 = path.join(imgDir, '*.mp3');
+
+  const res = await api.post('/project', {
+    description: {
+      name: 'testproj0',
+    },
+    template: {
+      task: 'classification',
+      xml,
+    },
+    data_sources: [
+      { type: 'local_directory', source_uri: glob0 },
+    ],
+  });
+
+  expect(res).not.to.have.property('status');
+};
+
 export const clickButton = async (app, tag, text) => {
   await app.client.waitForText(tag, text);
   await sleep(1500);
@@ -78,9 +98,14 @@ export const clickLink = async (app, tag, text) => {
   await app.client.element(`${tag}*=${text}`).element('..').click();
 };
 
-export const itNavigatesToProject = (app, appPath, xml) => {
+export const itNavigatesToProject = (
+  app,
+  appPath,
+  xml,
+  createProjFn = createProjectWithImages,
+) => {
   it('navigates to project page', async () => {
-    await createProject(appPath, xml);
+    await createProjFn(appPath, xml);
     try {
       await app.client.refresh();
     } catch (error) {
@@ -234,3 +259,5 @@ export function expectSampleMarkupToBeEq(app, appPath, markup) {
     }
   });
 }
+
+export const makeSampleUri = (imgDir, filename) => path.normalize(`${path.join(imgDir, filename)}`);

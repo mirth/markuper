@@ -10,7 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestImageGlobDataSourceAsGlob(t *testing.T) {
+func newImageSample(tmpDir string, filename string) MediaSample {
+	return MediaSample{
+		MediaURI:  filepath.Join(tmpDir, filename),
+		MediaType: IMAGE_FILE_TYPE,
+	}
+}
+
+func TestMediaGlobDataSourceAsGlob(t *testing.T) {
 	tmpDir, _ := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
 
@@ -21,28 +28,28 @@ func TestImageGlobDataSourceAsGlob(t *testing.T) {
 	fillDirWithSamples(tmpDir, "jpg", 5)
 	fillDirWithSamples(tmpDir, "jpeg", 5)
 
-	src := NewImageGlobDataSource(joinTmp(fmt.Sprintf("*.jpg")))
+	src := NewMediaGlobDataSource(joinTmp(fmt.Sprintf("*.jpg")))
 
 	list, err := src.FetchSampleList()
 	assert.Nil(t, err)
 
 	{
-		actual := []ImageSample{}
+		actual := []MediaSample{}
 		for _, iterS := range list {
-			actual = append(actual, iterS.(ImageSample))
+			actual = append(actual, iterS.(MediaSample))
 		}
 
-		assert.ElementsMatch(t, []ImageSample{
-			{ImageURI: joinTmp("img0.jpg")},
-			{ImageURI: joinTmp("img1.jpg")},
-			{ImageURI: joinTmp("img2.jpg")},
-			{ImageURI: joinTmp("img3.jpg")},
-			{ImageURI: joinTmp("img4.jpg")},
+		assert.ElementsMatch(t, []MediaSample{
+			newImageSample(tmpDir, "img0.jpg"),
+			newImageSample(tmpDir, "img1.jpg"),
+			newImageSample(tmpDir, "img2.jpg"),
+			newImageSample(tmpDir, "img3.jpg"),
+			newImageSample(tmpDir, "img4.jpg"),
 		}, actual)
 	}
 }
 
-func TestImageGlobDataSourceAsPath(t *testing.T) {
+func TestMediaGlobDataSourceAsPath(t *testing.T) {
 	tmpDir, _ := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
 
@@ -58,25 +65,25 @@ func TestImageGlobDataSourceAsPath(t *testing.T) {
 	os.Mkdir(joinTmp("noextdir"), 0755)
 	os.Mkdir(joinTmp("extdir.jpg"), 0755)
 
-	var src SampleListFetcher = NewImageGlobDataSource(tmpDir)
+	var src SampleListFetcher = NewMediaGlobDataSource(tmpDir)
 
 	list, err := src.FetchSampleList()
 	assert.Nil(t, err)
 
 	{
-		actual := []ImageSample{}
+		actual := []MediaSample{}
 		for _, iterS := range list {
-			actual = append(actual, iterS.(ImageSample))
+			actual = append(actual, iterS.(MediaSample))
 		}
 
-		assert.ElementsMatch(t, []ImageSample{
-			{ImageURI: joinTmp("img0.jpg")},
-			{ImageURI: joinTmp("img1.jpg")},
-			{ImageURI: joinTmp("img2.jpg")},
-			{ImageURI: joinTmp("img0.jpeg")},
-			{ImageURI: joinTmp("img1.jpeg")},
-			{ImageURI: joinTmp("img2.jpeg")},
-			{ImageURI: joinTmp("extdir.jpg")}, //fixme
+		assert.ElementsMatch(t, []MediaSample{
+			newImageSample(tmpDir, "img0.jpg"),
+			newImageSample(tmpDir, "img1.jpg"),
+			newImageSample(tmpDir, "img2.jpg"),
+			newImageSample(tmpDir, "img0.jpeg"),
+			newImageSample(tmpDir, "img1.jpeg"),
+			newImageSample(tmpDir, "img2.jpeg"),
+			newImageSample(tmpDir, "extdir.jpg"), //fixme
 		}, actual)
 	}
 }
