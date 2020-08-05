@@ -45,6 +45,8 @@ describe('Audio sample simple test', function () {
 
   it('contains correct audio source', async () => {
     const imgDir = path.join(appPath, 'src', 'e2e', 'test_data', 'proj0');
+    
+    await app.client.waitForExist('//*[@id="audio-source"]/source');
     const src = await app.client.element('//*[@id="audio-source"]/source').getAttribute('src');
     const expectedSampleUri = makeSampleUri(imgDir, 'track0.mp3');
     expect(path.normalize(src)).to.be.eq(path.normalize('file://' + expectedSampleUri));
