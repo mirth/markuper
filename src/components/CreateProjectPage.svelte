@@ -5,6 +5,7 @@ import Button from 'svelte-atoms/Button.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
+import { dirty } from '../forms';
 import api from '../api';
 import { goToProject, enrichWithColor } from '../project';
 import PageBlank from './PageBlank.svelte';
@@ -63,6 +64,9 @@ async function createNewProject() {
   isCreatingProject = false;
 }
 
+const dirties = new Set([]);
+const [makeProjectNameDirty, isProjectNameDirty] = dirty(dirties, 'projectName');
+
 </script>
 
 <PageBlank>
@@ -76,9 +80,11 @@ async function createNewProject() {
         title='Project name'
         size='big'
         placeholder='My cool project'
-        error={projectNameError} />
+        error={projectNameError && isProjectNameDirty()}
+        on:input={makeProjectNameDirty}
+         />
 
-      {#if projectNameError}
+      {#if projectNameError && isProjectNameDirty()}
         <span>{projectNameError}</span>
       {/if}
 
