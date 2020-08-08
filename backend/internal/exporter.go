@@ -44,7 +44,7 @@ func takeFirstLevelGroups(j json.RawMessage, sampleColumns []string) ([]string, 
 	for _, c := range sampleColumns {
 		value, ok := objmap[c]
 		if !ok {
-			return nil, errors.New(fmt.Sprintf("Column [%s] doesn't exist in markup", c))
+			value = json.RawMessage("")
 		}
 
 		values = append(values, string(value))
