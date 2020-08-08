@@ -33,6 +33,14 @@ type WithHttpRequest struct {
 	Payload WithProjectIDRequest
 }
 
+func maybeRemoveQuotes(s string) string {
+	if s[0] == `"`[0] {
+		return s[1 : len(s)-1]
+	}
+
+	return s
+}
+
 func takeFirstLevelGroups(j json.RawMessage, sampleColumns []string) ([]string, error) {
 	var objmap map[string]json.RawMessage
 	err := json.Unmarshal(j, &objmap)
@@ -42,12 +50,14 @@ func takeFirstLevelGroups(j json.RawMessage, sampleColumns []string) ([]string, 
 
 	values := []string{}
 	for _, c := range sampleColumns {
-		value, ok := objmap[c]
-		if !ok {
-			value = json.RawMessage("")
+		valueBin, ok := objmap[c]
+		valueStr := ""
+		if ok {
+			valueStr = string(valueBin)
+			valueStr = maybeRemoveQuotes(valueStr)
 		}
 
-		values = append(values, string(value))
+		values = append(values, valueStr)
 	}
 
 	return values, nil

@@ -69,9 +69,9 @@ func TestExportCSV(t *testing.T) {
 	{
 		pID := proj.ProjectID
 		assert.Equal(t, fmt.Sprintf(`sample_id,sample_uri,assessed_at,kek,aaa,lel
-%s-0,sampleuri0,2015-03-07T11:06:39,"""mark0""","""3""","[""l1"",""l2""]"
-%s-1,sampleuri1,2015-03-07T11:06:39,"""mark1""","""4""",[]
-%s-2,sampleuri2,2015-03-07T11:06:39,"""mark2""","""5""","[""l3""]"
+%s-0,sampleuri0,2015-03-07T11:06:39,mark0,3,"[""l1"",""l2""]"
+%s-1,sampleuri1,2015-03-07T11:06:39,mark1,4,[]
+%s-2,sampleuri2,2015-03-07T11:06:39,mark2,5,"[""l3""]"
 `, pID, pID, pID), string(r.CSV))
 
 		assert.Equal(
