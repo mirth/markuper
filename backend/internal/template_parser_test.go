@@ -10,14 +10,14 @@ func TestMissingAttribute(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="cat" vizual="Cat" />
+			<radio group="animal" value="cat" visual="Cat" />
 			<radio group="animal" value="dog" />
 		</content>
 		`
 
 		_, err := XMLToTemplate(data)
 		assert.NotNil(t, err)
-		assert.Equal(t, "Element [radio] missing the attribute [vizual]", err.Error())
+		assert.Equal(t, "Element [radio] missing the attribute [visual]", err.Error())
 	}
 
 	{
@@ -50,7 +50,7 @@ func TestEmptyAttribute(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="" vizual="Cat" />
+			<radio group="animal" value="" visual="Cat" />
 		</content>
 		`
 
@@ -62,19 +62,19 @@ func TestEmptyAttribute(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="cat" vizual="" />
+			<radio group="animal" value="cat" visual="" />
 		</content>
 		`
 
 		_, err := XMLToTemplate(data)
 		assert.NotNil(t, err)
-		assert.Equal(t, "Element [radio] has an empty attribute [vizual]", err.Error())
+		assert.Equal(t, "Element [radio] has an empty attribute [visual]", err.Error())
 	}
 
 	{
 		data := `
 		<content>
-			<checkbox group="" value="cat" vizual="Cat" />
+			<checkbox group="" value="cat" visual="Cat" />
 		</content>
 		`
 
@@ -87,12 +87,12 @@ func TestEmptyAttribute(t *testing.T) {
 func TestUnsupportedElement(t *testing.T) {
 	data := `
 	<content>
-		<radio group="animal" value="cat" vizual="Cat" />
-		<radio group="animal" value="dog" vizual="Dog" />
+		<radio group="animal" value="cat" visual="Cat" />
+		<radio group="animal" value="dog" visual="Dog" />
 
-		<kek group="color" value="black" vizual="Black" />
-		<kek group="color" value="white" vizual="White" />
-		<kek group="color" value="pink" vizual="Pink" />
+		<kek group="color" value="black" visual="Black" />
+		<kek group="color" value="white" visual="White" />
+		<kek group="color" value="pink" visual="Pink" />
 	</content>
 	`
 	_, err := XMLToTemplate(data)
@@ -100,9 +100,9 @@ func TestUnsupportedElement(t *testing.T) {
 	assert.Equal(t, "Unsupported element [kek]", err.Error())
 }
 
-func newValue(value, name string) ValueWithVizual {
+func newValue(value, name string) ValueWithvisual {
 	color := ""
-	return NewValueWithVizualWithColor(value, name, color)
+	return NewValueWithvisualWithColor(value, name, color)
 }
 
 // fixme duplicatedGroups for bbox
@@ -110,16 +110,16 @@ func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="cat" vizual="Cat" />
-			<radio group="animal" value="dog" vizual="Dog" />
+			<radio group="animal" value="cat" visual="Cat" />
+			<radio group="animal" value="dog" visual="Dog" />
 
-			<checkbox group="color" value="black" vizual="Black" />
-			<checkbox group="color" value="white" vizual="White" />
-			<checkbox group="color" value="pink" vizual="Pink" />
+			<checkbox group="color" value="black" visual="Black" />
+			<checkbox group="color" value="white" visual="White" />
+			<checkbox group="color" value="pink" visual="Pink" />
 
 			<bounding_box group="box">
-				<radio group="box_kind" value="kitty" vizual="Kitty" />
-				<radio group="box_kind" value="doge" vizual="Doge" />
+				<radio group="box_kind" value="kitty" visual="Kitty" />
+				<radio group="box_kind" value="doge" visual="Doge" />
 			</bounding_box>
 		</content>
 		`
@@ -130,7 +130,7 @@ func TestXMLToFields(t *testing.T) {
 		assert.ElementsMatch(t, []*RadioField{{
 			Type:  "radio",
 			Group: "animal",
-			Labels: []ValueWithVizual{
+			Labels: []ValueWithvisual{
 				newValue("cat", "Cat"),
 				newValue("dog", "Dog"),
 			},
@@ -139,7 +139,7 @@ func TestXMLToFields(t *testing.T) {
 		assert.ElementsMatch(t, []*CheckboxField{{
 			Type:  "checkbox",
 			Group: "color",
-			Labels: []ValueWithVizual{
+			Labels: []ValueWithvisual{
 				newValue("black", "Black"),
 				newValue("white", "White"),
 				newValue("pink", "Pink"),
@@ -153,7 +153,7 @@ func TestXMLToFields(t *testing.T) {
 				Radios: []*RadioField{{
 					Type:  "radio",
 					Group: "box_kind",
-					Labels: []ValueWithVizual{
+					Labels: []ValueWithvisual{
 						newValue("kitty", "Kitty"),
 						newValue("doge", "Doge"),
 					},
@@ -167,16 +167,16 @@ func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="cat" vizual="Cat" />
-			<radio group="animal" value="dog" vizual="Dog" />
+			<radio group="animal" value="cat" visual="Cat" />
+			<radio group="animal" value="dog" visual="Dog" />
 
-			<checkbox group="color" value="black" vizual="Black" />
-			<checkbox group="color" value="white" vizual="White" />
-			<checkbox group="color" value="pink" vizual="Pink" />
+			<checkbox group="color" value="black" visual="Black" />
+			<checkbox group="color" value="white" visual="White" />
+			<checkbox group="color" value="pink" visual="Pink" />
 
 			<bounding_box group="box">
-				<radio group="animal" value="kitty" vizual="Kitty" />
-				<radio group="animal" value="doge" vizual="Doge" />
+				<radio group="animal" value="kitty" visual="Kitty" />
+				<radio group="animal" value="doge" visual="Doge" />
 			</bounding_box>
 		</content>
 		`
@@ -188,12 +188,12 @@ func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="cat" vizual="Cat" />
-			<radio group="animal" value="dog" vizual="Dog" />
+			<radio group="animal" value="cat" visual="Cat" />
+			<radio group="animal" value="dog" visual="Dog" />
 
-			<checkbox group="animal" value="black" vizual="Black" />
-			<checkbox group="animal" value="white" vizual="White" />
-			<checkbox group="color" value="pink" vizual="Pink" />
+			<checkbox group="animal" value="black" visual="Black" />
+			<checkbox group="animal" value="white" visual="White" />
+			<checkbox group="color" value="pink" visual="Pink" />
 		</content>
 		`
 		_, err := XMLToTemplate(data)
@@ -204,12 +204,12 @@ func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
-			<radio group="animal" value="cat" vizual="Cat" />
-			<radio group="animal" value="cat" vizual="Dog" />
+			<radio group="animal" value="cat" visual="Cat" />
+			<radio group="animal" value="cat" visual="Dog" />
 
-			<checkbox group="color" value="black" vizual="Black" />
-			<checkbox group="color" value="white" vizual="White" />
-			<checkbox group="color" value="white" vizual="white" />
+			<checkbox group="color" value="black" visual="Black" />
+			<checkbox group="color" value="white" visual="White" />
+			<checkbox group="color" value="white" visual="white" />
 		</content>
 		`
 		_, err := XMLToTemplate(data)
@@ -219,8 +219,8 @@ func TestXMLToFields(t *testing.T) {
 
 	{
 		data := `
-				<radio group="animal" value="cat" vizual="Cat" />
-				<radio group="animal" value="cat" vizual="Dog" />
+				<radio group="animal" value="cat" visual="Cat" />
+				<radio group="animal" value="cat" visual="Dog" />
 		`
 
 		_, err := XMLToTemplate(data)
@@ -231,7 +231,7 @@ func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
-			<bounding_box group="box" value="cat" vizual="Cat" />
+			<bounding_box group="box" value="cat" visual="Cat" />
 		</content>
 		`
 
@@ -244,10 +244,10 @@ func TestXMLToFields(t *testing.T) {
 		data := `
 		<content>
 		    <bounding_box group="box1">
-		      <checkbox group="color1" value="black" vizual="Black" />
+		      <checkbox group="color1" value="black" visual="Black" />
 				</bounding_box>
 		    <bounding_box group="box2">
-		      <checkbox group="color2" value="black" vizual="Black" />
+		      <checkbox group="color2" value="black" visual="Black" />
 		    </bounding_box>
 		</content>
 		`
@@ -261,8 +261,8 @@ func TestXMLToFields(t *testing.T) {
 		data := `
 		<content>
 		    <bounding_box group="box">
-					<checkbox group="color" value="black" vizual="Black" />
-					<radio group="color" value="cat" vizual="Dog" />
+					<checkbox group="color" value="black" visual="Black" />
+					<radio group="color" value="cat" visual="Dog" />
 		    </bounding_box>
 		</content>
 		`
@@ -275,7 +275,7 @@ func TestXMLToFields(t *testing.T) {
 	{
 		data := `
 		<content>
-			<checkbox group="box" value="black" vizual="Black" />
+			<checkbox group="box" value="black" visual="Black" />
 		</content>
 		`
 
@@ -288,7 +288,7 @@ func TestXMLToFields(t *testing.T) {
 		data := `
 		<content>
 		    <bounding_box group="box1">
-					<checkbox group="box" value="black" vizual="Black" />
+					<checkbox group="box" value="black" visual="Black" />
 		    </bounding_box>
 		</content>
 		`
@@ -306,12 +306,12 @@ func TestDuplicatedLabels(t *testing.T) {
 				Radios: []*RadioField{{
 					Type:   "radio",
 					Group:  "animal",
-					Labels: []ValueWithVizual{newValue("dog", "Dog")},
+					Labels: []ValueWithvisual{newValue("dog", "Dog")},
 				}},
 				Checkboxes: []*CheckboxField{{
 					Type:   "checkbox",
 					Group:  "color",
-					Labels: []ValueWithVizual{newValue("white", "White")},
+					Labels: []ValueWithvisual{newValue("white", "White")},
 				}},
 			},
 		}
@@ -326,7 +326,7 @@ func TestDuplicatedLabels(t *testing.T) {
 				Radios: []*RadioField{{
 					Type:  "radio",
 					Group: "animal",
-					Labels: []ValueWithVizual{
+					Labels: []ValueWithvisual{
 						newValue("dog", "Dog"),
 						newValue("dog", "Dogh"),
 					},
@@ -346,7 +346,7 @@ func TestDuplicatedLabels(t *testing.T) {
 				Checkboxes: []*CheckboxField{{
 					Type:  "checkbox",
 					Group: "color",
-					Labels: []ValueWithVizual{
+					Labels: []ValueWithvisual{
 						newValue("white", "White"),
 						newValue("white", "White"),
 						newValue("black", "Black"),
@@ -368,7 +368,7 @@ func TestDuplicatedLabels(t *testing.T) {
 				Radios: []*RadioField{{
 					Type:  "radio",
 					Group: "animal",
-					Labels: []ValueWithVizual{
+					Labels: []ValueWithvisual{
 						newValue("dog", "Dog"),
 						newValue("dog", "Dogh"),
 					},
@@ -376,7 +376,7 @@ func TestDuplicatedLabels(t *testing.T) {
 				Checkboxes: []*CheckboxField{{
 					Type:  "checkbox",
 					Group: "color",
-					Labels: []ValueWithVizual{
+					Labels: []ValueWithvisual{
 						newValue("white", "White"),
 						newValue("white", "White"),
 						newValue("black", "Black"),
@@ -486,10 +486,10 @@ func TestClassificationFieldInsideClassificationFieldError(t *testing.T) {
 	{
 		data := `
 			<content>
-				<radio group="animal" value="cat" vizual="Cat">
-					<radio group="animal" value="cat" vizual="Cat"/>
+				<radio group="animal" value="cat" visual="Cat">
+					<radio group="animal" value="cat" visual="Cat"/>
 				</radio>
-				<radio group="animal" value="cat" vizual="Dog"/>
+				<radio group="animal" value="cat" visual="Dog"/>
 			</content>
 		`
 

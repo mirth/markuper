@@ -30,11 +30,11 @@ describe('Device state keep for assessed samples', function () {
 
   const xml = `
   <content>
-    <radio group="animal" value="cat" vizual="Cat" />
-    <radio group="animal" value="dog" vizual="Dog" />
+    <radio group="animal" value="cat" visual="Cat" />
+    <radio group="animal" value="dog" visual="Dog" />
 
-    <checkbox group="color" value="black" vizual="Black" />
-    <checkbox group="color" value="white" vizual="White" />
+    <checkbox group="color" value="black" visual="Black" />
+    <checkbox group="color" value="white" visual="White" />
   </content>
   `;
 
@@ -97,17 +97,17 @@ describe('Focus and state [Checkbox, Radio, Radio]', function () {
 
   const xml = `
   <content>
-    <checkbox group="color" value="black" vizual="Black" />
-    <checkbox group="color" value="white" vizual="White" />
-    <checkbox group="color" value="pink" vizual="Pink" />
+    <checkbox group="color" value="black" visual="Black" />
+    <checkbox group="color" value="white" visual="White" />
+    <checkbox group="color" value="pink" visual="Pink" />
 
-    <radio group="animal" value="cat" vizual="Cat" />
-    <radio group="animal" value="dog" vizual="Dog" />
-    <radio group="animal" value="chuk" vizual="Chuk" />
-    <radio group="animal" value="gek" vizual="Gek" />
+    <radio group="animal" value="cat" visual="Cat" />
+    <radio group="animal" value="dog" visual="Dog" />
+    <radio group="animal" value="chuk" visual="Chuk" />
+    <radio group="animal" value="gek" visual="Gek" />
 
-    <radio group="size" value="smoll" vizual="Smoll" />
-    <radio group="size" value="big" vizual="Big" />
+    <radio group="size" value="smoll" visual="Smoll" />
+    <radio group="size" value="big" visual="Big" />
   </content>
   `;
 
@@ -135,14 +135,14 @@ describe('Focus and state [Radio, Checkbox]', function () {
 
   const xml = `
   <content>
-    <radio group="animal" value="cat" vizual="Cat" />
-    <radio group="animal" value="dog" vizual="Dog" />
-    <radio group="animal" value="chuk" vizual="Chuk" />
-    <radio group="animal" value="gek" vizual="Gek" />
+    <radio group="animal" value="cat" visual="Cat" />
+    <radio group="animal" value="dog" visual="Dog" />
+    <radio group="animal" value="chuk" visual="Chuk" />
+    <radio group="animal" value="gek" visual="Gek" />
 
-    <checkbox group="color" value="black" vizual="Black" />
-    <checkbox group="color" value="white" vizual="White" />
-    <checkbox group="color" value="pink" vizual="Pink" />
+    <checkbox group="color" value="black" visual="Black" />
+    <checkbox group="color" value="white" visual="White" />
+    <checkbox group="color" value="pink" visual="Pink" />
   </content>
   `;
 

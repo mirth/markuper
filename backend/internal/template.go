@@ -13,7 +13,7 @@ type AnswerField = Jsonable
 type TaskAnswer struct {
 }
 
-type ValueWithVizual struct {
+type ValueWithvisual struct {
 	Value        string `json:"value"`
 	DisplayName  string `json:"display_name"`
 	DisplayColor string `json:"display_color"`
@@ -22,7 +22,7 @@ type ValueWithVizual struct {
 type ClassificationField struct {
 	Type   string            `json:"type"`
 	Group  string            `json:"group"`
-	Labels []ValueWithVizual `json:"labels"`
+	Labels []ValueWithvisual `json:"labels"`
 }
 
 type RadioField = ClassificationField
@@ -51,7 +51,7 @@ func NewRadioField(group string) *RadioField {
 	return &RadioField{
 		Group:  group,
 		Type:   "radio",
-		Labels: make([]ValueWithVizual, 0),
+		Labels: make([]ValueWithvisual, 0),
 	}
 }
 
@@ -59,7 +59,7 @@ func NewCheckboxField(group string) *CheckboxField {
 	return &CheckboxField{
 		Group:  group,
 		Type:   "checkbox",
-		Labels: make([]ValueWithVizual, 0),
+		Labels: make([]ValueWithvisual, 0),
 	}
 }
 
@@ -74,8 +74,8 @@ func NewBoundingBoxField(group string) *BoundingBoxField {
 	}
 }
 
-func NewValueWithVizualWithColor(value, displayName, displayColor string) ValueWithVizual {
-	return ValueWithVizual{
+func NewValueWithvisualWithColor(value, displayName, displayColor string) ValueWithvisual {
+	return ValueWithvisual{
 		Value:        value,
 		DisplayName:  displayName,
 		DisplayColor: displayColor,
@@ -162,20 +162,20 @@ func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) error {
 		}
 	}
 
-	f.Labels = append(f.Labels, NewValueWithVizualFromNode(n))
+	f.Labels = append(f.Labels, NewValueWithvisualFromNode(n))
 
 	appendIfNotExists(&t.FieldsOrder, g)
 
 	return nil
 }
 
-func NewValueWithVizualFromNode(n Node) ValueWithVizual {
+func NewValueWithvisualFromNode(n Node) ValueWithvisual {
 	color := getColor(n)
 
 	// fixme check if color is valid
-	return NewValueWithVizualWithColor(
+	return NewValueWithvisualWithColor(
 		getValue(n),
-		getVizual(n),
+		getvisual(n),
 		color,
 	)
 }
@@ -248,8 +248,8 @@ type TemplateServiceImpl struct {
 var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 	Task: "Classification",
 	XML: `<content>
-  <radio group="animal" value="cat" vizual="Cat" />
-  <radio group="animal" value="dog" vizual="Dog" />
+  <radio group="animal" value="cat" visual="Cat" />
+  <radio group="animal" value="dog" visual="Dog" />
 </content>
 `,
 }
@@ -257,8 +257,8 @@ var DEFAULT_CLASSIFICATION_TEMPLATE = TemplateXML{
 var DEFAULT_MULTILABEL_CLASSIFICATION_TEMPLATE = TemplateXML{
 	Task: "Multi-label classification",
 	XML: `<content>
-  <checkbox group="color" value="black" vizual="Black" />
-  <checkbox group="color" value="white" vizual="White" />
+  <checkbox group="color" value="black" visual="Black" />
+  <checkbox group="color" value="white" visual="White" />
 </content>
 `,
 }
@@ -267,8 +267,8 @@ var DEFAULT_OBJECT_DETECTION_TEMPLATE = TemplateXML{
 	Task: "Object detection",
 	XML: `<content>
   <bounding_box group="box">
-    <radio group="animal" value="cat" vizual="Cat"/>
-    <radio group="animal" value="dog" vizual="Dog"/>
+    <radio group="animal" value="cat" visual="Cat"/>
+    <radio group="animal" value="dog" visual="Dog"/>
   </bounding_box>
 </content>
 `,
