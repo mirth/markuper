@@ -481,3 +481,20 @@ func TestDuplicatedGroups(t *testing.T) {
 		assert.ElementsMatch(t, []string{}, dups)
 	}
 }
+
+func TestClassificationFieldInsideClassificationFieldError(t *testing.T) {
+	{
+		data := `
+			<content>
+				<radio group="animal" value="cat" vizual="Cat">
+					<radio group="animal" value="cat" vizual="Cat"/>
+				</radio>
+				<radio group="animal" value="cat" vizual="Dog"/>
+			</content>
+		`
+
+		_, err := XMLToTemplate(data)
+
+		assert.Equal(t, "Classification field [radio] mustn't have children", err.Error())
+	}
+}

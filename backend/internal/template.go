@@ -136,6 +136,10 @@ func isClassificationGroupReserved(group string) bool {
 }
 
 func (t *ClassificationComponents) CreateOrUpdateClFieldFor(n Node) error {
+	if len(n.Nodes) > 0 {
+		return NewBusinessError(fmt.Sprintf("Classification field [%s] mustn't have children", n.XMLName.Local))
+	}
+
 	g := getGroup(n)
 	if isClassificationGroupReserved(g) {
 		return NewBusinessError("Group name [box] is reserved for bounding_box box markup")
