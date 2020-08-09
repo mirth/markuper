@@ -58,7 +58,7 @@ function tryIncrementGroup(callerGroup) {
 
 /* eslint-disable prefer-const */
 $sampleMarkup = (sample.markup && sample.markup.markup) || {};
-$: [$assessState.focusedGroup] = sample.project.template.fields_order;
+[$assessState.focusedGroup] = sample.project.template.fields_order;
 
 </script>
 
