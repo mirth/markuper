@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { push } from 'svelte-spa-router';
 import { fetchProject } from './store';
 
+
 export function goToProject(projectId) {
   return async () => {
     await fetchProject(projectId);
