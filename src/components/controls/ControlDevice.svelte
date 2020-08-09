@@ -5,8 +5,8 @@ import { assessState, sampleMarkup } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 import { submitGroup } from '../../control';
 
-export let submitMarkupAndFetchNext;
 export let sample;
+export let submitMarkupAndFetchNext;
 
 function ownerByChild(childGroup) {
   const rootFields = getFieldsInOrderFor(sample.project.template);
@@ -58,8 +58,6 @@ function tryIncrementGroup(callerGroup) {
 
 /* eslint-disable prefer-const */
 $sampleMarkup = (sample.markup && sample.markup.markup) || {};
-$assessState.markup = {};
-
 [$assessState.focusedGroup] = sample.project.template.fields_order;
 
 </script>

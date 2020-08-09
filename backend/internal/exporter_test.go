@@ -15,17 +15,17 @@ func TestExportCSV(t *testing.T) {
 		Task: "some_task",
 		XML: `
 	<content>
-		<radio group="kek" value="mark1" vizual="Mark1" />
-		<radio group="kek" value="mark2" vizual="Mark2" />
-		<radio group="kek" value="mark3" vizual="Mark3" />
+		<radio group="kek" value="mark1" visual="Mark1" />
+		<radio group="kek" value="mark2" visual="Mark2" />
+		<radio group="kek" value="mark3" visual="Mark3" />
 
-		<radio group="aaa" value="3" vizual="aaa1" />
-		<radio group="aaa" value="4" vizual="aaa2" />
-		<radio group="aaa" value="5" vizual="aaa3" />
+		<radio group="aaa" value="3" visual="aaa1" />
+		<radio group="aaa" value="4" visual="aaa2" />
+		<radio group="aaa" value="5" visual="aaa3" />
 
-		<checkbox group="lel" value="l1" vizual="L1" />
-		<checkbox group="lel" value="l2" vizual="L2" />
-		<checkbox group="lel" value="l3" vizual="L3" />
+		<checkbox group="lel" value="l1" visual="L1" />
+		<checkbox group="lel" value="l2" visual="L2" />
+		<checkbox group="lel" value="l3" visual="L3" />
 	</content>`,
 	}
 
@@ -91,8 +91,8 @@ func TestExportCSVForBBox(t *testing.T) {
 		XML: `
 		<content>
 			<bounding_box group="box">
-				<radio group="animal" value="cat" vizual="Cat"/>
-				<radio group="animal" value="dog" vizual="Dog"/>
+				<radio group="animal" value="cat" visual="Cat"/>
+				<radio group="animal" value="dog" visual="Dog"/>
 			</bounding_box>
 		</content>`,
 	}

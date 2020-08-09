@@ -26,12 +26,12 @@ describe('Application launch', function () {
     const xml = `
     <content>
       <bounding_box group="box">
-        <checkbox group="color" value="black" vizual="Black" />
-        <checkbox group="color" value="white" vizual="White" />
-        <checkbox group="color" value="pink" vizual="Pink" />
+        <checkbox group="color" value="black" visual="Black" />
+        <checkbox group="color" value="white" visual="White" />
+        <checkbox group="color" value="pink" visual="Pink" />
 
-        <checkbox group="box" value="cat" vizual="Cat" />
-        <checkbox group="box" value="dog" vizual="Dog" />
+        <checkbox group="box" value="cat" visual="Cat" />
+        <checkbox group="box" value="dog" visual="Dog" />
       </bounding_box>
     </content>
     `;
@@ -58,8 +58,8 @@ describe('Application launch', function () {
   describe('Unable to create project because of some attribute is empty', () => {
     const xml = `
     <content>
-      <radio group="animal" value="cat" vizual="Cat" />
-      <checkbox group="animal" value="" vizual="Dog" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <checkbox group="animal" value="" visual="Dog" />
     </content>
     `;
     createProjectWithTemplate(app, appPath, xml);
@@ -86,8 +86,8 @@ describe('Application launch', function () {
   describe('Unable to create project because of duplicated labels', () => {
     const xml = `
     <content>
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="cat" vizual="Cot" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="cat" visual="Cot" />
     </content>
     `;
     createProjectWithTemplate(app, appPath, xml);
@@ -113,8 +113,8 @@ describe('Application launch', function () {
   describe('Unable to create project because of duplicated groups', () => {
     const xml = `
     <content>
-      <radio group="animal" value="cat" vizual="Cat" />
-      <checkbox group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <checkbox group="animal" value="dog" visual="Dog" />
     </content>
     `;
     createProjectWithTemplate(app, appPath, xml);
@@ -140,8 +140,8 @@ describe('Application launch', function () {
   describe('Unable to create project because of missing the attribute', () => {
     const xml = `
     <content>
-      <radio group="animal" value="cat" vizual="Cat" />
-      <checkbox group="animal" vizual="Dog" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <checkbox group="animal" visual="Dog" />
     </content>
     `;
     createProjectWithTemplate(app, appPath, xml);
@@ -167,7 +167,7 @@ describe('Application launch', function () {
   describe('Unable to create project because of empty bounding_box field', () => {
     const xml = `
     <content>
-      <bounding_box group="box" value="cat" vizual="Cat" />
+      <bounding_box group="box" value="cat" visual="Cat" />
     </content>
     `;
     createProjectWithTemplate(app, appPath, xml);
@@ -194,10 +194,10 @@ describe('Application launch', function () {
     const xml = `
     <content>
       <bounding_box group="box1">
-        <checkbox group="color1" value="black" vizual="Black" />
+        <checkbox group="color1" value="black" visual="Black" />
       </bounding_box>
       <bounding_box group="box2">
-        <checkbox group="color2" value="black" vizual="Black" />
+        <checkbox group="color2" value="black" visual="Black" />
       </bounding_box>
     </content>
     `;
@@ -224,7 +224,7 @@ describe('Application launch', function () {
   describe('Unable to create project because of classification field group is named [box]', () => {
     const xml = `
     <content>
-      <checkbox group="box" value="black" vizual="Black" />
+      <checkbox group="box" value="black" visual="Black" />
     </content>
     `;
     createProjectWithTemplate(app, appPath, xml);

@@ -7,32 +7,23 @@ import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
 import SampleView from './SampleView.svelte';
-import { sampleMarkup, assessState } from '../store';
+import {
+  sampleMarkup, assessState, activeSample, fetchNextSample,
+} from '../store';
 import { goToProject, getProjectIDFromSampleID } from '../project';
+import PrevNext from './sample_view/PrevNext.svelte';
+import Progress from './sample_view/Progress.svelte';
 
 export let params = {};
 
-async function fetchNext(projectID) {
-  const res = await api.get(`/project/${projectID}/next`);
-  return res;
+function resetMarkup() {
+  $assessState = {};
+  $sampleMarkup = {};
+  $activeSample = null;
 }
-
-async function getProjStats(projectID) {
-  const res = await api.get(`/project/${projectID}/stats`);
-  return res;
-}
-
-let sample = (async () => {
-  if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
-    return api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
-  }
-
-  return fetchNext(params.project_id);
-})();
-let projStats = getProjStats(params.project_id);
 
 async function submitMarkupAndFetchNext() {
-  sample = await sample;
+  const sample = await $activeSample;
   const { sample_id: sampleId } = sample;
 
   const projID = getProjectIDFromSampleID(sampleId);
@@ -42,47 +33,57 @@ async function submitMarkupAndFetchNext() {
       markup: $sampleMarkup,
     },
   });
-  sample = fetchNext(projID);
-  $assessState.focusedGroup = null;
 
-  projStats = getProjStats(projID);
+  resetMarkup();
+  $activeSample = fetchNextSample(projID);
+}
+
+resetMarkup();
+
+if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
+  $activeSample = api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
+} else {
+  $activeSample = fetchNextSample(params.project_id);
 }
 
 </script>
 
 <PageBlank>
 <Row>
-{#await sample then sample}
-  <Cell xs={8}>
-    {#if sample.sample === null}
-      <Typography type="title" block>No samples left</Typography>
-    {:else}
-      <SampleView {sample} />
-    {/if}
-  </Cell>
-  <Cell xs={4}>
-    <ControlDevice {sample} submitMarkupAndFetchNext={
-      sample.sample === null ? () => {} : submitMarkupAndFetchNext
-    } />
-    <hr />
-    <p>
-      Project:
-      <Button
-        type='empty'
-        on:click={goToProject(sample.project.project_id)}
-        style='padding: 0; display: inline;'
-      >
-        {sample.project.description.name}
-      </Button>
-      {#await projStats then projStats}
-        ({projStats.assessed_number_of_samples} / {projStats.total_number_of_samples})
-      {/await}
-    </p>
-    {#if sample.sample !== null}
-      <p>Sample:<small id='sample_uri'>{sample.sample.media_uri}</small></p>
-    {/if}
-  </Cell>
-{/await}
+  {#if $activeSample != null}
+    {#await $activeSample then sample}
+      <Cell xs={8}>
+        {#if sample.sample == null}
+          <Typography type="title" block>No samples left</Typography>
+        {:else}
+          <SampleView sample={sample} />
+        {/if}
+      </Cell>
+      <Cell xs={4}>
+        {#if sample.sample != null}
+          <ControlDevice
+            sample={sample}
+            submitMarkupAndFetchNext={sample.sample == null ? () => {} : submitMarkupAndFetchNext} />
+          <hr />
+        {/if}
+        <p>
+          Project:
+          <Button
+            type='empty'
+            on:click={goToProject(sample.project.project_id)}
+            style='padding: 0; display: inline;'
+          >
+            {sample.project.description.name}
+          </Button>
+          <Progress projectId={params.project_id} />
+        </p>
+        {#if sample.sample != null}
+          <p>Sample:<small id='sample_uri'>{sample.sample.media_uri}</small></p>
+        {/if}
+        <PrevNext projectId={params.project_id} />
+      </Cell>
+    {/await}
+  {/if}
 </Row>
 </PageBlank>
 

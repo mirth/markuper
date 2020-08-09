@@ -82,8 +82,8 @@ describe('Simple bounding box test', function () {
   const xml = `
   <content>
     <bounding_box group="bbox">
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="dog" visual="Dog" />
     </bounding_box>
   </content>
   `;
@@ -146,8 +146,8 @@ describe('Bounding boxes manipulation', function () {
   const xml = `
   <content>
     <bounding_box group="bbox">
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="dog" vizual="Dog" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="dog" visual="Dog" />
     </bounding_box>
   </content>
   `;
@@ -285,17 +285,17 @@ describe('Bounding box with Focus and state [Checkbox, Radio, Radio]', function 
   const xml = `
   <content>
     <bounding_box group="bbox">
-      <checkbox group="color" value="black" vizual="Black" />
-      <checkbox group="color" value="white" vizual="White" />
-      <checkbox group="color" value="pink" vizual="Pink" />
+      <checkbox group="color" value="black" visual="Black" />
+      <checkbox group="color" value="white" visual="White" />
+      <checkbox group="color" value="pink" visual="Pink" />
 
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="dog" vizual="Dog" />
-      <radio group="animal" value="chuk" vizual="Chuk" />
-      <radio group="animal" value="gek" vizual="Gek" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="dog" visual="Dog" />
+      <radio group="animal" value="chuk" visual="Chuk" />
+      <radio group="animal" value="gek" visual="Gek" />
 
-      <radio group="size" value="smoll" vizual="Smoll" />
-      <radio group="size" value="big" vizual="Big" />
+      <radio group="size" value="smoll" visual="Smoll" />
+      <radio group="size" value="big" visual="Big" />
     </bounding_box>
   </content>
   `;
@@ -347,14 +347,14 @@ describe('Bounding box with Focus and state [Radio, Checkbox]', function () {
   const xml = `
   <content>
     <bounding_box group="bbox">
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="dog" vizual="Dog" />
-      <radio group="animal" value="chuk" vizual="Chuk" />
-      <radio group="animal" value="gek" vizual="Gek" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="dog" visual="Dog" />
+      <radio group="animal" value="chuk" visual="Chuk" />
+      <radio group="animal" value="gek" visual="Gek" />
 
-      <checkbox group="color" value="black" vizual="Black" />
-      <checkbox group="color" value="white" vizual="White" />
-      <checkbox group="color" value="pink" vizual="Pink" />
+      <checkbox group="color" value="black" visual="Black" />
+      <checkbox group="color" value="white" visual="White" />
+      <checkbox group="color" value="pink" visual="Pink" />
     </bounding_box>
   </content>
   `;
@@ -405,14 +405,14 @@ describe('Display correct box labels', function () {
   const xml = `
   <content>
     <bounding_box group="bbox">
-      <radio group="animal" value="cat" vizual="Cat" color="#100000" />
-      <radio group="animal" value="dog" vizual="Dog" color="#200000" />
-      <radio group="animal" value="chuk" vizual="Chuk" color="#300000" />
-      <radio group="animal" value="gek" vizual="Gek" color="#400000" />
+      <radio group="animal" value="cat" visual="Cat" color="#100000" />
+      <radio group="animal" value="dog" visual="Dog" color="#200000" />
+      <radio group="animal" value="chuk" visual="Chuk" color="#300000" />
+      <radio group="animal" value="gek" visual="Gek" color="#400000" />
 
-      <checkbox group="color" value="black" vizual="Black" color="#500000" />
-      <checkbox group="color" value="white" vizual="White" color="#600000" />
-      <checkbox group="color" value="pink" vizual="Pink" color="#700000" />
+      <checkbox group="color" value="black" visual="Black" color="#500000" />
+      <checkbox group="color" value="white" visual="White" color="#600000" />
+      <checkbox group="color" value="pink" visual="Pink" color="#700000" />
     </bounding_box>
   </content>
   `;
@@ -457,14 +457,14 @@ describe('For [Radio, Checkbox] check control values while making multiple boxes
   const xml = `
   <content>
     <bounding_box group="bbox">
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="dog" vizual="Dog" />
-      <radio group="animal" value="chuk" vizual="Chuk" />
-      <radio group="animal" value="gek" vizual="Gek" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="dog" visual="Dog" />
+      <radio group="animal" value="chuk" visual="Chuk" />
+      <radio group="animal" value="gek" visual="Gek" />
 
-      <checkbox group="color" value="black" vizual="Black" />
-      <checkbox group="color" value="white" vizual="White" />
-      <checkbox group="color" value="pink" vizual="Pink" />
+      <checkbox group="color" value="black" visual="Black" />
+      <checkbox group="color" value="white" visual="White" />
+      <checkbox group="color" value="pink" visual="Pink" />
     </bounding_box>
   </content>
   `;

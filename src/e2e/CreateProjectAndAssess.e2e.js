@@ -40,10 +40,10 @@ describe('Application launch', function () {
   describe('Creates project and assesses samples', () => {
     const xml = `
     <content>
-      <radio group="animal" value="cat" vizual="Cat" />
-      <radio group="animal" value="dog" vizual="Dog" />
-      <radio group="animal" value="chuk" vizual="Chuk" />
-      <radio group="animal" value="gek" vizual="Gek" />
+      <radio group="animal" value="cat" visual="Cat" />
+      <radio group="animal" value="dog" visual="Dog" />
+      <radio group="animal" value="chuk" visual="Chuk" />
+      <radio group="animal" value="gek" visual="Gek" />
     </content>
     `;
     const [imgDir, glob0, glob1] = createProjectWithTemplate(app, appPath, xml);

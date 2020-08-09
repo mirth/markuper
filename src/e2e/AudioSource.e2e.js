@@ -31,8 +31,8 @@ describe('Audio sample simple test', function () {
 
   const xml = `
   <content>
-    <radio group="animal" value="cat" vizual="Cat" />
-    <radio group="animal" value="dog" vizual="Dog" />
+    <radio group="animal" value="cat" visual="Cat" />
+    <radio group="animal" value="dog" visual="Dog" />
   </content>
   `;
 

@@ -1,5 +1,7 @@
 <script>
-import { sampleView, sampleMarkup, assessState } from '../../store';
+import {
+  sampleView, sampleMarkup, assessState, dataView,
+} from '../../store';
 import BoxLabels from './BoxLabels.svelte';
 
 
@@ -11,7 +13,7 @@ let activeBox;
 let resizeObserver;
 
 function scaleBox(raw) {
-  const scale = $assessState.imageElement.naturalWidth / $assessState.imageElement.clientWidth;
+  const scale = $dataView.imageElement.naturalWidth / $dataView.imageElement.clientWidth;
   return {
     x: raw.x / scale,
     y: raw.y / scale,
@@ -21,7 +23,7 @@ function scaleBox(raw) {
 }
 
 function scaleBoxes(markupForGroup, assessStateBox) {
-  if (!$assessState.imageElement) {
+  if (!$dataView.imageElement) {
     return;
   }
 
@@ -32,19 +34,15 @@ function scaleBoxes(markupForGroup, assessStateBox) {
   }));
 }
 
-$: if (field) {
-  scaleBoxes($sampleMarkup[field.group], $assessState.box);
-}
-
 $: if (field && $assessState.box) {
   scaleBoxes($sampleMarkup[field.group], $assessState.box);
 }
 
-$: if (field && !resizeObserver && $assessState.imageElement) {
+$: if (field && !resizeObserver && $dataView.imageElement) {
   resizeObserver = new ResizeObserver(() => {
     scaleBoxes($sampleMarkup[field.group], $assessState.box);
   });
-  resizeObserver.observe($assessState.imageElement);
+  resizeObserver.observe($dataView.imageElement);
 }
 
 </script>
@@ -54,7 +52,7 @@ $: if (field && !resizeObserver && $assessState.imageElement) {
     src='file://{sample.sample.media_uri}'
     alt='KEK'
     draggable=false
-    bind:this={$assessState.imageElement}
+    bind:this={$dataView.imageElement}
     />
 
   {#each boxes as box, i}

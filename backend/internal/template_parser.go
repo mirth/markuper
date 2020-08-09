@@ -42,9 +42,9 @@ func missingAttribute(nodes []Node) (Node, string) {
 			}
 
 			{
-				_, ok := getAttrByName(n, "vizual")
+				_, ok := getAttrByName(n, "visual")
 				if !ok {
-					return n, "vizual"
+					return n, "visual"
 				}
 			}
 		}
@@ -71,9 +71,9 @@ func emptyAttribute(nodes []Node) (Node, string) {
 			}
 
 			{
-				a, _ := getAttrByName(n, "vizual")
+				a, _ := getAttrByName(n, "visual")
 				if len(a.Value) == 0 {
-					return n, "vizual"
+					return n, "visual"
 				}
 			}
 		}
@@ -270,8 +270,8 @@ func getAttrByName(n Node, name string) (xml.Attr, bool) {
 	return xml.Attr{}, false
 }
 
-func getVizual(n Node) string {
-	a, _ := getAttrByName(n, "vizual")
+func getvisual(n Node) string {
+	a, _ := getAttrByName(n, "visual")
 	return a.Value
 }
 
