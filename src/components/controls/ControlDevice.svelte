@@ -63,7 +63,7 @@ $: [$assessState.focusedGroup] = sample.project.template.fields_order;
 </script>
 
 <ControlList
-  submitMarkupAndFetchNext={submitMarkupAndFetchNext}
+  {submitMarkupAndFetchNext}
   onFieldCompleted={tryIncrementGroup}
   owner={sample.project.template}
   />
