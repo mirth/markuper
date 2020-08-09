@@ -7,10 +7,13 @@ import api from '../api';
 import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
 import SampleView from './SampleView.svelte';
-import { sampleMarkup, assessState, activeProject, activeSample, fetchNextSample} from '../store';
+import {
+  sampleMarkup, assessState, activeSample, fetchNextSample,
+} from '../store';
 import { goToProject, getProjectIDFromSampleID } from '../project';
 import PrevNext from './sample_view/PrevNext.svelte';
 import Progress from './sample_view/Progress.svelte';
+
 export let params = {};
 
 function resetMarkup() {
@@ -60,7 +63,7 @@ if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
         {#if sample.sample != null}
           <ControlDevice
             sample={sample}
-            submitMarkupAndFetchNext={sample.sample == null? () => {} : submitMarkupAndFetchNext} />
+            submitMarkupAndFetchNext={sample.sample == null ? () => {} : submitMarkupAndFetchNext} />
           <hr />
         {/if}
         <p>

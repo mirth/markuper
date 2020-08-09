@@ -1,5 +1,7 @@
 <script>
-import { sampleView, sampleMarkup, assessState, dataView } from '../../store';
+import {
+  sampleView, sampleMarkup, assessState, dataView,
+} from '../../store';
 import BoxLabels from './BoxLabels.svelte';
 
 

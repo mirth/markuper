@@ -1,7 +1,7 @@
 <script>
 
 import ControlList from './ControlList.svelte';
-import { assessState, sampleMarkup, activeSample } from '../../store';
+import { assessState, sampleMarkup } from '../../store';
 import { getFieldsInOrderFor } from '../../project';
 import { submitGroup } from '../../control';
 

@@ -1,9 +1,9 @@
 <script>
-import { fetchProjectStats } from './../../store'
+import { fetchProjectStats } from '../../store';
 
 export let projectId;
 
-$: projStats = fetchProjectStats(projectId)
+$: projStats = fetchProjectStats(projectId);
 </script>
 
 {#await projStats then projStats}

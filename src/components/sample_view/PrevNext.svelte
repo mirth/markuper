@@ -1,20 +1,19 @@
 <script>
 import Button from 'svelte-atoms/Button.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
-import { fetchProjectStats, activeSample, fetchNextSample } from './../../store';
+import { fetchProjectStats, activeSample, fetchNextSample } from '../../store';
 
 export let projectId;
 
 $: projStats = fetchProjectStats(projectId);
 
-async function skipSample(projStats) {
-  if(projStats.assessed_number_of_samples === projStats.total_number_of_samples) {
+async function skipSample(stats) {
+  if (stats.assessed_number_of_samples === stats.total_number_of_samples) {
     return;
   }
 
   $activeSample = fetchNextSample(projectId);
 }
-
 
 </script>
 
