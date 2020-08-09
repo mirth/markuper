@@ -19,6 +19,6 @@ export let isSelected;
       Submit
   </Button>
   {#if isSelected}
-    <KeyboardButton field={{ group: submitGroup }} key={'Enter'} onKeyPressed={submitMarkupAndFetchNext} />
+    <KeyboardButton field={{ group: submitGroup }} key={'Enter'} bind:onKeyPressed={submitMarkupAndFetchNext} />
   {/if}
 </div>

@@ -3,7 +3,8 @@
 
 import _ from 'lodash';
 import { push } from 'svelte-spa-router';
-import { fetchProject } from './store';
+import { fetchProject, activeSample } from './store';
+import api from './api';
 
 export function goToProject(projectId) {
   return async () => {

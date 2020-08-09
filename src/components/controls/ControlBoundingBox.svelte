@@ -3,7 +3,7 @@ import _ from 'lodash';
 import Table from 'svelte-atoms/Table/Table.svelte';
 import Tbody from 'svelte-atoms/Table/Tbody.svelte';
 import {
-  sampleView, sampleMarkup, assessState,
+  sampleView, sampleMarkup, assessState, dataView,
 } from '../../store';
 import ControlList from './ControlList.svelte';
 import BoxMarkup from './BoxMarkup.svelte';
@@ -14,7 +14,6 @@ export let onFieldCompleted;
 let upperLeft;
 let downRight;
 
-$assessState.box = null;
 
 function cornersToBox() {
   let width = downRight.x - upperLeft.x;
@@ -131,7 +130,7 @@ $: if (!$sampleMarkup[field.group]) {
   $sampleMarkup[field.group] = [];
 }
 
-$: img = $assessState.imageElement;
+$: img = $dataView.imageElement;
 
 $: if (upperLeft && downRight) {
   $assessState.box = cornersToBox();
