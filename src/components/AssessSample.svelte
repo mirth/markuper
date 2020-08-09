@@ -16,6 +16,7 @@ export let params = {};
 function resetMarkup() {
   $assessState = {};
   $sampleMarkup = {};
+  $activeSample = null;
 }
 
 async function submitMarkupAndFetchNext() {
@@ -35,7 +36,6 @@ async function submitMarkupAndFetchNext() {
 }
 
 resetMarkup();
-$activeSample = null;
 
 if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
   $activeSample = api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
