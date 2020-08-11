@@ -39,19 +39,19 @@ func TestExportCSV(t *testing.T) {
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 0),
-		`{"kek":"mark0","aaa":"3","lel":["l1","l2"]}`,
+		[]byte(`{"kek":"mark0","aaa":"3","lel":["l1","l2"]}`),
 	)
 	AssessWithMarkup(
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 1),
-		`{"kek":"mark1","aaa":"4","lel":[]}`,
+		[]byte(`{"kek":"mark1","aaa":"4","lel":[]}`),
 	)
 	AssessWithMarkup(
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 2),
-		`{"kek":"mark2","aaa":"5","lel":["l3"]}`,
+		[]byte(`{"kek":"mark2","aaa":"5","lel":["l3"]}`),
 	)
 
 	s := ExporterServiceImpl{
@@ -106,7 +106,7 @@ func TestExportCSVForBBox(t *testing.T) {
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 0),
-		`{"box":[{"box":{"x":0,"y":0,"width":2,"height":1},"animal":"cat"}]}`,
+		[]byte(`{"box":[{"box":{"x":0,"y":0,"width":2,"height":1},"animal":"cat"}]}`),
 	)
 
 	s := ExporterServiceImpl{

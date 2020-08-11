@@ -4,6 +4,10 @@ import { deterministicStrigify, getProjectIDFromSampleID } from '../../project';
 export let assessedList;
 
 function formatMarkup(markup) {
+  if (markup === null) {
+    return '[SKIPPED]';
+  }
+
   return deterministicStrigify(markup);
 }
 </script>

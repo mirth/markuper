@@ -69,8 +69,22 @@ export function isFieldSelected(field, state) {
   return field.group === state.focusedGroup;
 }
 
-export async function fetchNextSample(projectID) {
+function resetMarkup() {
+  assessState.set({});
+  sampleMarkup.set({});
+  activeSample.set(null);
+}
+
+export async function fetchNextSampleAndResetState(projectID) {
+  resetMarkup();
   const sample = await api.get(`/project/${projectID}/next`);
+
+  return sample;
+}
+
+export async function fetchSampleByIdAndResetState(projectId, sampleId) {
+  resetMarkup();
+  const sample = api.get(`/project/${projectId}/samples/${sampleId}`);
 
   return sample;
 }

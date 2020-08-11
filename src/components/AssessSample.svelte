@@ -8,19 +8,15 @@ import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
 import SampleView from './SampleView.svelte';
 import {
-  sampleMarkup, assessState, activeSample, fetchNextSample,
+  sampleMarkup, assessState, activeSample, fetchNextSampleAndResetState, fetchSampleByIdAndResetState,
 } from '../store';
 import { goToProject, getProjectIDFromSampleID } from '../project';
-import PrevNext from './sample_view/PrevNext.svelte';
+import Skip from './sample_view/Skip.svelte';
 import Progress from './sample_view/Progress.svelte';
 
 export let params = {};
 
-function resetMarkup() {
-  $assessState = {};
-  $sampleMarkup = {};
-  $activeSample = null;
-}
+
 
 async function submitMarkupAndFetchNext() {
   const sample = await $activeSample;
@@ -34,16 +30,15 @@ async function submitMarkupAndFetchNext() {
     },
   });
 
-  resetMarkup();
-  $activeSample = fetchNextSample(projID);
+
+  $activeSample = fetchNextSampleAndResetState(projID);
 }
 
-resetMarkup();
 
 if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
-  $activeSample = api.get(`/project/${params.project_id}/samples/${params.sample_id}`);
+  $activeSample = fetchSampleByIdAndResetState(params.project_id, params.sample_id);
 } else {
-  $activeSample = fetchNextSample(params.project_id);
+  $activeSample = fetchNextSampleAndResetState(params.project_id);
 }
 
 </script>
@@ -80,7 +75,7 @@ if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
         {#if sample.sample != null}
           <p>Sample:<small id='sample_uri'>{sample.sample.media_uri}</small></p>
         {/if}
-        <PrevNext projectId={params.project_id} />
+        <Skip projectId={params.project_id} />
       </Cell>
     {/await}
   {/if}

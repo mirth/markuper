@@ -4,6 +4,7 @@ import (
 	"backend/pkg/utils"
 	"context"
 	"encoding/json"
+	"math/rand"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -134,6 +135,12 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 		}
 
 		allSamples = append(allSamples, list...)
+	}
+
+	if project.ShuffleSamples {
+		rand.Shuffle(len(allSamples), func(i, j int) {
+			allSamples[i], allSamples[j] = allSamples[j], allSamples[i]
+		})
 	}
 
 	err = putSamples(s.db, project.ProjectID, allSamples)

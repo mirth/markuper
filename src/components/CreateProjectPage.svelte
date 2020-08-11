@@ -5,6 +5,7 @@ import Button from 'svelte-atoms/Button.svelte';
 import Row from 'svelte-atoms/Grids/Row.svelte';
 import Cell from 'svelte-atoms/Grids/Cell.svelte';
 import Typography from 'svelte-atoms/Typography.svelte';
+import Checkbox from 'svelte-atoms/Checkbox.svelte';
 import { dirty } from '../forms';
 import api from '../api';
 import { goToProject, enrichWithColor } from '../project';
@@ -23,6 +24,7 @@ let selectedTemplate = {
 
 let dataSources = [];
 let createProjectError;
+let shuffleSamples = false;
 
 $: projectNameError = (projectName.trim().length === 0) && 'Project name should not be empty';
 $: isProjectValid = !(
@@ -49,7 +51,7 @@ async function createNewProject() {
     },
     template: selectedTemplate.template,
     data_sources: dataSources,
-    shuffle_samples: false, // fixme
+    shuffle_samples: shuffleSamples,
   });
 
   if (res.status === 400) {
@@ -90,6 +92,8 @@ const [makeProjectNameDirty, isProjectNameDirty] = dirty(dirties, 'projectName')
 
       <Spacer size={16} />
       <TemplatePicker bind:selectedTemplate />
+      <Spacer size={24} />
+      <Checkbox bind:checked={shuffleSamples}>Shuffle samples</Checkbox>
       <Spacer size={24} />
       <DataSourcePicker bind:dataSources />
       <Spacer size={36} />

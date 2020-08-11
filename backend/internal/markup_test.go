@@ -44,17 +44,22 @@ func AssessWithMarkup(
 	t *testing.T,
 	s MarkupServiceImpl,
 	sID SampleID,
-	markup string,
+	markup []byte,
 ) {
+	expectedMarkup := markup
+	if markup == nil {
+		expectedMarkup = []byte("null")
+	}
+
 	mkp := &SampleMarkup{
 		CreatedAt: utils.TestNowUTC(),
-		Markup:    []byte(markup),
+		Markup:    expectedMarkup,
 	}
 	r := AssessRequest{
 		SampleID: sID,
 		SampleMarkup: SampleMarkup{
 			CreatedAt: utils.TestNowUTC(),
-			Markup:    json.RawMessage(markup),
+			Markup:    markup,
 		},
 	}
 
@@ -77,7 +82,8 @@ func TestMarkupAssess(t *testing.T) {
 			db: db,
 		}
 
-		AssessWithMarkup(t, svc, newSampleIDForTest("kek", 0), `{"kek":"kek"}`)
+		AssessWithMarkup(t, svc, newSampleIDForTest("kek", 0), []byte(`{"kek":"kek"}`))
+		AssessWithMarkup(t, svc, newSampleIDForTest("kek", 1), nil)
 	}
 }
 
@@ -107,7 +113,7 @@ func TestMarkupNext(t *testing.T) {
 		return sID
 	}
 
-	assessSample := func(sID SampleID) {
+	assessSample := func(sID SampleID, markup json.RawMessage) {
 		r := AssessRequest{SampleID: sID}
 		err := svc.Assess(r)
 		assert.Nil(t, err)
@@ -116,15 +122,15 @@ func TestMarkupNext(t *testing.T) {
 	{
 		{
 			sID := assertNext(0)
-			assessSample(sID)
+			assessSample(sID, []byte(`{"markup":"a"}`))
 		}
 		{
 			sID := assertNext(1)
-			assessSample(sID)
+			assessSample(sID, nil)
 		}
 		{
 			sID := assertNext(2)
-			assessSample(sID)
+			assessSample(sID, []byte(`{"markup":"b"}`))
 		}
 	}
 }
