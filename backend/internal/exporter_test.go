@@ -45,12 +45,18 @@ func TestExportCSV(t *testing.T) {
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 1),
-		[]byte(`{"kek":"mark1","aaa":"4","lel":[]}`),
+		nil,
 	)
 	AssessWithMarkup(
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 2),
+		[]byte(`{"kek":"mark1","aaa":"4","lel":[]}`),
+	)
+	AssessWithMarkup(
+		t,
+		m,
+		newSampleIDForTest(proj.ProjectID, 3),
 		[]byte(`{"kek":"mark2","aaa":"5","lel":["l3"]}`),
 	)
 
@@ -70,9 +76,10 @@ func TestExportCSV(t *testing.T) {
 		pID := proj.ProjectID
 		assert.Equal(t, fmt.Sprintf(`sample_id,sample_uri,assessed_at,kek,aaa,lel
 %s-0,sampleuri0,2015-03-07T11:06:39,mark0,3,"[""l1"",""l2""]"
-%s-1,sampleuri1,2015-03-07T11:06:39,mark1,4,[]
-%s-2,sampleuri2,2015-03-07T11:06:39,mark2,5,"[""l3""]"
-`, pID, pID, pID), string(r.CSV))
+%s-1,sampleuri1,2015-03-07T11:06:39,,,
+%s-2,sampleuri2,2015-03-07T11:06:39,mark1,4,[]
+%s-3,sampleuri3,2015-03-07T11:06:39,mark2,5,"[""l3""]"
+`, pID, pID, pID, pID), string(r.CSV))
 
 		assert.Equal(
 			t,
