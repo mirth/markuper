@@ -7,7 +7,7 @@ import path from 'path';
 import { expect } from 'chai';
 import {
   radioClick, assertRadioLabels, getSamplePath, getSampleClass, createProjectWithTemplate,
-  sleep, clickButton, getRadioState, makeSampleUri,
+  sleep, clickButton, getRadioState, assertSampleUri,
 } from './test_common';
 
 const appPath = path.join(__dirname, '../..');
@@ -15,17 +15,6 @@ const app = new Application({
   path: electronPath,
   args: [appPath],
 });
-
-
-const assertSampleUri = async (imgDir, sampleName) => {
-  const src = await app.client.element('img').getAttribute('src');
-  const expectedSampleUri = makeSampleUri(imgDir, sampleName);
-  expect(path.normalize(src)).to.be.eq(path.normalize('file://' + expectedSampleUri));
-
-  await app.client.waitForExist('//*[@id="sample_uri"]');
-  const actualSampleURI = await app.client.element('//*[@id="sample_uri"]').getText();
-  expect(actualSampleURI).to.be.eq(expectedSampleUri);
-};
 
 // pause
 describe('Application launch', function () {
@@ -67,7 +56,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
 
-      await assertSampleUri(imgDir, 'kek0.jpg');
+      await assertSampleUri(app, imgDir, 'kek0.jpg');
 
       await app.client.keys('3');
       await app.client.keys('Enter');
@@ -78,7 +67,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
 
-      await assertSampleUri(imgDir, 'kek1.jpg');
+      await assertSampleUri(app, imgDir, 'kek1.jpg');
 
       await radioClick(app, 'root/0', 2);
       await app.client.keys('Enter');
@@ -89,7 +78,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
 
-      await assertSampleUri(imgDir, 'kek2.jpg');
+      await assertSampleUri(app, imgDir, 'kek2.jpg');
 
       await app.client.keys('2');
       await app.client.keys('Enter');
@@ -100,7 +89,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
 
-      await assertSampleUri(imgDir, 'kek3.png');
+      await assertSampleUri(app, imgDir, 'kek3.png');
 
       await radioClick(app, 'root/0', 1);
       await app.client.keys('Enter');
@@ -111,7 +100,7 @@ describe('Application launch', function () {
       await app.client.waitForExist('img');
       await assertRadioLabels(app, 'root/0', ['Cat', 'Dog', 'Chuk', 'Gek']);
 
-      await assertSampleUri(imgDir, 'kek4.png');
+      await assertSampleUri(app, imgDir, 'kek4.png');
 
       await radioClick(app, 'root/0', 1);
       await app.client.keys('Enter');

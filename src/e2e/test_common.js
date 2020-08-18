@@ -238,6 +238,11 @@ export function expectSampleMarkupToBeEq(app, appPath, markup) {
     const cl = await getSampleClass(app, 'kek0.jpg').getText();
     expect(pathText).to.be.eq(path.join(imgDir, 'kek0.jpg') + ':');
 
+    if (markup === '[SKIPPED]') {
+      expect(cl).to.be.eq('[SKIPPED]');
+      return;
+    }
+
     const actual = JSON.parse(cl);
     const actualKeys = Object.keys(actual);
     const expectedKeys = Object.keys(markup);
@@ -261,3 +266,14 @@ export function expectSampleMarkupToBeEq(app, appPath, markup) {
 }
 
 export const makeSampleUri = (imgDir, filename) => path.normalize(`${path.join(imgDir, filename)}`);
+
+export const assertSampleUri = async (app, imgDir, sampleName) => {
+  await app.client.waitForExist('img');
+  const src = await app.client.element('img').getAttribute('src');
+  const expectedSampleUri = makeSampleUri(imgDir, sampleName);
+  expect(path.normalize(src)).to.be.eq(path.normalize('file://' + expectedSampleUri));
+
+  await app.client.waitForExist('//*[@id="sample_uri"]');
+  const actualSampleURI = await app.client.element('//*[@id="sample_uri"]').getText();
+  expect(actualSampleURI).to.be.eq(expectedSampleUri);
+};

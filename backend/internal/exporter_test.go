@@ -39,19 +39,25 @@ func TestExportCSV(t *testing.T) {
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 0),
-		`{"kek":"mark0","aaa":"3","lel":["l1","l2"]}`,
+		[]byte(`{"kek":"mark0","aaa":"3","lel":["l1","l2"]}`),
 	)
 	AssessWithMarkup(
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 1),
-		`{"kek":"mark1","aaa":"4","lel":[]}`,
+		nil,
 	)
 	AssessWithMarkup(
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 2),
-		`{"kek":"mark2","aaa":"5","lel":["l3"]}`,
+		[]byte(`{"kek":"mark1","aaa":"4","lel":[]}`),
+	)
+	AssessWithMarkup(
+		t,
+		m,
+		newSampleIDForTest(proj.ProjectID, 3),
+		[]byte(`{"kek":"mark2","aaa":"5","lel":["l3"]}`),
 	)
 
 	s := ExporterServiceImpl{
@@ -70,9 +76,10 @@ func TestExportCSV(t *testing.T) {
 		pID := proj.ProjectID
 		assert.Equal(t, fmt.Sprintf(`sample_id,sample_uri,assessed_at,kek,aaa,lel
 %s-0,sampleuri0,2015-03-07T11:06:39,mark0,3,"[""l1"",""l2""]"
-%s-1,sampleuri1,2015-03-07T11:06:39,mark1,4,[]
-%s-2,sampleuri2,2015-03-07T11:06:39,mark2,5,"[""l3""]"
-`, pID, pID, pID), string(r.CSV))
+%s-1,sampleuri1,2015-03-07T11:06:39,,,
+%s-2,sampleuri2,2015-03-07T11:06:39,mark1,4,[]
+%s-3,sampleuri3,2015-03-07T11:06:39,mark2,5,"[""l3""]"
+`, pID, pID, pID, pID), string(r.CSV))
 
 		assert.Equal(
 			t,
@@ -106,7 +113,7 @@ func TestExportCSVForBBox(t *testing.T) {
 		t,
 		m,
 		newSampleIDForTest(proj.ProjectID, 0),
-		`{"box":[{"box":{"x":0,"y":0,"width":2,"height":1},"animal":"cat"}]}`,
+		[]byte(`{"box":[{"box":{"x":0,"y":0,"width":2,"height":1},"animal":"cat"}]}`),
 	)
 
 	s := ExporterServiceImpl{

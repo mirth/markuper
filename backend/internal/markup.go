@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"math/rand"
-	"sort"
-	"strings"
+	"math"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -163,20 +161,32 @@ func getAllSamplesForProject(db *DB, projectID ProjectID) ([]json.RawMessage, er
 	return samples, nil
 }
 
-func getRandomSample(toAssess []SampleID) SampleID {
-	rand.Seed(time.Now().Unix())
-	rnds := rand.NewSource(time.Now().Unix())
-	r := rand.New(rnds)
-
-	return toAssess[r.Intn(len(toAssess))]
+type SampleWithOrder struct {
+	SampleID string
+	Index    uint
 }
 
-func getSampleInOrder(toAssess []SampleID) SampleID {
-	sort.SliceStable(toAssess, func(i, j int) bool {
-		return strings.Compare(toAssess[i], toAssess[j]) < 0
-	})
+func indexSamples(ids []string) map[SampleID]int {
+	m := map[SampleID]int{}
+	for i, s := range ids {
+		m[s] = i
+	}
 
-	return toAssess[0]
+	return m
+}
+
+func findSampleWithMinIndex(toAssess []string, allIDsIndex map[SampleID]int) SampleID {
+	minIndex := math.MaxInt32
+	var sampleID SampleID
+	for _, sID := range toAssess {
+		index, ok := allIDsIndex[sID]
+		if ok && index < minIndex {
+			minIndex = index
+			sampleID = sID
+		}
+	}
+
+	return sampleID
 }
 
 func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, error) {
@@ -184,13 +194,14 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 	if err != nil {
 		return SampleResponse{}, err
 	}
-
 	doneIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
-	tmp, err = getAllSampleIDsForProject(s.db, "samples", req.ProjectID)
 
+	tmp, err = getAllSampleIDsForProject(s.db, "samples", req.ProjectID)
 	if err != nil {
 		return SampleResponse{}, err
 	}
+
+	allIDsIndex := indexSamples(tmp)
 	allIDs := set.New(utils.ToSliceOfInterfaces(tmp)...)
 
 	toAssess := make([]SampleID, 0)
@@ -209,13 +220,7 @@ func (s *MarkupServiceImpl) GetNext(req WithProjectIDRequest) (SampleResponse, e
 		}, nil
 	}
 
-	sID := ""
-
-	if proj.ShuffleSamples {
-		sID = getRandomSample(toAssess)
-	} else {
-		sID = getSampleInOrder(toAssess)
-	}
+	sID := findSampleWithMinIndex(toAssess, allIDsIndex)
 
 	sample, err := s.db.GetSample(sID)
 
@@ -247,7 +252,7 @@ func ListMarkup(db *DB, projectID ProjectID) (MarkupList, error) {
 	samples := []MarkupListElement{}
 	err = db.DB.View(func(tx *bolt.Tx) error {
 		m := tx.Bucket(Markups)
-		s := tx.Bucket(Samples)
+		s := tx.Bucket([]byte(Samples))
 		for _, id := range ids {
 			binID := []byte(id)
 			smJson := m.Get(binID)

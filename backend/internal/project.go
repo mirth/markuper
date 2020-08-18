@@ -4,6 +4,7 @@ import (
 	"backend/pkg/utils"
 	"context"
 	"encoding/json"
+	"math/rand"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -70,11 +71,14 @@ type ProjectService interface {
 
 type ProjectServiceImpl struct {
 	db *DB
+
+	randSeed int64
 }
 
 func NewProjectService(db *DB) ProjectService {
 	return &ProjectServiceImpl{
-		db: db,
+		db:       db,
+		randSeed: time.Now().Unix(),
 	}
 }
 
@@ -134,6 +138,13 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 		}
 
 		allSamples = append(allSamples, list...)
+	}
+
+	if project.ShuffleSamples {
+		rand.Seed(s.randSeed)
+		rand.Shuffle(len(allSamples), func(i, j int) {
+			allSamples[i], allSamples[j] = allSamples[j], allSamples[i]
+		})
 	}
 
 	err = putSamples(s.db, project.ProjectID, allSamples)

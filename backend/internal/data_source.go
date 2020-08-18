@@ -65,6 +65,15 @@ func NewMediaGlobDataSource(sourceURI string) MediaGlobDataSource {
 	}
 }
 
+type TestNewMediaGlobDataSource struct {
+}
+
+func (s TestNewMediaGlobDataSource) FetchSampleList() ([]SampleData, error) {
+	samples := generateFiveSamples()
+
+	return samples, nil
+}
+
 func removeHiddenPaths(paths []string) []string {
 	filtered := make([]string, 0)
 
@@ -155,8 +164,9 @@ func GetSampleListFetcher(src DataSource) SampleListFetcher {
 		return NewMediaGlobDataSource(src.SourceURI)
 	case "fail_local_directory":
 		return NewFailMediaGlobDataSource(src.SourceURI)
+	case "test_local_directory":
+		return TestNewMediaGlobDataSource{}
 	}
-
 	return nil
 }
 

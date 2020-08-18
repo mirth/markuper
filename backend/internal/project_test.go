@@ -21,6 +21,8 @@ func newTestCreateProjectRequest(name string, template TemplateXML) CreateProjec
 		Description: ProjectDescription{
 			Name: name,
 		},
+
+		ShuffleSamples: false,
 	}
 }
 
