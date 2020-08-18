@@ -71,11 +71,14 @@ type ProjectService interface {
 
 type ProjectServiceImpl struct {
 	db *DB
+
+	randSeed int64
 }
 
 func NewProjectService(db *DB) ProjectService {
 	return &ProjectServiceImpl{
-		db: db,
+		db:       db,
+		randSeed: time.Now().Unix(),
 	}
 }
 
@@ -138,6 +141,7 @@ func (s *ProjectServiceImpl) CreateProject(req CreateProjectRequest) (Project, e
 	}
 
 	if project.ShuffleSamples {
+		rand.Seed(s.randSeed)
 		rand.Shuffle(len(allSamples), func(i, j int) {
 			allSamples[i], allSamples[j] = allSamples[j], allSamples[i]
 		})

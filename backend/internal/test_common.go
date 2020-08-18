@@ -54,3 +54,15 @@ func fillDirWithSamples(tmpDir, sampleExt string, nSamples int) []string {
 
 	return imgPaths
 }
+
+func generateFiveSamples() []SampleData {
+	samples := make([]SampleData, 0)
+	for i := 0; i < 5; i++ {
+		samples = append(samples, MediaSample{
+			MediaURI:  fmt.Sprintf("sampleuri%d", i),
+			MediaType: IMAGE_FILE_TYPE,
+		})
+	}
+
+	return samples
+}

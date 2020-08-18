@@ -22,14 +22,7 @@ func fillTestDBWithProj(db *DB, projName string, template TemplateXML) Project {
 	svc := NewProjectService(db)
 	p, _ := svc.CreateProject(newTestCreateProjectRequest(projName, template))
 
-	samples := make([]MediaSample, 0)
-	for i := 0; i < 5; i++ {
-		samples = append(samples, MediaSample{
-			MediaURI:  fmt.Sprintf("sampleuri%d", i),
-			MediaType: IMAGE_FILE_TYPE,
-		})
-	}
-
+	samples := generateFiveSamples()
 	for i, sample := range samples {
 		sk := newSampleIDForTest(p.ProjectID, i)
 
@@ -277,4 +270,57 @@ func TestOutOfSamples(t *testing.T) {
 	s := getNext()
 	assert.Nil(t, s.Sample)
 	assert.Equal(t, s.Project, proj0)
+}
+
+func TestShuffleSamples(t *testing.T) {
+	db := openTestDB()
+	defer testCloseAndReset(db)
+	projSvc := &ProjectServiceImpl{
+		db:       db,
+		randSeed: 42,
+	}
+	req := CreateProjectRequest{
+		Template: DEFAULT_CLASSIFICATION_TEMPLATE,
+		DataSources: []DataSource{{
+			Type:      "test_local_directory",
+			SourceURI: "/tmp/*.jpg",
+		}},
+		Description: ProjectDescription{
+			Name: "proj1",
+		},
+
+		ShuffleSamples: true,
+	}
+	proj, _ := projSvc.CreateProject(req)
+
+	markSvc := MarkupServiceImpl{
+		db: db,
+	}
+
+	getNext := func() SampleResponse {
+		s, err := markSvc.GetNext(WithProjectIDRequest{
+			ProjectID: proj.ProjectID,
+		})
+		assert.Nil(t, err)
+
+		return s
+	}
+	ass := func(sID SampleID) {
+		assessSample(t, &markSvc, sID)
+	}
+
+	nextAssessAssertOrder := func(actualMediaURI string) {
+		s := getNext()
+		var ms MediaSample
+		err := json.Unmarshal(s.Sample, &ms)
+		assert.Nil(t, err)
+		assert.Equal(t, ms.MediaURI, actualMediaURI)
+		ass(s.SampleID)
+	}
+
+	nextAssessAssertOrder("sampleuri2")
+	nextAssessAssertOrder("sampleuri3")
+	nextAssessAssertOrder("sampleuri4")
+	nextAssessAssertOrder("sampleuri0")
+	nextAssessAssertOrder("sampleuri1")
 }
