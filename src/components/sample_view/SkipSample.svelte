@@ -26,18 +26,20 @@ async function skipSampleAndFetchNext(stats) {
   $activeSample = fetchNextSampleAndResetState(projectId);
 }
 
-
 </script>
 
 {#await projStats then projStats}
   <Row>
-    <Button
-      on:click={() => skipSampleAndFetchNext(projStats)}
-      type='flat'
-      iconRight='chevron-right'
-      style='display: inline'
-      disabled={projStats.assessed_number_of_samples === projStats.total_number_of_samples}>
-      Skip
-    </Button>
+    <div id='skip_sample_button'>
+      <Button
+        on:click={() => skipSampleAndFetchNext(projStats)}
+        type='flat'
+        iconRight='chevron-right'
+        style='display: inline'
+        disabled={projStats.assessed_number_of_samples === projStats.total_number_of_samples}
+        >
+        Skip
+      </Button>
+    </div>
   </Row>
 {/await}

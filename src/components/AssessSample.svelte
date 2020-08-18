@@ -8,14 +8,14 @@ import PageBlank from './PageBlank.svelte';
 import ControlDevice from './controls/ControlDevice.svelte';
 import SampleView from './SampleView.svelte';
 import {
-  sampleMarkup, assessState, activeSample, fetchNextSampleAndResetState, fetchSampleByIdAndResetState,
+  sampleMarkup, activeSample, fetchNextSampleAndResetState,
+  fetchSampleByIdAndResetState,
 } from '../store';
 import { goToProject, getProjectIDFromSampleID } from '../project';
-import Skip from './sample_view/Skip.svelte';
+import SkipSample from './sample_view/SkipSample.svelte';
 import Progress from './sample_view/Progress.svelte';
 
 export let params = {};
-
 
 
 async function submitMarkupAndFetchNext() {
@@ -75,7 +75,7 @@ if (Object.prototype.hasOwnProperty.call(params, 'sample_id')) {
         {#if sample.sample != null}
           <p>Sample:<small id='sample_uri'>{sample.sample.media_uri}</small></p>
         {/if}
-        <Skip projectId={params.project_id} />
+        <SkipSample projectId={params.project_id} />
       </Cell>
     {/await}
   {/if}
