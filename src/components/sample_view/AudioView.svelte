@@ -4,7 +4,7 @@ export let sample;
 </script>
 
 
-<audio controls id='audio-source'>
+<audio autoplay controls id='audio-source'>
   <source src={sample.sample.media_uri}>
 </audio>
 
