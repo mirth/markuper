@@ -1,6 +1,6 @@
 {
   "name": "markuper",
-  "version": "0.1.0-alpha.13",
+  "version": "0.1.0-alpha.14",
   "description": "Data annotation tool",
   "main": "main.js",
   "license": "Proprietary",
@@ -78,7 +78,10 @@
     "is-valid-glob": "^1.0.0",
     "js-file-download": "^0.4.10",
     "lodash": "^4.17.15",
+    "node-localstorage": "^2.1.6",
     "svelte-atoms": "^0.0.17",
-    "svelte-spa-router": "^2.0.0"
+    "svelte-spa-router": "^2.0.0",
+    "universal-analytics": "^0.4.23",
+    "uuid": "^8.3.0"
   }
 }

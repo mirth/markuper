@@ -1,7 +1,22 @@
 const { app, BrowserWindow } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
+const ua = require('universal-analytics');
+const { v4: uuid } = require('uuid');
+const { JSONStorage } = require('node-localstorage');
 const runBackend = require('./run_backend');
+
+
+function setupAnalytics() {
+  const nodeStorage = new JSONStorage(app.getPath('userData'));
+  const userId = nodeStorage.getItem('userid') || uuid();
+  nodeStorage.setItem('userid', userId);
+
+  const visitor = ua('UA-73579103-13', userId);
+  visitor.event('application', 'app_start').send();
+}
+
+setupAnalytics();
 
 autoUpdater.setFeedURL({
   provider: 's3',
